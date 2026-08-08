@@ -363,7 +363,7 @@
                     });
                 }
             } catch (error) {
-                // Silenciar errores de red menores
+                // Silenciar errores menores
             }
         }
 
@@ -388,12 +388,12 @@
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
                 
-                osc.type = 'sine'; // Tono suave
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Frecuencia inicial
-                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3); // Caída rápida
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
                 
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); // Volumen inicial
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); // Fade out
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -401,43 +401,65 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.3);
             } catch (e) {
-                console.log("El navegador bloqueó el audio nativo porque el usuario no ha interactuado con la página aún.");
+                console.log("Audio bloqueado temporalmente por políticas del navegador.");
             }
         }
 
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
-            setInterval(verificarEventosHttp, 2000); // Respaldo cada 2s
+            setInterval(verificarEventosHttp, 2000); 
         };
 
         function pedirPermisoNotificaciones() { 
-            if (window.Notification) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        alert("¡Avisos de escritorio activados! (El sonido nativo también está habilitado ahora).");
-                        // Al hacer clic, también reproducimos el sonido una vez silencioso o normal para que el navegador desbloquee el AudioContext
-                        reproducirSonidoAlerta();
-                    }
-                });
+            if (!window.Notification) {
+                alert("Este navegador no soporta notificaciones de escritorio.");
+                return;
             }
+            
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("¡Notificaciones de escritorio estilo WhatsApp activadas!");
+                    reproducirSonidoAlerta();
+                    new Notification("Don Nicolás", {
+                        body: "Las alertas en la esquina de tu pantalla están listas.",
+                        icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png"
+                    });
+                } else {
+                    alert("Has denegado los permisos de notificación.");
+                }
+            });
         }
 
         function procesarYMostrarEvento(data) {
             let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
             
-            // Evitar duplicados si el WebSocket y el HTTP detectan la orden simultáneamente
             if (idsEventosProcesados.has(idUnico)) return;
             idsEventosProcesados.add(idUnico);
 
-            // 1. Aumentar conteo
+            // 1. Contador y sonido
             contadorNotificaciones++;
             actualizarContadorVisual();
-
-            // 2. Reproducir sonido flash instantáneo
             reproducirSonidoAlerta();
 
-            // 3. Pintar en pantalla
+            // 2. Notificación flotante en la esquina estilo WhatsApp
+            if (window.Notification && Notification.permission === "granted") {
+                let tituloNoti = data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`;
+                let cuerpoNoti = data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`;
+                
+                let notificacionFlotante = new Notification(tituloNoti, {
+                    body: cuerpoNoti,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png",
+                    tag: 'don-nicolas-alerta'
+                });
+
+                notificacionFlotante.onclick = function() {
+                    window.focus();
+                    notificacionFlotante.close();
+                };
+            }
+
+            // 3. Pintar tarjeta en el monitor interno
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
             if (mensajeVacio) mensajeVacio.remove();
@@ -488,7 +510,6 @@
                 contadorNotificaciones--;
                 actualizarContadorVisual();
             }
-            // Mostrar mensaje si ya no hay nada
             const contenedor = document.getElementById('contenedor-alertas');
             if (contenedor.children.length === 0) {
                 contenedor.innerHTML = `<div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">⏳ Esperando órdenes o llamadas de las mesas...</div>`;
