@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # ⚠️ CREDENCIALES DE SUPABASE
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRhdGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -28,6 +28,9 @@ HEADERS = {
 }
 
 TURNO_ACTUAL_SISTEMA = "Mañana"
+
+# 🧠 COLA DE EVENTOS PENDIENTES PARA EL RESPALDO HÍBRIDO (WEBHOOK/HTTP)
+EVENTOS_PENDIENTES = []
 
 # --- MENÚ COMPLETO Y EXACTO (CON APARTADO DE MÉTODOS) ---
 MENU_INICIAL_COMPLETO = [
@@ -144,6 +147,8 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.discard(websocket)
     async def broadcast(self, message: dict):
+        # Guardar en la cola para respaldo HTTP
+        EVENTOS_PENDIENTES.append(message)
         if self.active_connections:
             for connection in self.active_connections:
                 try: await connection.send_json(message)
@@ -269,7 +274,10 @@ async def alerta_mesero(alerta: AlertaRequest):
 
 @app.get("/api/obtener-eventos")
 async def obtener_eventos():
-    return []
+    global EVENTOS_PENDIENTES
+    eventos_a_enviar = EVENTOS_PENDIENTES.copy()
+    EVENTOS_PENDIENTES.clear()
+    return eventos_a_enviar
 
 @app.post("/admin/agregar")
 async def agregar_producto(
