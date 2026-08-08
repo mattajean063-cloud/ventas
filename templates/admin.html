@@ -189,7 +189,6 @@
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <!-- NUEVO: Checkbox para desactivar personalización de Leche/Azúcar -->
                                         <input class="form-check-input" type="checkbox" name="admite_extras_cafe" value="true" id="checkExtras" checked>
                                         <label class="form-check-label small" for="checkExtras" style="color: var(--text-main);">
                                             🥛 Permitir opciones de Leche y Endulzante
@@ -303,6 +302,7 @@
             let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
             qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
         }
+        
         function descargarQR() {
             const imgElement = document.querySelector('#qr-box img');
             if (!imgElement) return;
@@ -312,6 +312,7 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
+        // --- SISTEMA DE WEBSOCKET LIMPIO (SIN DUPLICADOS) ---
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
@@ -326,24 +327,9 @@
             };
         }
 
-        async function verificarEventosHttp() {
-            try {
-                let response = await fetch('/api/obtener-eventos');
-                let eventos = await response.json();
-                if (eventos && eventos.length > 0) {
-                    eventos.forEach(evento => {
-                        procesarYMostrarEvento(evento);
-                    });
-                }
-            } catch (error) {
-                console.error("Error consultando eventos por HTTP:", error);
-            }
-        }
-
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
-            setInterval(verificarEventosHttp, 3000); 
         };
 
         function pedirPermisoNotificaciones() { 
