@@ -7,9 +7,14 @@ from pydantic import BaseModel
 from typing import List, Set, Optional
 import shutil
 
+# Importaciones para SQLAlchemy y conexión a Supabase Postgres
+from sqlalchemy import create_engine, Column, Integer, String, Numeric
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 app = FastAPI()
 
-# --- RUTAS DINÁMICAS ---
+# --- CONFIGURACIÓN DE RUTAS ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -20,13 +25,25 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- BASE DE DATOS (En memoria) ---
-menu_data = [
-    {"id": 1, "nombre": "Café Americano Antigüeño", "precio": 15.00, "categoria": "Bebidas", "descripcion": "Café de altura con notas volcánicas.", "imagen": "americano.jpg"},
-    {"id": 2, "nombre": "Desayuno Típico Don Nicolás", "precio": 35.00, "categoria": "Comida", "descripcion": "Frijoles, huevos, plátanos y queso.", "imagen": "desayuno.jpg"}
-]
+# --- CONFIGURACIÓN DE BASE DE DATOS (SUPABASE) ---
+# Usamos tu URL de conexión de Supabase (ajustando postgresql:// a postgresql+psycopg2:// para mejor compatibilidad)
+DATABASE_URL = "postgresql+psycopg2://postgres:matamata675411302603@db.picteudhhdsytfvpvoja.supabase.co:5432/postgres"
 
-# --- HISTORIAL TEMPORAL PARA GARANTIZAR ENTREGA (POLLING) ---
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Definición del modelo de la tabla productos que ya creaste en Supabase
+class ProductoModel(Base):
+    __tablename__ = "productos"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre = Column(String, nullable=False)
+    precio = Column(Numeric(10, 2), nullable=False)
+    categoria = Column(String, nullable=False)
+    descripcion = Column(String)
+    imagen = Column(String)
+
+# --- HISTORIAL TEMPORAL PARA POLLING (NOTIFICACIONES) ---
 historial_notificaciones = []
 
 # --- LÓGICA DE WEBSOCKETS ---
@@ -51,7 +68,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# --- MODELOS ---
+# --- MODELOS PYDANTIC ---
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
@@ -69,18 +86,51 @@ class AlertaRequest(BaseModel):
 # --- RUTAS WEB ---
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
+    db = SessionLocal()
+    try:
+        productos_db = db.query(ProductoModel).all()
+        # Convertir a formato de diccionario para el template
+        menu_lista = [
+            {
+                "id": p.id,
+                "nombre": p.nombre,
+                "precio": float(p.precio),
+                "categoria": p.categoria,
+                "descripcion": p.descripcion,
+                "imagen": p.imagen
+            } for p in productos_db
+        ]
+    finally:
+        db.close()
+
     categorias = {
-        "Bebidas": [p for p in menu_data if p["categoria"] == "Bebidas"],
-        "Comida": [p for p in menu_data if p["categoria"] == "Comida"],
-        "Postres": [p for p in menu_data if p["categoria"] == "Postres"]
+        "Bebidas": [p for p in menu_lista if p["categoria"] == "Bebidas"],
+        "Comida": [p for p in menu_lista if p["categoria"] == "Comida"],
+        "Postres": [p for p in menu_lista if p["categoria"] == "Postres"]
     }
     return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
-    return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_data})
+    db = SessionLocal()
+    try:
+        productos_db = db.query(ProductoModel).all()
+        menu_lista = [
+            {
+                "id": p.id,
+                "nombre": p.nombre,
+                "precio": float(p.precio),
+                "categoria": p.categoria,
+                "descripcion": p.descripcion,
+                "imagen": p.imagen
+            } for p in productos_db
+        ]
+    finally:
+        db.close()
 
-# --- APIS Y WEBSOCKETS ---
+    return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista})
+
+# --- APIS Y POLLING DE ALERTAS ---
 @app.websocket("/ws/admin")
 async def websocket_admin(websocket: WebSocket):
     await manager.connect(websocket)
@@ -122,19 +172,40 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN ---
+# --- ADMIN (GESTIÓN EN SUPABASE) ---
 @app.post("/admin/agregar")
 async def agregar_producto(nombre: str = Form(...), precio: float = Form(...), categoria: str = Form(...), descripcion: str = Form(default=""), imagen_file: UploadFile = File(...)):
     file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
-    with open(file_path, "wb") as buffer: shutil.copyfileobj(imagen_file.file, buffer)
-    nuevo_id = max([p["id"] for p in menu_data], default=0) + 1
-    menu_data.append({"id": nuevo_id, "nombre": nombre, "precio": precio, "categoria": categoria, "descripcion": descripcion, "imagen": imagen_file.filename})
+    with open(file_path, "wb") as buffer: 
+        shutil.copyfileobj(imagen_file.file, buffer)
+    
+    db = SessionLocal()
+    try:
+        nuevo_producto = ProductoModel(
+            nombre=nombre,
+            precio=precio,
+            categoria=categoria,
+            descripcion=descripcion,
+            imagen=imagen_file.filename
+        )
+        db.add(nuevo_producto)
+        db.commit()
+    finally:
+        db.close()
+
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/eliminar/{producto_id}")
 async def eliminar_producto(producto_id: int):
-    global menu_data
-    menu_data = [p for p in menu_data if p["id"] != producto_id]
+    db = SessionLocal()
+    try:
+        producto = db.query(ProductoModel).filter(ProductoModel.id == producto_id).first()
+        if producto:
+            db.delete(producto)
+            db.commit()
+    finally:
+        db.close()
+
     return RedirectResponse(url="/admin", status_code=303)
 
 if __name__ == "__main__":
