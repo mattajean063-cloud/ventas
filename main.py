@@ -63,14 +63,17 @@ async def menu_cliente(request: Request, mesa: int = 1):
     except Exception as e:
         print("Error obteniendo productos para el menú:", e)
     
-    # Aseguramos que productos sea una lista limpia
     if not isinstance(productos, list):
         productos = []
+
+    # Definimos la lista de categorías que requiere index.html en la línea 211
+    categorias = ["Bebidas Frías", "Bebidas Calientes", "Comida", "Postres", "Métodos", "Cócteles y Café Filtrado", "Extras"]
 
     template = env.get_template("index.html")
     html_content = template.render(
         request=request,
         productos=productos,
+        categorias=categorias,
         turno_actual=turno_global,
         mesa=mesa
     )
