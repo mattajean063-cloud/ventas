@@ -119,7 +119,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Estilo para los Modales / Pantallas superpuestas */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -172,7 +171,7 @@
             <div class="fs-1 mb-2">🎉</div>
             <h3 class="text-warning fw-bold mb-3">¡Muchas gracias por su pedido!</h3>
             <p class="text-light mb-4" style="color: var(--text-muted) !important;">
-                Su orden ha sido recibida con éxito en cocina y será atendida de inmediato en su mesa.
+                Su orden ha sido recibida con éxito en cocina y será atendida de inmediato en su mesa. ¡Buen provecho!
             </p>
             <button class="btn btn-amber w-100 py-2 shadow-sm" onclick="cerrarMensajeAgradecimiento()">
                 Continuar viendo el menú
@@ -199,54 +198,45 @@
             <button class="btn btn-outline-warning btn-sm w-50 py-1" onclick="enviarAlerta('cuenta')">🧾 Pedir Cuenta</button>
         </div>
 
+        <!-- Botones de Filtro Superiores Simplificados -->
         <div class="container d-flex justify-content-center gap-2 flex-wrap" style="max-width: 600px;">
             <button class="btn-categoria active" onclick="filtrarCategoria('todos', this)">🌟 Todos</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Bebidas Frías', this)">🥤 Frías</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Bebidas Calientes', this)">☕ Calientes</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Bebidas', this)">🥤 Bebidas</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Comida', this)">🍳 Comida</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Postres', this)">🍰 Postres</button>
         </div>
     </div>
 
     <div class="container" style="max-width: 600px;">
-        <!-- BEBIDAS FRÍAS -->
-        {% if categorias['Bebidas Frías'] %}
-        <div class="grupo-categoria" data-categoria="Bebidas Frías">
-            <h5 class="category-title">🥤 Bebidas Frías</h5>
+        <!-- BEBIDAS FRÍAS Y CALIENTES (Agrupadas en el filtro general 'Bebidas') -->
+        {% if categorias['Bebidas Frías'] or categorias['Bebidas Calientes'] %}
+        <div class="grupo-categoria" data-categoria="Bebidas">
+            <h5 class="category-title">☕ Bebidas (Frías y Calientes)</h5>
             <div class="d-flex flex-column gap-3">
                 {% for p in categorias['Bebidas Frías'] %}
                 <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm">
                     <div class="d-flex align-items-center gap-3">
                         <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
                         <div>
-                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }}</h6>
+                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }} <span class="badge bg-dark text-info" style="font-size: 0.65rem;">Fría</span></h6>
                             <p class="text-muted small mb-2" style="color: var(--text-muted) !important; font-size: 0.82rem; line-height: 1.2;">{{ p.descripcion }}</p>
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida')">➕</button>
                 </div>
                 {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- BEBIDAS CALIENTES -->
-        {% if categorias['Bebidas Calientes'] %}
-        <div class="grupo-categoria" data-categoria="Bebidas Calientes">
-            <h5 class="category-title">☕ Bebidas Calientes</h5>
-            <div class="d-flex flex-column gap-3">
                 {% for p in categorias['Bebidas Calientes'] %}
                 <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm">
                     <div class="d-flex align-items-center gap-3">
                         <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
                         <div>
-                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }}</h6>
+                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }} <span class="badge bg-dark text-danger" style="font-size: 0.65rem;">Caliente</span></h6>
                             <p class="text-muted small mb-2" style="color: var(--text-muted) !important; font-size: 0.82rem; line-height: 1.2;">{{ p.descripcion }}</p>
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida')">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -268,7 +258,7 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Comida')">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -290,7 +280,7 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Postre')">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -334,7 +324,7 @@
         document.getElementById('label-mesa').innerText = numeroMesa;
 
         let carrito = [];
-        let tipoCuentaSeleccionada = 'juntas'; // 'juntas' o 'separadas'
+        let tipoCuentaSeleccionada = 'juntas';
 
         function seleccionarTipoCuenta(tipo) {
             tipoCuentaSeleccionada = tipo;
@@ -355,21 +345,50 @@
             });
         }
 
-        function agregarAlCarrito(id, nombre, precio) {
+        function agregarAlCarrito(id, nombre, precio, tipoItem) {
             let cliente = "General";
 
-            // Si eligieron cuentas separadas, mostramos un mensaje en pantalla amigable pidiendo el nombre
+            // Si eligieron cuentas separadas, pedimos amablemente el nombre
             if (tipoCuentaSeleccionada === 'separadas') {
                 let nombreIngresado = prompt("Por favor, ¿podría indicarnos amablemente su nombre para asociar este platillo a su cuenta personal?");
-                if (nombreIngresado === null) return; // Si cancela, no agrega
+                if (nombreIngresado === null) return;
                 cliente = nombreIngresado.trim() === "" ? "Invitado" : nombreIngresado.trim();
             }
 
-            let itemExistente = carrito.find(item => item.id === id && item.cliente === cliente);
+            let tipoLeche = "";
+            let tipoEndulzante = "";
+
+            // Si el producto seleccionado es una bebida, preguntamos por la leche y el endulzante
+            if (tipoItem === 'Bebida') {
+                tipoLeche = prompt("¿Qué tipo de leche prefiere? (Ej. Entera, Deslactosada, Almendras, Soya o Ninguna):", "Entera");
+                if (tipoLeche === null) return;
+
+                tipoEndulzante = prompt("¿Qué tipo de endulzante prefiere? (Ej. Azúcar, Splenda, Morena, Miel o Ninguno):", "Azúcar");
+                if (tipoEndulzante === null) return;
+            }
+
+            // Nota u observación general del producto
+            let nota = prompt("¿Desea agregar alguna nota u observación especial para este producto? (Opcional):", "");
+            if (nota === null) return;
+
+            // Agrupamos características para mostrar en el carrito
+            let itemKey = `${id}-${cliente}-${tipoLeche}-${tipoEndulzante}-${nota}`;
+            let itemExistente = carrito.find(item => item.key === itemKey);
+
             if (itemExistente) {
                 itemExistente.cantidad += 1;
             } else {
-                carrito.push({ id, nombre, precio, cantidad: 1, cliente });
+                carrito.push({
+                    key: itemKey,
+                    id,
+                    nombre,
+                    precio,
+                    cantidad: 1,
+                    cliente,
+                    tipoLeche,
+                    tipoEndulzante,
+                    nota: nota.trim()
+                });
             }
             actualizarCarritoUI();
         }
@@ -391,15 +410,28 @@
             carrito.forEach((item, index) => {
                 let subtotal = item.precio * item.cantidad;
                 total += subtotal;
+
                 let badgeCliente = tipoCuentaSeleccionada === 'separadas' ? `<span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>` : '';
+                let detallesExtras = '';
+                if (item.tipoLeche) {
+                    detallesExtras += `<br><small class="text-warning">🥛 Leche: ${item.tipoLeche}</small>`;
+                }
+                if (item.tipoEndulzante) {
+                    detallesExtras += `<br><small class="text-warning">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
+                }
+                if (item.nota) {
+                    detallesExtras += `<br><small class="text-info">📝 Nota: ${item.nota}</small>`;
+                }
+
                 lista.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary py-2 text-light">
+                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary py-2 text-light">
                         <div>
                             ${badgeCliente}
                             <div class="fw-bold">${item.cantidad}x ${item.nombre}</div>
-                            <small class="text-muted">Q ${subtotal.toFixed(2)}</small>
+                            ${detallesExtras}
+                            <div class="text-muted small">Q ${subtotal.toFixed(2)}</div>
                         </div>
-                        <button class="btn btn-outline-danger btn-sm py-0 px-2" onclick="removerDelCarrito(${index})">❌</button>
+                        <button class="btn btn-outline-danger btn-sm py-0 px-2 mt-1" onclick="removerDelCarrito(${index})">❌</button>
                     </div>
                 `;
             });
@@ -434,14 +466,11 @@
                 });
 
                 if (respuesta.ok) {
-                    // Limpiar carrito y ocultar panel
                     carrito = [];
                     actualizarCarritoUI();
                     document.getElementById('contenedor-resumen-pedido').style.display = 'none';
                     document.getElementById('checkRevisado').checked = false;
                     toggleBotonEnviar();
-
-                    // Mostrar modal de agradecimiento con el estilo de la página
                     document.getElementById('modal-agradecimiento').style.display = 'flex';
                 } else {
                     alert("Hubo un error al enviar el pedido.");
