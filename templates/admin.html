@@ -192,7 +192,6 @@
 
         window.onload = function() {
             generarQR();
-            // Monitorear eventos cada 3 segundos sin fallos
             setInterval(verificarNuevosEventos, 3000);
         };
 
@@ -210,7 +209,6 @@
             });
         }
 
-        // --- SISTEMA DE MONITOREO AUTOMÁTICO (POLLING) ---
         async function verificarNuevosEventos() {
             try {
                 let respuesta = await fetch('/api/obtener-eventos');
