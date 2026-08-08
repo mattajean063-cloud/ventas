@@ -1,6 +1,5 @@
 import os
 import base64
-from datetime import datetime
 from fastapi import FastAPI, Request, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -31,6 +30,9 @@ HEADERS = {
 
 # --- HISTORIAL TEMPORAL PARA POLLING (NOTIFICACIONES) ---
 historial_notificaciones = []
+
+# --- ESTADO GLOBAL DEL TURNO (Mañana / Tarde) ---
+TURNO_ACTUAL_SISTEMA = "Mañana"
 
 # --- LÓGICA DE WEBSOCKETS ---
 class ConnectionManager:
@@ -72,6 +74,7 @@ class AlertaRequest(BaseModel):
 # --- RUTAS WEB ---
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
+    global TURNO_ACTUAL_SISTEMA
     menu_lista = []
     try:
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
@@ -80,15 +83,17 @@ async def ver_menu(request: Request, mesa: int = 1):
     except Exception as e:
         print("ERROR AL CONSULTAR SUPABASE API (INDEX):", e)
 
-    # Determinar horario actual en base a la hora del servidor (Mañana: 00:00 - 12:00, Tarde: 12:00 - 23:59)
-    hora_actual = datetime.now().hour
-    turno_actual = "Mañana" if hora_actual < 12 else "Tarde"
-
-    # Filtrar productos para que solo muestren los del turno correspondiente (o los que apliquen a "Ambos")
+    # Filtrar productos aplicando la regla de turnos solo a la categoría de Comida
     productos_filtrados = []
     for p in menu_lista:
+        categoria = p.get("categoria")
         horario = p.get("horario", "Ambos")
-        if horario == "Ambos" or horario == turno_actual:
+        
+        if categoria == "Comida":
+            if horario == "Ambos" or horario == TURNO_ACTUAL_SISTEMA:
+                productos_filtrados.append(p)
+        else:
+            # Las bebidas y postres se muestran siempre
             productos_filtrados.append(p)
 
     categorias = {
@@ -98,10 +103,11 @@ async def ver_menu(request: Request, mesa: int = 1):
         "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"]
     }
     
-    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias, "turno": turno_actual})
+    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias, "turno": TURNO_ACTUAL_SISTEMA})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
+    global TURNO_ACTUAL_SISTEMA
     menu_lista = []
     try:
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
@@ -110,7 +116,15 @@ async def ver_admin(request: Request):
     except Exception as e:
         print("ERROR AL CONSULTAR SUPABASE API (ADMIN):", e)
 
-    return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista})
+    return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista, "turno_actual": TURNO_ACTUAL_SISTEMA})
+
+# --- CAMBIAR TURNO MANUALMENTE DESDE EL ADMIN ---
+@app.post("/admin/cambiar-turno")
+async def cambiar_turno(turno: str = Form(...)):
+    global TURNO_ACTUAL_SISTEMA
+    if turno in ["Mañana", "Tarde"]:
+        TURNO_ACTUAL_SISTEMA = turno
+    return RedirectResponse(url="/admin", status_code=303)
 
 # --- APIS Y POLLING DE ALERTAS ---
 @app.websocket("/ws/admin")
@@ -154,7 +168,7 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN DE PRODUCTOS, PRECIOS Y HORARIOS) ---
+# --- ADMIN (GESTIÓN DE PRODUCTOS, PRECIOS Y HORARIOS DE COMIDA) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -175,7 +189,7 @@ async def agregar_producto(
             "precio": float(precio),
             "categoria": categoria,
             "descripcion": descripcion,
-            "horario": horario,
+            "horario": horario if categoria == "Comida" else "Ambos",
             "imagen": imagen_base64
         }
         
@@ -190,9 +204,7 @@ async def agregar_producto(
 @app.post("/admin/actualizar-precio/{producto_id}")
 async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
     try:
-        payload = {
-            "precio": float(nuevo_precio)
-        }
+        payload = {"precio": float(nuevo_precio)}
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e:
@@ -203,9 +215,7 @@ async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
 @app.post("/admin/actualizar-horario/{producto_id}")
 async def actualizar_horario(producto_id: int, horario: str = Form(...)):
     try:
-        payload = {
-            "horario": horario
-        }
+        payload = {"horario": horario}
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e:
