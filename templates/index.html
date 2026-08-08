@@ -3,187 +3,543 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Don Nicolás - Menú</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Café Don Nicolás - Menú Digital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #1a1412; color: #f3f0eb; }
-        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        :root {
+            --bg-dark: #1e140f;
+            --bg-card: #2d1f18;
+            --accent-gold: #d97706;
+            --accent-gold-hover: #b45309;
+            --text-light: #f4ecd8;
+            --text-muted: #d1c7bd;
+            --border-color: #5c3f2d;
+        }
+        body { background-color: var(--bg-dark); color: var(--text-light); font-family: 'Georgia', serif; padding-bottom: 180px; }
+        .sticky-container { position: sticky; top: 0; z-index: 1000; background: rgba(30, 20, 15, 0.95); backdrop-filter: blur(10px); padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .product-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; transition: all 0.2s ease-in-out; }
+        .product-card:hover { transform: translateY(-2px); border-color: var(--accent-gold); }
+        .product-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); }
+        .btn-amber { background-color: var(--accent-gold); color: white; font-weight: bold; border-radius: 10px; transition: background-color 0.2s; }
+        .btn-amber:hover:not(:disabled) { background-color: var(--accent-gold-hover); color: white; }
+        .btn-amber:disabled { background-color: #5c3f2d; color: #a39585; border-color: #5c3f2d; cursor: not-allowed; }
+        .badge-mesa { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: white; font-weight: bold; }
+        .category-title { color: var(--accent-gold); border-bottom: 2px solid var(--border-color); padding-bottom: 6px; margin-top: 2rem; margin-bottom: 1rem; font-weight: bold; }
+        .btn-categoria { background-color: var(--bg-card); color: var(--text-light); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; transition: all 0.2s; }
+        .btn-categoria.active, .btn-categoria:hover { background-color: var(--accent-gold); color: white; border-color: var(--accent-gold); }
+        .order-panel { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: rgba(45, 31, 24, 0.98); border: 2px solid var(--accent-gold); border-radius: 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.7); z-index: 1050; backdrop-filter: blur(10px); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 10, 7, 0.9); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-colonial { background-color: var(--bg-card); border: 2px solid var(--accent-gold); border-radius: 16px; max-width: 450px; width: 100%; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        .opcion-btn { background-color: #2b1d14; border: 1px solid var(--border-color); color: var(--text-light); border-radius: 10px; padding: 8px; font-weight: bold; font-size: 0.85rem; transition: all 0.2s; text-align: center; cursor: pointer; }
+        .opcion-btn:hover, .opcion-btn.selected { background-color: var(--accent-gold); color: white; border-color: var(--accent-gold); }
     </style>
 </head>
-<body class="bg-[#1a1412] text-[#f3f0eb] min-h-screen pb-24">
+<body>
 
-    <!-- Header / Logo -->
-    <header class="bg-[#261e1b] border-b border-[#3d312c] py-6 px-4 text-center sticky top-0 z-40 shadow-md">
-        <h1 class="text-3xl font-bold text-[#d4af37] tracking-wide">Don Nicolás</h1>
-        <p class="text-xs text-amber-200/70 uppercase tracking-widest mt-1">Mesa # <span id="span-mesa">{{ mesa }}</span> • {{ nombre_menu }}</p>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-4 py-6 space-y-8">
-        
-        <!-- Recorrido de Categorías -->
-        {% for cat_nombre, items in categorias.items() %}
-            {% if items %}
-            <section class="space-y-4">
-                <div class="border-b border-[#3d312c] pb-2">
-                    <h2 class="text-2xl font-semibold text-[#d4af37]">{{ cat_nombre }}</h2>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for p in items %}
-                    <div class="bg-[#261e1b] border border-[#3d312c] rounded-xl p-4 flex gap-4 items-center shadow-lg hover:border-[#d4af37]/50 transition">
-                        <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="w-20 h-20 object-cover rounded-lg border border-[#3d312c]">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-lg text-amber-100 truncate">{{ p.nombre }}</h3>
-                            <p class="text-xs text-amber-200/60 line-clamp-2 mt-0.5">{{ p.descripcion }}</p>
-                            <p class="text-[#d4af37] font-semibold mt-2">Q {{ "%.2f"|format(p.precio) }}</p>
-                        </div>
-                        <button onclick='agregarAlCarro({{ p | tojson | safe }})' class="bg-[#d4af37] text-[#1a1412] p-3 rounded-xl font-bold hover:bg-amber-400 transition shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        </button>
-                    </div>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-        {% endfor %}
-
-    </main>
-
-    <!-- Botones Flotantes / Acciones -->
-    <div class="fixed bottom-4 left-4 right-4 max-w-4xl mx-auto flex gap-3 z-40">
-        <button onclick="llamarMesero('mesero')" class="flex-1 bg-[#3d312c] text-amber-100 py-3 rounded-xl font-medium border border-amber-500/20 shadow-lg text-sm flex items-center justify-center gap-2">
-            🛎️ Llamar Mesero
-        </button>
-        <button onclick="llamarMesero('cuenta')" class="flex-1 bg-[#3d312c] text-amber-100 py-3 rounded-xl font-medium border border-amber-500/20 shadow-lg text-sm flex items-center justify-center gap-2">
-            🧾 Pedir Cuenta
-        </button>
-        <button onclick="abrirCarrito()" class="flex-2 bg-[#d4af37] text-[#1a1412] px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2">
-            🛒 Ver Pedido (<span id="cart-count">0</span>)
-        </button>
-    </div>
-
-    <!-- Modal del Carrito -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-[#261e1b] w-full max-w-lg rounded-t-2xl sm:rounded-2xl border border-[#3d312c] p-6 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center border-b border-[#3d312c] pb-4">
-                <h2 class="text-xl font-bold text-[#d4af37]">Tu Pedido (Mesa <span id="modal-mesa">{{ mesa }}</span>)</h2>
-                <button onclick="cerrarCarrito()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
-            </div>
-            
-            <div id="cart-items" class="flex-1 overflow-y-auto py-4 space-y-4 divide-y divide-[#3d312c]">
-                <!-- Items dinámicos -->
-            </div>
-
-            <div class="border-t border-[#3d312c] pt-4 mt-auto">
-                <div class="flex justify-between items-center text-lg font-bold mb-4">
-                    <span>Total:</span>
-                    <span id="cart-total" class="text-[#d4af37]">Q 0.00</span>
-                </div>
-                <button onclick="enviarPedido()" class="w-full bg-[#d4af37] text-[#1a1412] py-3 rounded-xl font-bold hover:bg-amber-400 transition shadow">
-                    Confirmar y Enviar Pedido
-                </button>
+    <!-- MODAL DE BIENVENIDA -->
+    <div id="modal-bienvenida" class="modal-overlay">
+        <div class="modal-colonial shadow-lg text-center">
+            <h3 class="text-warning fw-bold mb-3">☕ ¡Bienvenidos a Don Nicolás!</h3>
+            <p class="text-light mb-4" style="line-height: 1.5; color: var(--text-muted) !important;">
+                Nos alegra mucho atenderle en la <strong>Mesa #{{ mesa }}</strong>. Por favor, indíquenos cómo desean gestionar su cuenta el día de hoy:
+            </p>
+            <div class="d-grid gap-3">
+                <button class="btn btn-amber py-2 fs-6 shadow-sm" onclick="seleccionarTipoCuenta('juntas')">👥 Cuentas Juntas</button>
+                <button class="btn btn-outline-warning py-2 fs-6 shadow-sm" onclick="seleccionarTipoCuenta('separadas')">👤 Cuentas Separadas</button>
             </div>
         </div>
     </div>
 
-    <script>
-        let carrito = [];
-        const mesa = {{ mesa }};
+    <!-- MODAL NOMBRE CLIENTE -->
+    <div id="modal-nombre-cliente" class="modal-overlay" style="display: none;">
+        <div class="modal-colonial shadow-lg text-center">
+            <div class="fs-1 mb-2">👤</div>
+            <h4 class="text-warning fw-bold mb-2">Cuenta Personal</h4>
+            <p class="text-light small mb-3">Por favor, indíquenos su nombre:</p>
+            <div class="mb-3">
+                <input type="text" id="input-nombre-personal" class="form-control bg-dark text-light border-secondary text-center fw-bold fs-5" placeholder="Escriba su nombre...">
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-light w-50 py-2" onclick="cancelarNombreCliente()">Cancelar</button>
+                <button class="btn btn-amber w-50 py-2" onclick="confirmarNombreCliente()">Continuar</button>
+            </div>
+        </div>
+    </div>
 
-        function agregarAlCarro(producto) {
-            let itemExistente = carrito.find(item => item.nombre === producto.nombre);
+    <!-- MODAL PERSONALIZAR PRODUCTO -->
+    <div id="modal-personalizar" class="modal-overlay" style="display: none;">
+        <div class="modal-colonial shadow-lg">
+            <h4 class="text-warning fw-bold mb-2 text-center" id="titulo-modal-producto">Personalizar Producto</h4>
+            <p class="text-muted small text-center mb-3">Personalice su elección:</p>
+            
+            <div id="seccion-tamanos" class="mb-3" style="display: none;">
+                <label class="form-label text-warning small fw-bold mb-1">📏 Tamaño:</label>
+                <div class="row g-2">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Pequeño 8oz', this)">Pequeño (8oz)</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Grande 12oz', this)">Grande (12oz)</div></div>
+                </div>
+            </div>
+
+            <div id="seccion-promo-manana" class="mb-3" style="display: none;">
+                <label class="form-label text-warning small fw-bold mb-1">🌅 Opción Incluida / Cambio a Latte (+Q12):</label>
+                <div class="row g-2 mb-2">
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Café Negro', this, 0)">Café Negro</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Jugo Naranja', this, 0)">Jugo Naranja</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Té', this, 0)">Té</div></div>
+                </div>
+                <div class="d-grid">
+                    <div class="opcion-btn text-warning" onclick="seleccionarOpcion('promo', 'Cambiar a Latte', this, 12)">✨ Cambiar a Latte (+Q12)</div>
+                </div>
+            </div>
+
+            <div id="seccion-leche-endulzante">
+                <label class="form-label text-warning small fw-bold mb-1">🥛 Tipo de Leche:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Entera', this, 0)">Entera</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Deslactosada', this, 0)">Deslactosada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Descremada', this, 0)">Descremada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Leche Vegetal (+Q8)', this, 8)">Leche Vegetal (+Q8)</div></div>
+                </div>
+
+                <label class="form-label text-warning small fw-bold mb-1">🍯 Tipo de Endulzante:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Azúcar', this)">Azúcar</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Splenda', this)">Splenda</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Morena', this)">Morena</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Sin Endulzante', this)">Ninguno</div></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-warning small fw-bold mb-1">📝 Nota Adicional (Opcional):</label>
+                <input type="text" id="input-nota-custom" class="form-control bg-dark text-light border-secondary" placeholder="Ej. Bien caliente...">
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-light w-50 py-2" onclick="cerrarModalPersonalizar()">Cancelar</button>
+                <button class="btn btn-amber w-50 py-2" onclick="confirmarPersonalizacionBebida()">Agregar al Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SELECCIONAR CARNES TACOS (NUEVO) -->
+    <div id="modal-tacos" class="modal-overlay" style="display: none;">
+        <div class="modal-colonial shadow-lg">
+            <h4 class="text-warning fw-bold mb-2 text-center" id="titulo-modal-tacos">Seleccionar Tacos</h4>
+            <p class="text-muted small text-center mb-3" id="subtitulo-modal-tacos">Elige las carnes para tus tacos:</p>
+            
+            <div id="selector-carne-unica" class="mb-3">
+                <label class="form-label text-warning small fw-bold mb-1">🥩 Tipo de Carne:</label>
+                <select id="select-carne-unica" class="form-select bg-dark text-light border-secondary">
+                    <option value="4 Carnes">4 Carnes</option>
+                    <option value="Cochinita Pibil">Cochinita Pibil</option>
+                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
+                    <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
+                </select>
+            </div>
+
+            <div id="selector-carnes-mixtas" class="mb-3" style="display: none;">
+                <label class="form-label text-warning small fw-bold mb-1">🥩 Primera Opción de Carne:</label>
+                <select id="select-carne-1" class="form-select bg-dark text-light border-secondary mb-2">
+                    <option value="4 Carnes">4 Carnes</option>
+                    <option value="Cochinita Pibil">Cochinita Pibil</option>
+                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
+                    <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
+                </select>
+
+                <label class="form-label text-warning small fw-bold mb-1">🥩 Segunda Opción de Carne:</label>
+                <select id="select-carne-2" class="form-select bg-dark text-light border-secondary">
+                    <option value="4 Carnes">4 Carnes</option>
+                    <option value="Cochinita Pibil">Cochinita Pibil</option>
+                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
+                    <option value="Pollo con salsa de maracuyá" selected>Pollo con salsa de maracuyá</option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-outline-light w-50 py-2" onclick="cerrarModalTacos()">Cancelar</button>
+                <button class="btn btn-amber w-50 py-2" onclick="confirmarSeleccionTacos()">Confirmar Tacos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGRADECIMIENTO -->
+    <div id="modal-agradecimiento" class="modal-overlay" style="display: none;">
+        <div class="modal-colonial shadow-lg text-center">
+            <div class="fs-1 mb-2">🎉</div>
+            <h3 class="text-warning fw-bold mb-3">¡Muchas gracias por su pedido!</h3>
+            <p class="text-light mb-4">Su orden ha sido recibida con éxito en cocina.</p>
+            <button class="btn btn-amber w-100 py-2 shadow-sm" onclick="cerrarMensajeAgradecimiento()">Continuar viendo el menú</button>
+        </div>
+    </div>
+
+    <!-- Contenedor Fijo Superior -->
+    <div class="sticky-container shadow-sm mb-3 pt-3">
+        <div class="container d-flex justify-content-between align-items-center mb-2" style="max-width: 600px;">
+            <div>
+                <h4 class="text-warning fw-bold m-0">☕ Don Nicolás</h4>
+                <small class="text-muted">Modo Cuenta: <strong id="label-tipo-cuenta" class="text-warning">Juntas</strong></small>
+            </div>
+            <div class="text-end">
+                <span class="badge badge-mesa fs-6 px-3 py-2 rounded-pill shadow-sm">Mesa #<span id="label-mesa">{{ mesa }}</span></span>
+            </div>
+        </div>
+        <div class="container d-flex gap-2 mb-2" style="max-width: 600px;">
+            <button class="btn btn-outline-light btn-sm w-50 py-1" onclick="enviarAlerta('mesero')">🙋‍♂️ Llamar Mesero</button>
+            <button class="btn btn-outline-warning btn-sm w-50 py-1" onclick="enviarAlerta('cuenta')">🧾 Pedir Cuenta</button>
+        </div>
+        <div class="container d-flex justify-content-center gap-1 flex-wrap" style="max-width: 600px;">
+            <button class="btn-categoria active" onclick="filtrarCategoria('todos', this)">🌟 Todos</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Bebidas', this)">🥤 Bebidas</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Comida', this)">🍳 Comida</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Postres', this)">🍰 Postres</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Cócteles y Café Filtrado', this)">🍸 Cócteles</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Extras', this)">➕ Extras</button>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 600px;">
+        <div class="d-flex justify-content-center mb-4">
+            <div class="text-center px-4 py-3 shadow-sm" style="background-color: var(--bg-card); border: 2px solid var(--accent-gold); border-radius: 30px; max-width: 420px; width: 100%;">
+                <p class="text-light m-0 fw-bold" style="font-size: 0.9rem; line-height: 1.4;">
+                    Todos incluyen café negro,<br>jugo de naranja o té.<br>
+                    <span class="text-warning">Por +Q12 cámbialo por un latte.</span>
+                </p>
+            </div>
+        </div>
+
+        {% for cat_nombre, cat_productos in categorias.items() %}
+        {% if cat_productos %}
+        <div class="grupo-categoria" data-categoria="{{ 'Bebidas' if 'Bebidas' in cat_nombre else (cat_nombre if cat_nombre in ['Comida', 'Postres', 'Extras'] else 'Cócteles y Café Filtrado') }}">
+            <h5 class="category-title">
+                {% if 'Bebidas' in cat_nombre %}☕ Bebidas (Frías y Calientes)
+                {% elif cat_nombre == 'Comida' %}🍳 Comida y Platillos
+                {% elif cat_nombre == 'Postres' %}🍰 Postres Tradicionales
+                {% elif cat_nombre == 'Cócteles y Café Filtrado' %}🍸 Cócteles y Café Filtrado
+                {% else %}➕ Extras{% endif %}
+            </h5>
+            <div class="d-flex flex-column gap-3">
+                {% for p in cat_productos %}
+                <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
+                        <div>
+                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }}
+                                {% if p.config_tamano == 'fijo_8oz' %}<span class="badge bg-dark text-info" style="font-size: 0.65rem;">8 oz</span>{% endif %}
+                                {% if p.config_tamano == 'fijo_12oz' %}<span class="badge bg-dark text-info" style="font-size: 0.65rem;">12 oz</span>{% endif %}
+                            </h6>
+                            <p class="text-muted small mb-2" style="font-size: 0.82rem;">{{ p.descripcion }}</p>
+                            <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, '{{ p.categoria }}', '{{ p.config_tamano|default('ninguno') }}', {{ 'true' if p.admite_promo else 'false' }})">➕</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- PANEL FLOTANTE DE PEDIDO -->
+    <div id="contenedor-resumen-pedido" class="order-panel p-3 px-4" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseDetallePedido" aria-expanded="false" style="cursor: pointer;">
+            <div>
+                <h5 class="text-warning fw-bold m-0 fs-6">📋 Su Selección</h5>
+                <small class="text-muted" style="font-size: 0.75rem;">Toque para desplegar/ocultar</small>
+            </div>
+            <div class="text-end d-flex align-items-center gap-2">
+                <span class="text-warning fw-bold fs-5" id="total-carrito">Q 0.00</span>
+                <span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.75rem;">▼ Ver</span>
+            </div>
+        </div>
+        <div class="collapse mt-2 pt-2 border-top border-secondary" id="collapseDetallePedido">
+            <div id="lista-carrito" class="mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+            <div class="form-check mb-3 p-2 rounded" style="background-color: #3d291d; border: 1px solid #5c3f2d;">
+                <input class="form-check-input ms-0 me-2" type="checkbox" id="checkRevisado" onchange="toggleBotonEnviar()">
+                <label class="form-check-label text-light fw-bold" for="checkRevisado" style="font-size: 0.82rem; cursor: pointer;">He revisado bien mi pedido y estoy seguro de enviarlo.</label>
+            </div>
+            <button id="btn-enviar-pedido" class="btn btn-amber w-100 py-2 fw-bold shadow" onclick="enviarPedido()" disabled>🚀 Confirmar y Enviar Pedido</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let numeroMesa = urlParams.get('mesa') || '1';
+        document.getElementById('label-mesa').innerText = numeroMesa;
+
+        let carrito = [];
+        let tipoCuentaSeleccionada = 'juntas';
+        let productoPendiente = null;
+        let clienteActualTemp = 'General';
+        let seleccionLecheTemp = 'Entera';
+        let seleccionEndulzanteTemp = 'Azúcar';
+        let seleccionTamanoTemp = '';
+        let seleccionPromoTemp = '';
+        let costoExtraLeche = 0;
+        let costoExtraPromo = 0;
+
+        function seleccionarTipoCuenta(tipo) {
+            tipoCuentaSeleccionada = tipo;
+            document.getElementById('label-tipo-cuenta').innerText = tipo === 'juntas' ? 'Juntas' : 'Separadas';
+            document.getElementById('modal-bienvenida').style.display = 'none';
+        }
+
+        function filtrarCategoria(categoria, boton) {
+            document.querySelectorAll('.btn-categoria').forEach(btn => btn.classList.remove('active'));
+            boton.classList.add('active');
+            document.querySelectorAll('.grupo-categoria').forEach(grupo => {
+                if (categoria === 'todos' || grupo.dataset.categoria === categoria) {
+                    grupo.style.display = 'block';
+                } else {
+                    grupo.style.display = 'none';
+                }
+            });
+        }
+
+        function iniciarAgregarProducto(id, nombre, precio, categoria, configTamano, admitePromo) {
+            productoPendiente = { id, nombre, precio, categoria, configTamano, admitePromo };
+
+            if (tipoCuentaSeleccionada === 'separadas') {
+                document.getElementById('input-nombre-personal').value = '';
+                document.getElementById('modal-nombre-cliente').style.display = 'flex';
+                setTimeout(() => { document.getElementById('input-nombre-personal').focus(); }, 100);
+            } else {
+                continuarDespuesDeNombre("General");
+            }
+        }
+
+        function cancelarNombreCliente() {
+            document.getElementById('modal-nombre-cliente').style.display = 'none';
+            productoPendiente = null;
+        }
+
+        function confirmarNombreCliente() {
+            let nombreInput = document.getElementById('input-nombre-personal').value.trim();
+            let cliente = nombreInput === "" ? "Invitado" : nombreInput;
+            document.getElementById('modal-nombre-cliente').style.display = 'none';
+            continuarDespuesDeNombre(cliente);
+        }
+
+        function continuarDespuesDeNombre(cliente) {
+            if (!productoPendiente) return;
+            clienteActualTemp = cliente;
+            productoPendiente.cliente = cliente;
+
+            // Detectar si el producto es Tacos (Tablita / Media Tablita)
+            let nombreProd = productoPendiente.nombre.toLowerCase();
+            if (nombreProd.includes('tacos') || nombreProd.includes('tablita')) {
+                abrirModalTacos(productoPendiente);
+                return;
+            }
+
+            if (productoPendiente.configTamano === 'elegir_ambos') {
+                document.getElementById('seccion-tamanos').style.display = 'block';
+                seleccionTamanoTemp = '';
+            } else if (productoPendiente.configTamano === 'fijo_8oz') {
+                document.getElementById('seccion-tamanos').style.display = 'none';
+                seleccionTamanoTemp = 'Pequeño (8oz)';
+            } else if (productoPendiente.configTamano === 'fijo_12oz') {
+                document.getElementById('seccion-tamanos').style.display = 'none';
+                seleccionTamanoTemp = 'Grande (12oz)';
+            } else {
+                document.getElementById('seccion-tamanos').style.display = 'none';
+                seleccionTamanoTemp = '';
+            }
+
+            let esComida = productoPendiente.categoria === 'Comida';
+            document.getElementById('seccion-promo-manana').style.display = (esComida && productoPendiente.admitePromo) ? 'block' : 'none';
+            
+            let esBebida = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
+            document.getElementById('seccion-leche-endulzante').style.display = esBebida ? 'block' : 'none';
+
+            seleccionLecheTemp = 'Entera';
+            seleccionEndulzanteTemp = 'Azúcar';
+            seleccionPromoTemp = '';
+            costoExtraLeche = 0;
+            costoExtraPromo = 0;
+            document.getElementById('input-nota-custom').value = '';
+            
+            document.querySelectorAll('#modal-personalizar .opcion-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('titulo-modal-producto').innerText = productoPendiente.nombre;
+            document.getElementById('modal-personalizar').style.display = 'flex';
+        }
+
+        // --- LÓGICA MODAL DE TACOS ---
+        function abrirModalTacos(prod) {
+            document.getElementById('titulo-modal-tacos').innerText = prod.nombre;
+            let esMixto = prod.nombre.toLowerCase().includes('mixto') || prod.nombre.toLowerCase().includes('2 opciones');
+            
+            if (esMixto) {
+                let esOcho = prod.nombre.toLowerCase().includes('8 tacos');
+                document.getElementById('subtitulo-modal-tacos').innerText = esOcho 
+                    ? 'Elige 2 carnes (4 tacos de cada una para completar 8)' 
+                    : 'Elige 2 carnes (2 tacos de cada una para completar 4)';
+                document.getElementById('selector-carne-unica').style.display = 'none';
+                document.getElementById('selector-carnes-mixtas').style.display = 'block';
+            } else {
+                let esOcho = prod.nombre.toLowerCase().includes('8 tacos');
+                document.getElementById('subtitulo-modal-tacos').innerText = esOcho 
+                    ? 'Elige la carne para tus 8 tacos' 
+                    : 'Elige la carne para tus 4 tacos';
+                document.getElementById('selector-carne-unica').style.display = 'block';
+                document.getElementById('selector-carnes-mixtas').style.display = 'none';
+            }
+            document.getElementById('modal-tacos').style.display = 'flex';
+        }
+
+        function cerrarModalTacos() {
+            document.getElementById('modal-tacos').style.display = 'none';
+            productoPendiente = null;
+        }
+
+        function confirmarSeleccionTacos() {
+            if (!productoPendiente) return;
+            let nombreBase = productoPendiente.nombre;
+            let esMixto = nombreBase.toLowerCase().includes('mixto') || nombreBase.toLowerCase().includes('2 opciones');
+            let detalleCarne = "";
+
+            if (esMixto) {
+                let c1 = document.getElementById('select-carne-1').value;
+                let c2 = document.getElementById('select-carne-2').value;
+                if (c1 === c2) {
+                    alert("Por favor seleccione dos opciones de carne diferentes.");
+                    return;
+                }
+                detalleCarne = `${c1} & ${c2}`;
+            } else {
+                detalleCarne = document.getElementById('select-carne-unica').value;
+            }
+
+            let nombrePersonalizado = `${nombreBase} (${detalleCarne})`;
+            procesarAdicionFinal(productoPendiente.precio, '', '', '', '', `Carne: ${detalleCarne}`, nombrePersonalizado);
+            cerrarModalTacos();
+        }
+        // ------------------------------
+
+        function seleccionarOpcion(categoria, valor, elemento, extra = 0) {
+            elemento.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+
+            if (categoria === 'leche') { seleccionLecheTemp = valor; costoExtraLeche = extra; }
+            if (categoria === 'endulzante') seleccionEndulzanteTemp = valor;
+            if (categoria === 'tamano') seleccionTamanoTemp = valor;
+            if (categoria === 'promo') { seleccionPromoTemp = valor; costoExtraPromo = extra; }
+        }
+
+        function cerrarModalPersonalizar() {
+            document.getElementById('modal-personalizar').style.display = 'none';
+            productoPendiente = null;
+        }
+
+        function confirmarPersonalizacionBebida() {
+            if (!productoPendiente) return;
+            let nota = document.getElementById('input-nota-custom').value.trim();
+            let precioFinal = productoPendiente.precio + costoExtraLeche + costoExtraPromo;
+            let esBebida = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
+
+            procesarAdicionFinal(
+                precioFinal, 
+                esBebida ? seleccionLecheTemp : '', 
+                esBebida ? seleccionEndulzanteTemp : '', 
+                seleccionTamanoTemp, 
+                seleccionPromoTemp, 
+                nota,
+                productoPendiente.nombre
+            );
+            cerrarModalPersonalizar();
+        }
+
+        function procesarAdicionFinal(precioFinal, tipoLeche = '', tipoEndulzante = '', tamano = '', promo = '', nota = '', nombrePersonalizado = '') {
+            if (!productoPendiente) return;
+            let { id, cliente } = productoPendiente;
+            let nombreFinal = nombrePersonalizado || productoPendiente.nombre;
+            let itemKey = `${id}-${cliente}-${tipoLeche}-${tipoEndulzante}-${tamano}-${promo}-${nota}-${nombreFinal}`;
+            let itemExistente = carrito.find(item => item.key === itemKey);
+
             if (itemExistente) {
                 itemExistente.cantidad += 1;
             } else {
-                carrito.push({
-                    nombre: producto.nombre,
-                    precio: producto.precio,
-                    cantidad: 1,
-                    cliente: "General",
-                    nota: ""
-                });
+                carrito.push({ key: itemKey, id, nombre: nombreFinal, precio: precioFinal, cantidad: 1, cliente, tipoLeche, tipoEndulzante, tamano, promo, nota });
             }
-            actualizarContador();
-            alert(`¡${producto.nombre} agregado al pedido!`);
+            productoPendiente = null;
+            actualizarCarritoUI();
         }
 
-        function actualizarContador() {
-            let totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            document.getElementById('cart-count').innerText = totalItems;
-        }
+        function actualizarCarritoUI() {
+            const panel = document.getElementById('contenedor-resumen-pedido');
+            const lista = document.getElementById('lista-carrito');
+            const totalSpan = document.getElementById('total-carrito');
 
-        function abrirCarrito() {
-            let container = document.getElementById('cart-items');
-            container.innerHTML = '';
+            if (carrito.length === 0) { panel.style.display = 'none'; return; }
+            panel.style.display = 'block';
+            lista.innerHTML = '';
             let total = 0;
 
-            if (carrito.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-400 py-8">Tu carrito está vacío.</p>';
-            } else {
-                carrito.forEach((item, index) => {
-                    total += item.precio * item.cantidad;
-                    container.innerHTML += `
-                        <div class="pt-4 flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-amber-100">${item.nombre}</h4>
-                                <p class="text-sm text-[#d4af37]">Q ${item.precio.toFixed(2)} x ${item.cantidad}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="cambiarCantidad(${index}, -1)" class="bg-[#3d312c] px-2.5 py-1 rounded font-bold">-</button>
-                                <span>${item.cantidad}</span>
-                                <button onclick="cambiarCantidad(${index}, 1)" class="bg-[#3d312c] px-2.5 py-1 rounded font-bold">+</button>
-                            </div>
+            carrito.forEach((item, index) => {
+                let subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                let badgeCliente = tipoCuentaSeleccionada === 'separadas' ? `<span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>` : '';
+                let detallesExtras = '';
+                if (item.tamano) detallesExtras += `<br><small class="text-info">📏 Tamaño: ${item.tamano}</small>`;
+                if (item.promo) detallesExtras += `<br><small class="text-warning">🌅 Incluye: ${item.promo}</small>`;
+                if (item.tipoLeche && item.tipoLeche !== 'Entera') detallesExtras += `<br><small class="text-warning">🥛 Leche: ${item.tipoLeche}</small>`;
+                if (item.tipoEndulzante && item.tipoEndulzante !== 'Azúcar') detallesExtras += `<br><small class="text-warning">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
+                if (item.nota) detallesExtras += `<br><small class="text-muted">📝 ${item.nota}</small>`;
+
+                lista.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary py-2 text-light">
+                        <div>
+                            ${badgeCliente}
+                            <div class="fw-bold">${item.cantidad}x ${item.nombre}</div>
+                            ${detallesExtras}
+                            <div class="text-muted small">Q ${subtotal.toFixed(2)}</div>
                         </div>
-                    `;
-                });
-            }
-            document.getElementById('cart-total').innerText = `Q ${total.toFixed(2)}`;
-            document.getElementById('cart-modal').classList.remove('hidden');
+                        <button class="btn btn-outline-danger btn-sm py-0 px-2 mt-1" onclick="removerDelCarrito(${index})">❌</button>
+                    </div>
+                `;
+            });
+            totalSpan.innerText = `Q ${total.toFixed(2)}`;
         }
 
-        function cerrarCarrito() {
-            document.getElementById('cart-modal').classList.add('hidden');
-        }
-
-        function cambiarCantidad(index, delta) {
-            carrito[index].cantidad += delta;
-            if (carrito[index].cantidad <= 0) {
-                carrito.splice(index, 1);
-            }
-            actualizarContador();
-            abrirCarrito();
+        function removerDelCarrito(index) { carrito.splice(index, 1); actualizarCarritoUI(); }
+        function toggleBotonEnviar() {
+            const check = document.getElementById('checkRevisado');
+            const boton = document.getElementById('btn-enviar-pedido');
+            if (check && boton) boton.disabled = !check.checked;
         }
 
         async function enviarPedido() {
-            if (carrito.length === 0) return alert("Agrega productos antes de enviar.");
+            if (carrito.length === 0) return;
             let total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            
-            let res = await fetch('/api/enviar-pedido', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mesa: mesa, items: carrito, total: total })
-            });
-
-            if (res.ok) {
-                alert("¡Pedido enviado con éxito a cocina/barra!");
-                carrito = [];
-                actualizarContador();
-                cerrarCarrito();
-            } else {
-                alert("Hubo un error al enviar el pedido.");
-            }
+            let payload = { mesa: parseInt(numeroMesa), items: carrito, total: total };
+            try {
+                let respuesta = await fetch('/api/enviar-pedido', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (respuesta.ok) {
+                    carrito = [];
+                    actualizarCarritoUI();
+                    document.getElementById('contenedor-resumen-pedido').style.display = 'none';
+                    document.getElementById('checkRevisado').checked = false;
+                    toggleBotonEnviar();
+                    document.getElementById('modal-agradecimiento').style.display = 'flex';
+                }
+            } catch (e) { alert("Error de conexión."); }
         }
-
-        async function llamarMesero(tipo) {
-            let res = await fetch('/api/alerta-mesero', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mesa: mesa, tipo: tipo })
-            });
-            if (res.ok) {
-                alert(tipo === 'mesero' ? "Se ha notificado al mesero." : "Se ha solicitado la cuenta.");
-            }
+        function cerrarMensajeAgradecimiento() { document.getElementById('modal-agradecimiento').style.display = 'none'; }
+        async function enviarAlerta(tipo) {
+            try {
+                let res = await fetch('/api/alerta-mesero', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mesa: parseInt(numeroMesa), tipo: tipo })
+                });
+                if(res.ok) alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Solicitud de cuenta enviada.");
+            } catch (e) { alert("Error de conexión."); }
         }
     </script>
 </body>
