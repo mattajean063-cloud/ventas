@@ -1,5 +1,5 @@
 import os
-import time
+import base64
 from fastapi import FastAPI, Request, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,9 +18,9 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- CREDENCIALES DE LA API REST Y STORAGE DE SUPABASE ---
+# --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRhdGRzeXRmdnBvamEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcyMzg5OTUxOCwiZXhwIjoyMDM5NDc1NTE4fQ.TU_CLAVE_ANON_O_SERVICE_ROLE_AQUI" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -140,7 +140,7 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN CON SUPABASE STORAGE Y API REST) ---
+# --- ADMIN (GESTIÓN DE PRODUCTOS CON IMAGEN BASE64) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -150,27 +150,17 @@ async def agregar_producto(
     imagen_file: UploadFile = File(...)
 ):
     try:
-        timestamp = int(time.time())
-        file_name = f"{timestamp}_{imagen_file.filename.replace(' ', '_')}"
         file_bytes = await imagen_file.read()
-        
-        storage_headers = {
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}",
-            "Content-Type": imagen_file.content_type
-        }
-        
-        storage_url = f"{SUPABASE_URL}/storage/v1/object/productos/{file_name}"
-        requests.post(storage_url, headers=storage_headers, data=file_bytes)
-        
-        imagen_url = f"{SUPABASE_URL}/storage/v1/object/public/productos/{file_name}"
+        encoded_image = base64.b64encode(file_bytes).decode('utf-8')
+        content_type = imagen_file.content_type or "image/jpeg"
+        imagen_base64 = f"data:{content_type};base64,{encoded_image}"
         
         payload = {
             "nombre": nombre,
             "precio": float(precio),
             "categoria": categoria,
             "descripcion": descripcion,
-            "imagen": imagen_url
+            "imagen": imagen_base64
         }
         
         db_headers = {**HEADERS, "Content-Type": "application/json"}
