@@ -1,0 +1,9 @@
+body { background-color: #f8f9fa; }
+.container { max-width: 500px; background: white; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+button { font-weight: bold; }/* Animación de entrada sacudida */
+@keyframes shakeX {
+    0%, 100% {transform: translateX(0);}
+    10%, 30%, 50%, 70%, 90% {transform: translateX(-10px);}
+    20%, 40%, 60%, 80% {transform: translateX(10px);}
+}
+.animate__shakeX { animation: shakeX 0.8s; }    
