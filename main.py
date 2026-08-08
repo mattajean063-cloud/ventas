@@ -8,11 +8,11 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-# Configuración de plantillas (asegurate de tener una carpeta llamada 'templates')
+# Configuración de plantillas
 templates = Jinja2Templates(directory="templates")
 
-# Configuración de Supabase (ajusta tus credenciales o variables de entorno)
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://picteudhhdsytfvpvoja.supabase.co")
+# Configuración de Supabase
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://tu-proyecto.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE")
 
 HEADERS = {
@@ -43,16 +43,18 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# Variable global para el turno actual ('Mañana' o 'Tarde')
+# Variable global para el turno actual
 turno_global = "Mañana"
 
 @app.get("/admin", response_class=HTMLResponse)
 async def panel_admin(request: Request):
+    productos = []
     try:
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
-        productos = response.json() if response.status_code == 200 else []
-    except Exception:
-        productos = []
+        if response.status_code == 200:
+            productos = response.json()
+    except Exception as e:
+        print("Error obteniendo productos:", e)
     
     return templates.TemplateResponse("admin.html", {
         "request": request,
@@ -139,18 +141,15 @@ async def eliminar_producto(producto_id: int):
         print("Error al eliminar producto:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
-# Ruta WebSocket para recibir y mandar eventos al panel admin en tiempo real
 @app.websocket("/ws/admin")
 async def websocket_admin(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            # Puedes recibir mensajes de prueba o comandos si lo requieres
+            await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-# Endpoint opcional para disparar notificaciones desde otros puntos de la app hacia el admin
 @app.post("/api/disparar-alerta")
 async def disparar_alerta(evento: dict):
     await manager.broadcast(evento)
