@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 import jinja2
 
-# Activamos debug=True para ver errores detallados en pantalla si ocurren
+# Activamos debug=True para ver errores detallados si ocurren
 app = FastAPI(debug=True)
 
 # Inicialización segura de plantillas sin conflicto de caché
@@ -64,11 +64,14 @@ async def panel_admin(request: Request):
     except Exception as e:
         print("Error obteniendo productos:", e)
     
-    return templates.TemplateResponse("admin.html", {
-        "request": request,
-        "productos": productos,
-        "turno_actual": turno_global
-    })
+    # Renderizado nativo con Jinja2 para evitar conflictos de caché con Starlette
+    template = env.get_template("admin.html")
+    html_content = template.render(
+        request=request,
+        productos=productos,
+        turno_actual=turno_global
+    )
+    return HTMLResponse(content=html_content)
 
 @app.post("/admin/cambiar-turno")
 async def cambiar_turno(turno: str = Form(...)):
