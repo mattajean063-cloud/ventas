@@ -20,7 +20,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRhdGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -56,12 +56,15 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# --- MODELOS PYDANTIC ---
+# --- MODELOS PYDANTIC ACTUALIZADOS PARA OPCIONES DE BEBIDAS ---
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
     cantidad: Optional[int] = 1
     cliente: Optional[str] = "General"
+    tipoLeche: Optional[str] = ""
+    tipoEndulzante: Optional[str] = ""
+    nota: Optional[str] = ""
 
 class PedidoRequest(BaseModel):
     mesa: int
