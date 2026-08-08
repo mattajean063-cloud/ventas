@@ -5,57 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo - Don Nicolás</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --bg-dark-coffee: #1a120b;
-            --bg-card-coffee: #251a12;
-            --bg-input-coffee: #160f09;
-            --border-bronze: #4e3629;
-            --accent-gold: #c5a880;
-            --accent-gold-hover: #b0936b;
-            --text-cream: #f4ecd8;
-            --text-muted-cream: #d1c7bd;
+            --bg-cream: #f7f4ed;
+            --bg-card-white: #ffffff;
+            --border-subtle: #e6dfd3;
+            --text-main: #2c221e;
+            --text-muted: #6b584c;
+            --accent-gold: #b38b59;
+            --accent-gold-hover: #9c7546;
         }
 
         body { 
-            background-color: var(--bg-dark-coffee); 
-            color: var(--text-cream); 
-            font-family: Georgia, serif; 
+            background-color: var(--bg-cream); 
+            color: var(--text-main); 
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
         }
         
         .card-colonial { 
-            background-color: var(--bg-card-coffee); 
-            border: 1px solid var(--border-bronze); 
-            border-radius: 15px; 
+            background-color: var(--bg-card-white); 
+            border: 1px solid var(--border-subtle); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
         
         .btn-amber { 
             background-color: var(--accent-gold); 
-            color: #1a120b; 
-            font-weight: bold; 
+            color: white; 
+            font-weight: 600; 
+            border: none;
         }
         .btn-amber:hover { 
             background-color: var(--accent-gold-hover); 
-            color: #1a120b; 
+            color: white; 
         }
 
         .notid-card {
-            background: linear-gradient(135deg, #2b1f17 0%, #1a120b 100%);
-            border: 2px solid var(--accent-gold);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            background: #ffffff;
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
         }
 
         .form-control, .form-select { 
-            background-color: var(--bg-input-coffee) !important; 
-            color: var(--text-cream) !important; 
-            border-color: var(--border-bronze) !important; 
+            background-color: #faf8f5 !important; 
+            color: var(--text-main) !important; 
+            border-color: var(--border-subtle) !important; 
+            border-radius: 8px;
         }
-        
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-gold) !important;
-            box-shadow: 0 0 0 0.25rem rgba(197, 168, 128, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(179, 139, 89, 0.15);
         }
 
         .product-img { 
@@ -63,7 +70,7 @@
             height: 55px; 
             object-fit: cover; 
             border-radius: 8px; 
-            border: 1px solid var(--border-bronze); 
+            border: 1px solid var(--border-subtle); 
         }
         
         #qr-box img { 
@@ -71,6 +78,7 @@
             border-radius: 8px; 
             padding: 5px; 
             background: white; 
+            border: 1px solid var(--border-subtle);
         }
     </style>
 </head>
@@ -78,14 +86,14 @@
     <div class="container-fluid" style="max-width: 1300px;">
         
         <!-- Cabecera Superior con Interruptor de Turno -->
-        <div class="card-colonial p-4 mb-4 shadow">
+        <div class="card-colonial p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <h2 class="fw-bold m-0" style="color: var(--accent-gold);">🖥️ Monitor y Gestión - Don Nicolás</h2>
+                <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
                 
-                <div class="d-flex align-items-center gap-3 p-2 rounded border border-secondary" style="background-color: var(--bg-input-coffee);">
-                    <span class="small fw-bold" style="color: var(--accent-gold);">Turno Menú Comida:</span>
+                <div class="d-flex align-items-center gap-3 bg-white p-2 rounded border border-secondary" style="border-color: var(--border-subtle) !important;">
+                    <span class="small fw-bold" style="color: var(--text-muted);">Turno Menú Comida:</span>
                     <form action="/admin/cambiar-turno" method="POST" class="m-0">
-                        <select name="turno" class="form-select form-select-sm text-center fw-bold" style="color: var(--accent-gold); width: 130px;" onchange="this.form.submit()">
+                        <select name="turno" class="form-select form-select-sm text-center fw-bold" onchange="this.form.submit()" style="width: 130px; color: var(--accent-gold) !important;">
                             <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
                             <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
                         </select>
@@ -93,8 +101,8 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-outline-warning btn-sm me-2" style="color: var(--accent-gold); border-color: var(--accent-gold);" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
-                    <a href="/?mesa=1" class="btn btn-outline-light btn-sm" target="_blank">Ver Menú ↗</a>
+                    <button class="btn btn-outline-secondary btn-sm me-2" style="color: var(--text-muted); border-color: var(--border-subtle);" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
+                    <a href="/?mesa=1" class="btn btn-outline-dark btn-sm">Ver Menú ↗</a>
                 </div>
             </div>
         </div>
@@ -102,10 +110,10 @@
         <div class="row g-4">
             <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
             <div class="col-lg-8">
-                <div class="card-colonial p-4 shadow h-100">
-                    <h4 class="mb-3 border-bottom border-secondary pb-2" style="color: var(--accent-gold);">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
+                <div class="card-colonial p-4 h-100">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
                     <div id="contenedor-alertas">
-                        <div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted-cream) !important;">
+                        <div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">
                             ⏳ Esperando órdenes o llamadas de las mesas...
                         </div>
                     </div>
@@ -114,17 +122,17 @@
 
             <!-- COLUMNA DERECHA: QR y Agregar Producto -->
             <div class="col-lg-4 d-flex flex-column gap-4">
-                <div class="card-colonial p-4 shadow text-center">
-                    <h4 class="mb-3 border-bottom border-secondary pb-2" style="color: var(--accent-gold);">📱 Generar Código QR</h4>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold" style="color: var(--accent-gold);">Número de Mesa:</label>
+                <div class="card-colonial p-4 text-center">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📱 Generar Código QR</h4>
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold" style="color: var(--text-muted);">Número de Mesa:</label>
                         <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
                     </div>
                     <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
-                    <button class="btn btn-amber w-100 py-2 shadow mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
+                    <button class="btn btn-amber w-100 py-2 shadow-sm mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
                 </div>
 
-                <div class="card-colonial shadow overflow-hidden">
+                <div class="card-colonial overflow-hidden">
                     <button class="btn w-100 d-flex justify-content-between align-items-center p-4 fw-bold fs-5 text-start border-0" 
                             type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent; color: var(--accent-gold);">
                         <span>➕ Agregar Producto</span>
@@ -134,15 +142,15 @@
                         <div class="p-4 pt-0">
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Nombre</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Nombre</label>
                                     <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Precio (Q)</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio (Q)</label>
                                     <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Categoría</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Categoría</label>
                                     <select class="form-select" name="categoria" required>
                                         <option value="" disabled selected>Seleccione</option>
                                         <option value="Bebidas Frías">Bebidas Frías</option>
@@ -155,7 +163,7 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Horario (Solo Comida)</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Horario (Solo Comida)</label>
                                     <select class="form-select" name="horario" required>
                                         <option value="Ambos">Mañana y Tarde</option>
                                         <option value="Mañana">Solo Mañana</option>
@@ -164,7 +172,7 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Configuración de Tamaño:</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Configuración de Tamaño:</label>
                                     <select class="form-select" name="config_tamano" required>
                                         <option value="ninguno">Sin Tamaño / Estándar</option>
                                         <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)</option>
@@ -173,24 +181,31 @@
                                     </select>
                                 </div>
 
-                                <div class="mb-3 p-2 rounded border border-secondary" style="background-color: var(--bg-input-coffee);">
-                                    <div class="form-check">
+                                <div class="mb-3 p-3 rounded border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
+                                    <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
-                                        <label class="form-check-label text-light small" for="checkPromo">
+                                        <label class="form-check-label small" for="checkPromo" style="color: var(--text-main);">
                                             🌅 Incluir opción de desayuno / bebida matutina
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <!-- NUEVO: Checkbox para desactivar personalización de Leche/Azúcar -->
+                                        <input class="form-check-input" type="checkbox" name="admite_extras_cafe" value="true" id="checkExtras" checked>
+                                        <label class="form-check-label small" for="checkExtras" style="color: var(--text-main);">
+                                            🥛 Permitir opciones de Leche y Endulzante
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Descripción</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Descripción</label>
                                     <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--accent-gold);">Foto</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Foto</label>
                                     <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
                                 </div>
-                                <button type="submit" class="btn btn-amber w-100 py-2 shadow">Guardar Producto</button>
+                                <button type="submit" class="btn btn-amber w-100 py-2 shadow-sm">Guardar Producto</button>
                             </form>
                         </div>
                     </div>
@@ -201,12 +216,12 @@
         <!-- Inventario Completo -->
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card-colonial p-4 shadow">
-                    <h4 class="mb-3 border-bottom border-secondary pb-2" style="color: var(--accent-gold);">📋 Inventario del Menú</h4>
+                <div class="card-colonial p-4">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📋 Inventario del Menú</h4>
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover align-middle bg-transparent">
+                        <table class="table table-hover align-middle bg-transparent" style="color: var(--text-main);">
                             <thead>
-                                <tr style="color: var(--accent-gold);">
+                                <tr style="color: var(--accent-gold); border-bottom: 2px solid var(--border-subtle);">
                                     <th>Imagen y Cambiar</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
@@ -218,7 +233,7 @@
                             </thead>
                             <tbody>
                                 {% for p in productos %}
-                                <tr>
+                                <tr style="border-bottom: 1px solid var(--border-subtle);">
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             {% if p.imagen %}
@@ -227,13 +242,13 @@
                                                 <span class="text-muted small">Sin foto</span>
                                             {% endif %}
                                             <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
-                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm text-xs" style="font-size: 0.7rem; width: 140px;" required>
-                                                <button type="submit" class="btn btn-outline-warning btn-sm py-0" style="font-size: 0.75rem; color: var(--accent-gold); border-color: var(--accent-gold);">📷 Actualizar Foto</button>
+                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm" style="font-size: 0.7rem; width: 140px;" required>
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.75rem; color: var(--text-muted);">📷 Actualizar Foto</button>
                                             </form>
                                         </div>
                                     </td>
-                                    <td class="fw-bold text-light">{{ p.nombre }}</td>
-                                    <td><span class="badge bg-secondary">{{ p.categoria }}</span></td>
+                                    <td class="fw-bold">{{ p.nombre }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ p.categoria }}</span></td>
                                     <td>
                                         <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
                                             <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
@@ -242,7 +257,7 @@
                                     </td>
                                     <td>
                                         <form action="/admin/actualizar-tamano/{{ p.id }}" method="POST">
-                                            <select name="config_tamano" class="form-select form-select-sm fw-bold" style="color: var(--accent-gold); width: 145px;" onchange="this.form.submit()">
+                                            <select name="config_tamano" class="form-select form-select-sm fw-bold" style="width: 145px; color: var(--accent-gold);" onchange="this.form.submit()">
                                                 <option value="ninguno" {% if p.config_tamano == 'ninguno' %}selected{% endif %}>Sin Tamaño</option>
                                                 <option value="fijo_8oz" {% if p.config_tamano == 'fijo_8oz' %}selected{% endif %}>Fijo: 8 oz</option>
                                                 <option value="fijo_12oz" {% if p.config_tamano == 'fijo_12oz' %}selected{% endif %}>Fijo: 12 oz</option>
@@ -253,7 +268,7 @@
                                     <td>
                                         {% if p.categoria == 'Comida' %}
                                         <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
-                                            <select name="horario" class="form-select form-select-sm fw-bold" style="color: var(--accent-gold); width: 125px;" onchange="this.form.submit()">
+                                            <select name="horario" class="form-select form-select-sm fw-bold" style="width: 125px; color: var(--accent-gold);" onchange="this.form.submit()">
                                                 <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
                                                 <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
                                                 <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
@@ -265,7 +280,7 @@
                                     </td>
                                     <td>
                                         <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
+                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -345,7 +360,7 @@
             if (mensajeVacio) mensajeVacio.remove();
 
             let tarjetaFlash = document.createElement('div');
-            tarjetaFlash.className = 'notid-card p-3 mb-3 text-light';
+            tarjetaFlash.className = 'notid-card p-3 mb-3';
 
             if (data.tipo === 'alerta') {
                 tarjetaFlash.innerHTML = `
@@ -353,17 +368,17 @@
                         <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">${data.titulo}</h5>
                         <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
                     </div>
-                    <p class="mt-2 mb-2 text-light">${data.mensaje}</p>
-                    <div class="text-end"><button class="btn btn-sm btn-outline-light py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button></div>
+                    <p class="mt-2 mb-2 text-dark">${data.mensaje}</p>
+                    <div class="text-end"><button class="btn btn-sm btn-outline-secondary py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button></div>
                 `;
             } else if (data.tipo === 'nuevo_pedido') {
                 let itemsHtml = data.items.map(i => {
                     let detalles = '';
-                    if (i.tamano) detalles += `<br><small class="text-info ms-3">📏 Tamaño: ${i.tamano}</small>`;
+                    if (i.tamano) detalles += `<br><small class="text-secondary ms-3">📏 Tamaño: ${i.tamano}</small>`;
                     if (i.promo) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🌅 Promo: ${i.promo}</small>`;
                     if (i.tipoLeche) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🥛 Leche: ${i.tipoLeche}</small>`;
                     if (i.tipoEndulzante) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🍯 Endulzante: ${i.tipoEndulzante}</small>`;
-                    if (i.nota) detalles += `<br><small class="text-info ms-3">📝 Nota: ${i.nota}</small>`;
+                    if (i.nota) detalles += `<br><small class="text-secondary ms-3">📝 Nota: ${i.nota}</small>`;
                     return `<li class="mb-2"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})${detalles}</li>`;
                 }).join('');
 
@@ -372,8 +387,8 @@
                         <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">🚀 Nuevo Pedido</h5>
                         <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
                     </div>
-                    <ul class="mt-2 mb-2 ps-3 text-light small">${itemsHtml}</ul>
-                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary">
+                    <ul class="mt-2 mb-2 ps-3 text-dark small">${itemsHtml}</ul>
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: var(--border-subtle) !important;">
                         <span class="fw-bold fs-6" style="color: var(--accent-gold);">Total: Q ${data.total.toFixed(2)}</span>
                         <button class="btn btn-sm btn-amber py-1" onclick="this.closest('.notid-card').remove()">Completar Pedido</button>
                     </div>
