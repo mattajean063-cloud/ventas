@@ -6,11 +6,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List, Set, Optional
 import shutil
-
-# Importaciones para SQLAlchemy y conexión a Supabase Postgres
-from sqlalchemy import create_engine, Column, Integer, String, Numeric
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import requests
 
 app = FastAPI()
 
@@ -25,22 +21,17 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- CONFIGURACIÓN DE BASE DE DATOS (CONEXIÓN DIRECTA PUERTO 5432) ---
-DATABASE_URL = "postgresql+psycopg2://postgres.picteudhhdsytfvpvoja:matamata675411302603@aws-0-us-west-1.pooler.supabase.co:5432/postgres?sslmode=require"
+# --- CREDENCIALES DE LA API REST DE SUPABASE (PUERTO 443 / HTTP) ---
+SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnBvamEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcyMzg5OTUxOCwiZXhwIjoyMDM5NDc1NTE4fQ.TU_CLAVE_ANON_O_SERVICE_ROLE_AQUI" 
+# (O usa tu Service Role Key de Supabase si necesitas permisos de escritura totales)
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Definición exacta del modelo de la tabla productos en Supabase
-class ProductoModel(Base):
-    __tablename__ = "productos"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    nombre = Column(String, nullable=False)
-    precio = Column(Numeric(10, 2), nullable=False)
-    categoria = Column(String, nullable=False)
-    descripcion = Column(String)
-    imagen = Column(String)
+HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation"
+}
 
 # --- HISTORIAL TEMPORAL PARA POLLING (NOTIFICACIONES) ---
 historial_notificaciones = []
@@ -85,52 +76,30 @@ class AlertaRequest(BaseModel):
 # --- RUTAS WEB ---
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
-    db = SessionLocal()
     menu_lista = []
     try:
-        productos_db = db.query(ProductoModel).all()
-        menu_lista = [
-            {
-                "id": p.id,
-                "nombre": p.nombre,
-                "precio": float(p.precio),
-                "categoria": p.categoria,
-                "descripcion": p.descripcion,
-                "imagen": p.imagen
-            } for p in productos_db
-        ]
+        response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
+        if response.status_code == 200:
+            menu_lista = response.json()
     except Exception as e:
-        print("ERROR AL CONSULTAR SUPABASE (INDEX):", e)
-    finally:
-        db.close()
+        print("ERROR AL CONSULTAR SUPABASE API (INDEX):", e)
 
     categorias = {
-        "Bebidas": [p for p in menu_lista if p["categoria"] == "Bebidas"],
-        "Comida": [p for p in menu_lista if p["categoria"] == "Comida"],
-        "Postres": [p for p in menu_lista if p["categoria"] == "Postres"]
+        "Bebidas": [p for p in menu_lista if p.get("categoria") == "Bebidas"],
+        "Comida": [p for p in menu_lista if p.get("categoria") == "Comida"],
+        "Postres": [p for p in menu_lista if p.get("categoria") == "Postres"]
     }
     return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
-    db = SessionLocal()
     menu_lista = []
     try:
-        productos_db = db.query(ProductoModel).all()
-        menu_lista = [
-            {
-                "id": p.id,
-                "nombre": p.nombre,
-                "precio": float(p.precio),
-                "categoria": p.categoria,
-                "descripcion": p.descripcion,
-                "imagen": p.imagen
-            } for p in productos_db
-        ]
+        response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
+        if response.status_code == 200:
+            menu_lista = response.json()
     except Exception as e:
-        print("ERROR AL CONSULTAR SUPABASE (ADMIN):", e)
-    finally:
-        db.close()
+        print("ERROR AL CONSULTAR SUPABASE API (ADMIN):", e)
 
     return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista})
 
@@ -176,7 +145,7 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN EN SUPABASE) ---
+# --- ADMIN (GESTIÓN VÍA API REST DE SUPABASE) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -186,27 +155,23 @@ async def agregar_producto(
     imagen_file: UploadFile = File(...)
 ):
     try:
+        # Guardar imagen localmente
         file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
         with open(file_path, "wb") as buffer: 
             shutil.copyfileobj(imagen_file.file, buffer)
         
-        db = SessionLocal()
-        try:
-            nuevo_producto = ProductoModel(
-                nombre=nombre,
-                precio=precio,
-                categoria=categoria,
-                descripcion=descripcion,
-                imagen=imagen_file.filename
-            )
-            db.add(nuevo_producto)
-            db.commit()
-            print("¡PRODUCTO GUARDADO EXITOSAMENTE EN SUPABASE!")
-        except Exception as db_err:
-            db.rollback()
-            print("ERROR AL GUARDAR EN SUPABASE:", db_err)
-        finally:
-            db.close()
+        # Enviar datos a Supabase mediante la API HTTP (evita bloqueos de puertos en Render)
+        payload = {
+            "nombre": nombre,
+            "precio": float(precio),
+            "categoria": categoria,
+            "descripcion": descripcion,
+            "imagen": imagen_file.filename
+        }
+        
+        response = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=HEADERS, json=payload)
+        print("RESPUESTA SUPABASE API:", response.status_code, response.text)
+        
     except Exception as e:
         print("ERROR GENERAL EN /admin/agregar:", e)
 
@@ -214,16 +179,10 @@ async def agregar_producto(
 
 @app.post("/admin/eliminar/{producto_id}")
 async def eliminar_producto(producto_id: int):
-    db = SessionLocal()
     try:
-        producto = db.query(ProductoModel).filter(ProductoModel.id == producto_id).first()
-        if producto:
-            db.delete(producto)
-            db.commit()
+        requests.delete(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=HEADERS)
     except Exception as e:
-        print("ERROR AL ELIMINAR EN SUPABASE:", e)
-    finally:
-        db.close()
+        print("ERROR AL ELIMINAR EN SUPABASE API:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
