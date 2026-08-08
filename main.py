@@ -170,6 +170,20 @@ async def agregar_producto(
     except Exception as e: print("ERROR EN /admin/agregar:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
+@app.post("/admin/actualizar-imagen/{producto_id}")
+async def actualizar_imagen(producto_id: int, nueva_imagen_file: UploadFile = File(...)):
+    try:
+        file_bytes = await nueva_imagen_file.read()
+        encoded_image = base64.b64encode(file_bytes).decode('utf-8')
+        content_type = nueva_imagen_file.content_type or "image/jpeg"
+        imagen_base64 = f"data:{content_type};base64,{encoded_image}"
+        
+        payload = {"imagen": imagen_base64}
+        db_headers = {**HEADERS, "Content-Type": "application/json"}
+        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
+    except Exception as e: print("ERROR AL ACTUALIZAR IMAGEN:", e)
+    return RedirectResponse(url="/admin", status_code=303)
+
 @app.post("/admin/actualizar-precio/{producto_id}")
 async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
     try:
