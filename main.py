@@ -19,7 +19,7 @@ templates = Jinja2Templates(env=env)
 
 # Configuración de Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://tu-proyecto.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "TU_SUPABASE_KEY")
+SUPABASE_KEY = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -63,10 +63,14 @@ async def menu_cliente(request: Request, mesa: int = 1):
     except Exception as e:
         print("Error obteniendo productos para el menú:", e)
     
-    template = env.get_template("index.html") # Asegúrate de que tu plantilla de cliente se llame index.html o como la tengas nombrada
+    # Definimos las categorías que usa tu menú para evitar el error de 'categorias is undefined'
+    categorias = ["Bebidas Frías", "Bebidas Calientes", "Comida", "Postres", "Métodos", "Cócteles y Café Filtrado", "Extras"]
+
+    template = env.get_template("index.html")
     html_content = template.render(
         request=request,
         productos=productos,
+        categorias=categorias,
         turno_actual=turno_global,
         mesa=mesa
     )
