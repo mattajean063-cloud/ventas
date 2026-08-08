@@ -56,7 +56,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# --- MODELOS PYDANTIC ---
+# --- MODELOS PYDANTIC ACTUALIZADOS ---
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
@@ -64,6 +64,8 @@ class ItemPedido(BaseModel):
     cliente: Optional[str] = "General"
     tipoLeche: Optional[str] = ""
     tipoEndulzante: Optional[str] = ""
+    tamano: Optional[str] = ""
+    promo: Optional[str] = ""
     nota: Optional[str] = ""
 
 class PedidoRequest(BaseModel):
@@ -103,10 +105,12 @@ async def ver_menu(request: Request, mesa: int = 1):
         "Bebidas Frías": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Frías"],
         "Bebidas Calientes": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Calientes"],
         "Comida": [p for p in productos_filtrados if p.get("categoria") == "Comida"],
-        "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"]
+        "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"],
+        "Cócteles y Café Filtrado": [p for p in productos_filtrados if p.get("categoria") == "Cócteles y Café Filtrado"],
+        "Extras": [p for p in productos_filtrados if p.get("categoria") == "Extras"]
     }
     
-    # Definir el nombre del menú según el turno activo
+    # Definir el nombre del menú según el turno activo (Menú Brunch o Menú de Tarde)
     nombre_menu = "Menú Brunch" if TURNO_ACTUAL_SISTEMA == "Mañana" else "Menú de Tarde"
     
     return templates.TemplateResponse(request=request, name="index.html", context={
@@ -186,6 +190,8 @@ async def agregar_producto(
     categoria: str = Form(...), 
     descripcion: str = Form(default=""), 
     horario: str = Form(default="Ambos"), 
+    admite_tamano: Optional[str] = Form(default=None),
+    admite_promo: Optional[str] = Form(default=None),
     imagen_file: UploadFile = File(...)
 ):
     try:
@@ -200,6 +206,8 @@ async def agregar_producto(
             "categoria": categoria,
             "descripcion": descripcion,
             "horario": horario if categoria == "Comida" else "Ambos",
+            "admite_tamano": True if admite_tamano == "true" else False,
+            "admite_promo": True if admite_promo == "true" else False,
             "imagen": imagen_base64
         }
         
