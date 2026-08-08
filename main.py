@@ -86,6 +86,7 @@ class AlertaRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
     db = SessionLocal()
+    menu_lista = []
     try:
         productos_db = db.query(ProductoModel).all()
         menu_lista = [
@@ -98,6 +99,8 @@ async def ver_menu(request: Request, mesa: int = 1):
                 "imagen": p.imagen
             } for p in productos_db
         ]
+    except Exception as e:
+        print("ERROR AL CONSULTAR SUPABASE (INDEX):", e)
     finally:
         db.close()
 
@@ -111,6 +114,7 @@ async def ver_menu(request: Request, mesa: int = 1):
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
     db = SessionLocal()
+    menu_lista = []
     try:
         productos_db = db.query(ProductoModel).all()
         menu_lista = [
@@ -123,6 +127,8 @@ async def ver_admin(request: Request):
                 "imagen": p.imagen
             } for p in productos_db
         ]
+    except Exception as e:
+        print("ERROR AL CONSULTAR SUPABASE (ADMIN):", e)
     finally:
         db.close()
 
@@ -188,6 +194,8 @@ async def agregar_producto(nombre: str = Form(...), precio: float = Form(...), c
         )
         db.add(nuevo_producto)
         db.commit()
+    except Exception as e:
+        print("ERROR AL INSERTAR EN SUPABASE:", e)
     finally:
         db.close()
 
@@ -201,6 +209,8 @@ async def eliminar_producto(producto_id: int):
         if producto:
             db.delete(producto)
             db.commit()
+    except Exception as e:
+        print("ERROR AL ELIMINAR EN SUPABASE:", e)
     finally:
         db.close()
 
