@@ -61,6 +61,7 @@ class ItemPedido(BaseModel):
     nombre: str
     precio: float
     cantidad: Optional[int] = 1
+    cliente: Optional[str] = "General"
 
 class PedidoRequest(BaseModel):
     mesa: int
@@ -83,7 +84,7 @@ async def ver_menu(request: Request, mesa: int = 1):
     except Exception as e:
         print("ERROR AL CONSULTAR SUPABASE API (INDEX):", e)
 
-    # Filtrar productos aplicando la regla de turnos solo a la categoría de Comida
+    # Filtrar productos aplicando turno solo a la categoría de Comida
     productos_filtrados = []
     for p in menu_lista:
         categoria = p.get("categoria")
@@ -93,7 +94,6 @@ async def ver_menu(request: Request, mesa: int = 1):
             if horario == "Ambos" or horario == TURNO_ACTUAL_SISTEMA:
                 productos_filtrados.append(p)
         else:
-            # Las bebidas y postres se muestran siempre
             productos_filtrados.append(p)
 
     categorias = {
@@ -118,7 +118,6 @@ async def ver_admin(request: Request):
 
     return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista, "turno_actual": TURNO_ACTUAL_SISTEMA})
 
-# --- CAMBIAR TURNO MANUALMENTE DESDE EL ADMIN ---
 @app.post("/admin/cambiar-turno")
 async def cambiar_turno(turno: str = Form(...)):
     global TURNO_ACTUAL_SISTEMA
@@ -168,7 +167,7 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN DE PRODUCTOS, PRECIOS Y HORARIOS DE COMIDA) ---
+# --- ADMIN (GESTIÓN DE PRODUCTOS) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -208,7 +207,7 @@ async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e:
-        print("ERROR AL ACTUALIZAR PRECIO EN SUPABASE:", e)
+        print("ERROR AL ACTUALIZAR PRECIO:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
@@ -219,7 +218,7 @@ async def actualizar_horario(producto_id: int, horario: str = Form(...)):
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e:
-        print("ERROR AL ACTUALIZAR HORARIO EN SUPABASE:", e)
+        print("ERROR AL ACTUALIZAR HORARIO:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
@@ -228,7 +227,7 @@ async def eliminar_producto(producto_id: int):
     try:
         requests.delete(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=HEADERS)
     except Exception as e:
-        print("ERROR AL ELIMINAR EN SUPABASE API:", e)
+        print("ERROR AL ELIMINAR:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
