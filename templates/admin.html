@@ -83,7 +83,7 @@
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Nombre</label>
-                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Helado" required>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Precio (Q)</label>
@@ -97,6 +97,8 @@
                                         <option value="Bebidas Calientes">Bebidas Calientes</option>
                                         <option value="Comida">Comida</option>
                                         <option value="Postres">Postres</option>
+                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
+                                        <option value="Extras">Extras</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -107,6 +109,23 @@
                                         <option value="Tarde">Solo Tarde</option>
                                     </select>
                                 </div>
+                                
+                                <!-- Opciones Dinámicas para Tamaños y Bebida/Promo de Mañana -->
+                                <div class="mb-3 p-2 rounded bg-dark border border-secondary">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="admite_tamano" value="true" id="checkTamano">
+                                        <label class="form-check-label text-light small" for="checkTamano">
+                                            📏 Permitir elegir tamaño (8oz / 12oz)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
+                                        <label class="form-check-label text-light small" for="checkPromo">
+                                            🌅 Incluir opción de bebida/promo matutina
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Descripción</label>
                                     <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
@@ -253,11 +272,14 @@
             } else if (data.tipo === 'nuevo_pedido') {
                 let itemsHtml = data.items.map(i => {
                     let detalles = '';
-                    // Capturamos tanto si vienen con camelCase o con snake_case
                     let leche = i.tipoLeche || i.tipo_leche;
                     let endulzante = i.tipoEndulzante || i.tipo_endulzante;
+                    let tamano = i.tamano;
+                    let promo = i.promo;
                     let nota = i.nota;
 
+                    if (tamano) detalles += `<br><small class="text-info ms-3">📏 Tamaño: ${tamano}</small>`;
+                    if (promo) detalles += `<br><small class="text-warning ms-3">🌅 Promo: ${promo}</small>`;
                     if (leche) detalles += `<br><small class="text-warning ms-3">🥛 Leche: ${leche}</small>`;
                     if (endulzante) detalles += `<br><small class="text-warning ms-3">🍯 Endulzante: ${endulzante}</small>`;
                     if (nota) detalles += `<br><small class="text-info ms-3">📝 Nota: ${nota}</small>`;
