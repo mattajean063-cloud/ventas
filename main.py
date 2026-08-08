@@ -1,4 +1,5 @@
 import os
+import time
 from fastapi import FastAPI, Request, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -149,8 +150,9 @@ async def agregar_producto(
     imagen_file: UploadFile = File(...)
 ):
     try:
+        timestamp = int(time.time())
+        file_name = f"{timestamp}_{imagen_file.filename.replace(' ', '_')}"
         file_bytes = await imagen_file.read()
-        file_name = imagen_file.filename
         
         storage_headers = {
             "apikey": SUPABASE_KEY,
@@ -176,6 +178,19 @@ async def agregar_producto(
         
     except Exception as e:
         print("ERROR GENERAL EN /admin/agregar:", e)
+
+    return RedirectResponse(url="/admin", status_code=303)
+
+@app.post("/admin/actualizar-precio/{producto_id}")
+async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
+    try:
+        payload = {
+            "precio": float(nuevo_precio)
+        }
+        db_headers = {**HEADERS, "Content-Type": "application/json"}
+        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
+    except Exception as e:
+        print("ERROR AL ACTUALIZAR PRECIO EN SUPABASE:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
