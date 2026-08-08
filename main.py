@@ -25,8 +25,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- CONFIGURACIÓN DE BASE DE DATOS (SUPABASE CON POOLER 6543) ---
-DATABASE_URL = "postgresql+psycopg2://postgres:matamata675411302603@db.picteudhhdsytfvpvoja.supabase.co:6543/postgres?sslmode=require"
+# --- CONFIGURACIÓN DE BASE DE DATOS (CONEXIÓN DIRECTA PUERTO 5432) ---
+DATABASE_URL = "postgresql+psycopg2://postgres.picteudhhdsytfvpvoja:matamata675411302603@aws-0-us-west-1.pooler.supabase.co:5432/postgres?sslmode=require"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -176,7 +176,7 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN EN SUPABASE CON DIAGNÓSTICO) ---
+# --- ADMIN (GESTIÓN EN SUPABASE) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -186,29 +186,31 @@ async def agregar_producto(
     imagen_file: UploadFile = File(...)
 ):
     try:
-        # 1. Intentar guardar la imagen localmente
         file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
         with open(file_path, "wb") as buffer: 
             shutil.copyfileobj(imagen_file.file, buffer)
         
-        # 2. Intentar guardar en Supabase
         db = SessionLocal()
-        nuevo_producto = ProductoModel(
-            nombre=nombre,
-            precio=precio,
-            categoria=categoria,
-            descripcion=descripcion,
-            imagen=imagen_file.filename
-        )
-        db.add(nuevo_producto)
-        db.commit()
-        db.close()
-        
-        return RedirectResponse(url="/admin", status_code=303)
-        
+        try:
+            nuevo_producto = ProductoModel(
+                nombre=nombre,
+                precio=precio,
+                categoria=categoria,
+                descripcion=descripcion,
+                imagen=imagen_file.filename
+            )
+            db.add(nuevo_producto)
+            db.commit()
+            print("¡PRODUCTO GUARDADO EXITOSAMENTE EN SUPABASE!")
+        except Exception as db_err:
+            db.rollback()
+            print("ERROR AL GUARDAR EN SUPABASE:", db_err)
+        finally:
+            db.close()
     except Exception as e:
-        # Muestra el error exacto en la interfaz web si algo falla
-        return HTMLResponse(content=f"<h2 style='color:red;'>ERROR EXACTO AL GUARDAR:</h2><pre>{str(e)}</pre>", status_code=500)
+        print("ERROR GENERAL EN /admin/agregar:", e)
+
+    return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/eliminar/{producto_id}")
 async def eliminar_producto(producto_id: int):
