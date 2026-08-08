@@ -17,8 +17,16 @@
             --accent-gold-hover: #9c7546;
         }
 
-        body { background-color: var(--bg-cream); color: var(--text-main); font-family: 'Montserrat', sans-serif; }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; font-weight: 700; }
+        body { 
+            background-color: var(--bg-cream); 
+            color: var(--text-main); 
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+        }
         
         .card-colonial { 
             background-color: var(--bg-card-white); 
@@ -27,264 +35,178 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
         
-        .btn-amber { background-color: var(--accent-gold); color: white; font-weight: 600; border: none; }
-        .btn-amber:hover { background-color: var(--accent-gold-hover); color: white; }
+        .btn-amber { 
+            background-color: var(--accent-gold); 
+            color: white; 
+            font-weight: 600; 
+            border: none;
+        }
+        .btn-amber:hover { 
+            background-color: var(--accent-gold-hover); 
+            color: white; 
+        }
 
         .product-card {
             background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: 10px;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             height: 100%;
         }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
 
         .product-img {
-            width: 100%; height: 150px; object-fit: cover;
-            border-top-left-radius: 10px; border-top-right-radius: 10px;
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
             border-bottom: 1px solid var(--border-subtle);
         }
 
         .form-control, .form-select { 
-            background-color: #faf8f5 !important; color: var(--text-main) !important; 
-            border-color: var(--border-subtle) !important; border-radius: 8px;
+            background-color: #faf8f5 !important; 
+            color: var(--text-main) !important; 
+            border-color: var(--border-subtle) !important; 
+            border-radius: 8px;
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-gold) !important;
             box-shadow: 0 0 0 0.2rem rgba(179, 139, 89, 0.15);
         }
 
-        .accordion-button:not(.collapsed) {
-            background-color: #faf8f5;
-            color: var(--accent-gold);
-            box-shadow: none;
+        .nav-pills .nav-link {
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 8px;
+            margin-right: 5px;
+            transition: all 0.2s;
         }
-        .accordion-button {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            background-color: #ffffff;
+
+        .nav-pills .nav-link.active {
+            background-color: var(--accent-gold) !important;
+            color: white !important;
         }
     </style>
 </head>
 <body class="p-3 p-md-4">
     <div class="container" style="max-width: 1200px;">
         
-        <!-- Cabecera y Buscador Preciso -->
+        <!-- Cabecera del Menú -->
         <div class="card-colonial p-4 mb-4 text-center">
             <h1 style="color: var(--accent-gold);" class="display-5 fw-bold mb-1">☕ Don Nicolás</h1>
-            <p class="text-muted mb-3">Mesa Asignada: <span class="badge bg-dark fs-6 px-3 py-1">#{{ mesa }}</span></p>
-            
-            <!-- Buscador general avanzado y ultra preciso -->
-            <div class="mx-auto" style="max-width: 500px;">
-                <input type="text" id="buscador-menu" class="form-control text-center py-2" placeholder="🔍 Busca muffins, tacos, waffles, café..." oninput="filtrarMenuPreciso()">
-            </div>
+            <p class="text-muted mb-2">Mesa Asignada: <span class="badge bg-dark fs-6 px-3 py-1">#{{ mesa }}</span></p>
+            <span class="badge px-3 py-2 text-dark border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
+                🕒 Menú activo: <b style="color: var(--accent-gold);">{{ nombre_menu }}</b>
+            </span>
         </div>
 
         <div class="row g-4">
-            <!-- COLUMNA IZQUIERDA: Acordeón de Categorías y Subcategorías -->
-            <div class="col-lg-8" id="contenedor-categorias-principal">
+            <!-- COLUMNA IZQUIERDA: Catálogo de Productos por Categoría -->
+            <div class="col-lg-8">
                 
-                <!-- ACORDEÓN 1: TACOS Y ANTOJITOS (La Tablita) -->
-                <div class="card-colonial mb-3 overflow-hidden item-buscable" data-keywords="tacos tablita carnes cochinita pibil quesillo chorizo pollo maracuyá">
-                    <div class="accordion accordion-flush" id="acordeonTacos">
-                        <div class="accordion-item border-0">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTacos">
-                                    🌮 Tacos y Antojitos (La Tablita)
-                                </button>
-                            </h2>
-                            <div id="collapseTacos" class="accordion-collapse collapse show" data-bs-parent="#acordeonTacos">
-                                <div class="accordion-body bg-light">
-                                    <div class="row row-cols-1 row-cols-md-2 g-3">
-                                        <!-- Opción Tablita 8 Tacos -->
-                                        <div class="col item-subbuscable" data-keywords="la tablita 8 tacos carnes cochinita mixto">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">La Tablita (8 Tacos)</h6>
-                                                    <p class="text-muted small mb-2">Elige entre 4 carnes, cochinita, quesillo o mixtos.</p>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 80.00+</span>
+                <!-- Pestañas de Navegación de Categorías -->
+                <ul class="nav nav-pills mb-4 flex-nowrap overflow-auto pb-2" id="pills-tab" role="tablist">
+                    {% set active_tab = true %}
+                    {% for cat_nombre, items in categorias.items() %}
+                        {% if items %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if active_tab %}active{% endif %}" id="pills-{{ loop.index }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ loop.index }}" type="button" role="tab">
+                                {{ cat_nombre }}
+                            </button>
+                        </li>
+                        {% set active_tab = false %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+                <!-- Contenido de las Pestañas -->
+                <div class="tab-content" id="pills-tabContent">
+                    {% set active_content = true %}
+                    {% for cat_nombre, items in categorias.items() %}
+                        {% if items %}
+                        <div class="tab-pane fade {% if active_content %}show active{% endif %}" id="pills-{{ loop.index }}" role="tabpanel">
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                {% for p in items %}
+                                    {% set nombre_lower = p.nombre | lower %}
+                                    {% if "la tablita" not in nombre_lower and "la media tablita" not in nombre_lower %}
+                                    <div class="col">
+                                        <div class="product-card d-flex flex-column justify-content-between">
+                                            <div>
+                                                {% if p.imagen %}
+                                                    <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
+                                                {% endif %}
+                                                <div class="p-3">
+                                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                                        <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">{{ p.nombre }}</h5>
+                                                        <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q {{ "%.2f"|format(p.precio) }}</span>
+                                                    </div>
+                                                    <p class="text-muted small mb-2" style="font-size: 0.85rem; line-height: 1.3;">{{ p.descripcion }}</p>
                                                 </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="abrirModalTablita('La Tablita', 80.0)">Personalizar y Elegir Carne</button>
                                             </div>
-                                        </div>
-                                        <!-- Opción Media Tablita 4 Tacos -->
-                                        <div class="col item-subbuscable" data-keywords="media tablita 4 tacos surtidos">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">La Media Tablita (4 Tacos)</h6>
-                                                    <p class="text-muted small mb-2">Porción de 4 tacos con salsas y opción a elegir carne.</p>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 43.00+</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="abrirModalTablita('La Media Tablita', 43.0)">Personalizar y Elegir Carne</button>
+                                            <div class="px-3 pb-3 pt-0">
+                                                <button class="btn btn-amber btn-sm w-100 py-1" onclick='abrirModalProducto({{ p | tojson | safe }})'>
+                                                    Agregar al Carrito
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    {% endif %}
+                                {% endfor %}
 
-                <!-- ACORDEÓN 2: MUFFINS -->
-                <div class="card-colonial mb-3 overflow-hidden item-buscable" data-keywords="muffin tocino huevo queso chorizo">
-                    <div class="accordion accordion-flush" id="acordeonMuffins">
-                        <div class="accordion-item border-0">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMuffins">
-                                    🍞 Muffins Desayuno
-                                </button>
-                            </h2>
-                            <div id="collapseMuffins" class="accordion-collapse collapse" data-bs-parent="#acordeonMuffins">
-                                <div class="accordion-body bg-light">
-                                    <div class="row row-cols-1 row-cols-md-2 g-3">
-                                        <div class="col item-subbuscable" data-keywords="muffin tocino huevo queso amarillo">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Tocino, Huevo y Queso Amarillo</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 25.00</span>
+                                <!-- Tarjetas Únicas Agrupadas para La Tablita y La Media Tablita -->
+                                {% if cat_nombre == "Comida" %}
+                                <div class="col">
+                                    <div class="product-card d-flex flex-column justify-content-between">
+                                        <div>
+                                            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400" class="product-img" alt="La Tablita">
+                                            <div class="p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">La Tablita (8 tacos)</h5>
+                                                    <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q 80.00+</span>
                                                 </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Muffin Tocino, Huevo y Queso Amarillo', 25.0)">Agregar</button>
+                                                <p class="text-muted small mb-2" style="font-size: 0.85rem;">8 tacos con cebolla, cilantro, salsas y opción de elegir carnes.</p>
                                             </div>
                                         </div>
-                                        <div class="col item-subbuscable" data-keywords="muffin jamon huevo queso amarillo">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Jamón, Huevo y Queso Amarillo</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 20.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Muffin Jamón, Huevo y Queso Amarillo', 20.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="muffin chorizo queso mozzarella">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Chorizo y Queso Mozzarella</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 22.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Muffin Chorizo y Queso Mozzarella', 22.0)">Agregar</button>
-                                            </div>
+                                        <div class="px-3 pb-3 pt-0">
+                                            <button class="btn btn-amber btn-sm w-100 py-1" onclick="abrirModalTablita('La Tablita', 80.0)">
+                                                Personalizar y Agregar
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ACORDEÓN 3: WALFFES -->
-                <div class="card-colonial mb-3 overflow-hidden item-buscable" data-keywords="waffle waffles americano dulce nutella dulce de leche helado fruta">
-                    <div class="accordion accordion-flush" id="acordeonWaffles">
-                        <div class="accordion-item border-0">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWaffles">
-                                    🧇 Waffles (Brunch y Tarde)
-                                </button>
-                            </h2>
-                            <div id="collapseWaffles" class="accordion-collapse collapse" data-bs-parent="#acordeonWaffles">
-                                <div class="accordion-body bg-light">
-                                    <div class="row row-cols-1 row-cols-md-2 g-3">
-                                        <div class="col item-subbuscable" data-keywords="waffle americano huevos tocino fruta miel">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Waffle Americano</h6>
-                                                    <p class="text-muted small mb-1">Con 2 huevos fritos, tocino y fruta.</p>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 55.00</span>
+                                <div class="col">
+                                    <div class="product-card d-flex flex-column justify-content-between">
+                                        <div>
+                                            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400" class="product-img" alt="La Media Tablita">
+                                            <div class="p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">La Media Tablita (4 tacos)</h5>
+                                                    <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q 43.00+</span>
                                                 </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Waffle Americano', 55.0)">Agregar</button>
+                                                <p class="text-muted small mb-2" style="font-size: 0.85rem;">4 tacos surtidos con cebolla, cilantro y opción de carnes.</p>
                                             </div>
                                         </div>
-                                        <div class="col item-subbuscable" data-keywords="waffle dulce helado fruta">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Waffle Dulce</h6>
-                                                    <p class="text-muted small mb-1">Acompañado de bola de helado y fruta.</p>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 45.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Waffle Dulce', 45.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="waffles nutella">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Waffles con Nutella</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 40.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Waffles con Nutella', 40.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="waffles dulce de leche">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Waffles con Dulce de Leche</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 40.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Waffles con Dulce de Leche', 40.0)">Agregar</button>
-                                            </div>
+                                        <div class="px-3 pb-3 pt-0">
+                                            <button class="btn btn-amber btn-sm w-100 py-1" onclick="abrirModalTablita('La Media Tablita', 43.0)">
+                                                Personalizar y Agregar
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
+                                {% endif %}
+
                             </div>
                         </div>
-                    </div>
+                        {% set active_content = false %}
+                        {% endif %}
+                    {% endfor %}
                 </div>
-
-                <!-- ACORDEÓN 4: GALLETAS Y POSTRES -->
-                <div class="card-colonial mb-3 overflow-hidden item-buscable" data-keywords="galleta galletas nutella red velvet almendras chispas chocolate brownie alfajores cheesecake">
-                    <div class="accordion accordion-flush" id="acordeonGalletas">
-                        <div class="accordion-item border-0">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGalletas">
-                                    🍪 Galletas y Postres Caseros
-                                </button>
-                            </h2>
-                            <div id="collapseGalletas" class="accordion-collapse collapse" data-bs-parent="#acordeonGalletas">
-                                <div class="accordion-body bg-light">
-                                    <div class="row row-cols-1 row-cols-md-2 g-3">
-                                        <div class="col item-subbuscable" data-keywords="galleta chispas rellena nutella">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Galleta Chispas Rellena de Nutella</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 12.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Galleta Chispas Rellena de Nutella', 12.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="galleta red velvet queso crema">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Galleta Red Velvet Rellena de Queso Crema</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 15.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Galleta Red Velvet Rellena de Queso Crema', 15.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="galleta almendras dulce de leche">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Galleta Almendras Rellena de Dulce de Leche</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 10.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Galleta Almendras Rellena de Dulce de Leche', 10.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                        <div class="col item-subbuscable" data-keywords="brownie chocolate">
-                                            <div class="product-card p-3 d-flex flex-column justify-content-between">
-                                                <div>
-                                                    <h6 class="fw-bold">Brownie</h6>
-                                                    <span class="fw-bold" style="color: var(--accent-gold);">Q 20.00</span>
-                                                </div>
-                                                <button class="btn btn-amber btn-sm mt-2" onclick="agregarDirecto('Brownie', 20.0)">Agregar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
             <!-- COLUMNA DERECHA: Carrito de Compras -->
@@ -317,7 +239,64 @@
         </div>
     </div>
 
-    <!-- MODAL PERSONALIZAR TACOS (LA TABLITA) -->
+    <!-- MODAL DE CONFIGURACIÓN GENERAL / CAFÉ -->
+    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-colonial p-3">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: var(--accent-gold);" id="modal-titulo">Personalizar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modal-nombre">
+                    <input type="hidden" id="modal-precio">
+                    <input type="hidden" id="modal-base-precio">
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Para quien es:</label>
+                        <input type="text" id="modal-cliente" class="form-control" placeholder="Nombre (Ej. Juan)">
+                    </div>
+
+                    <div class="mb-3" id="seccion-tamano" style="display: none;">
+                        <label class="form-label small fw-bold text-muted">Tamaño:</label>
+                        <select class="form-select" id="modal-tamano" onchange="calcularPrecioModal()">
+                            <option value="8oz">Pequeño (8oz)</option>
+                            <option value="12oz">Grande (12oz) [+Q 4.00]</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="seccion-leche" style="display: none;">
+                        <label class="form-label small fw-bold text-muted">Tipo de Leche:</label>
+                        <select class="form-select" id="modal-leche">
+                            <option value="Entera">Leche Entera</option>
+                            <option value="Deslactosada">Leche Deslactosada</option>
+                            <option value="Almendra">Leche de Almendra [+Q 5.00]</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="seccion-endulzante" style="display: none;">
+                        <label class="form-label small fw-bold text-muted">Endulzante:</label>
+                        <select class="form-select" id="modal-endulzante">
+                            <option value="Azúcar normal">Azúcar normal</option>
+                            <option value="Morena">Azúcar Morena</option>
+                            <option value="Splenda">Splenda</option>
+                            <option value="Sin endulzante">Sin endulzante</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Nota o instrucciones especiales:</label>
+                        <textarea class="form-control" id="modal-nota" rows="2" placeholder="Ej. Poco hielo, bien caliente..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-amber w-100 py-2" onclick="agregarAlCarritoDesdeModal()">Añadir al Carrito</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ESPECÍFICO PARA LA TABLITA / MEDIA TABLITA -->
     <div class="modal fade" id="modalTablita" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content card-colonial p-3">
@@ -331,21 +310,34 @@
                     
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Seleccione el tipo de carne:</label>
-                        <select class="form-select" id="select-tipo-carne" onchange="verificarOpcionMixto()">
+                        <select class="form-select" id="select-tipo-carne" onchange="verificarOpcionMixta()">
                             <option value="4 Carnes">4 Carnes (Surtidos)</option>
-                            <option value="Cochinita Pibil">Cochinita Pibil</option>
-                            <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
+                            <option value="Cochinita Pibil">Cochinita Pibil [+Q 5.00 si aplica]</option>
+                            <option value="Quesillo y Chorizo">Quesillo y Chorizo [+Q 5.00 si aplica]</option>
                             <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
                             <option value="Mixtos">Mixtos (Elige exactamente 2 opciones)</option>
                         </select>
                     </div>
 
-                    <div id="contenedor-mixtos" class="mb-3 p-3 rounded border" style="display: none; background-color: #faf8f5;">
+                    <!-- Contenedor desplegable para Mixtos (2 opciones) -->
+                    <div id="contenedor-mixtos" class="mb-3 p-3 rounded border" style="display: none; background-color: #faf8f5; border-color: var(--border-subtle) !important;">
                         <label class="form-label small fw-bold" style="color: var(--accent-gold);">Seleccione las 2 opciones para su mixto:</label>
-                        <div class="form-check"><input class="form-check-input check-mixto" type="checkbox" value="4 Carnes" id="mix1"><label class="form-check-label small" for="mix1">4 Carnes</label></div>
-                        <div class="form-check"><input class="form-check-input check-mixto" type="checkbox" value="Cochinita Pibil" id="mix2"><label class="form-check-label small" for="mix2">Cochinita Pibil</label></div>
-                        <div class="form-check"><input class="form-check-input check-mixto" type="checkbox" value="Quesillo y Chorizo" id="mix3"><label class="form-check-label small" for="mix3">Quesillo y Chorizo</label></div>
-                        <div class="form-check"><input class="form-check-input check-mixto" type="checkbox" value="Pollo con salsa de maracuyá" id="mix4"><label class="form-check-label small" for="mix4">Pollo con salsa de maracuyá</label></div>
+                        <div class="form-check">
+                            <input class="form-check-input check-mixto" type="checkbox" value="4 Carnes" id="mix1">
+                            <label class="form-check-label small" for="mix1">4 Carnes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-mixto" type="checkbox" value="Cochinita Pibil" id="mix2">
+                            <label class="form-check-label small" for="mix2">Cochinita Pibil</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-mixto" type="checkbox" value="Quesillo y Chorizo" id="mix3">
+                            <label class="form-check-label small" for="mix3">Quesillo y Chorizo</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input check-mixto" type="checkbox" value="Pollo con salsa de maracuyá" id="mix4">
+                            <label class="form-check-label small" for="mix4">Pollo con salsa de maracuyá</label>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -365,41 +357,91 @@
         let carrito = [];
         const mesaActual = {{ mesa }};
 
-        // --- BUSCADOR PRECISO ---
-        function filtrarMenuPreciso() {
-            let textoBusqueda = document.getElementById('buscador-menu').value.toLowerCase().trim();
-            let bloquesCategoria = document.querySelectorAll('.item-buscable');
+        function abrirModalProducto(p) {
+            document.getElementById('modal-nombre').value = p.nombre;
+            document.getElementById('modal-precio').value = p.precio;
+            document.getElementById('modal-base-precio').value = p.precio;
+            document.getElementById('modal-titulo').innerText = p.nombre;
+            document.getElementById('modal-cliente').value = '';
+            document.getElementById('modal-nota').value = '';
 
-            bloquesCategoria.forEach(bloque => {
-                let palabrasClaveBloque = bloque.getAttribute('data-keywords') || "";
-                let subItems = bloque.querySelectorAll('.item-subbuscable');
-                let hayCoincidenciaEnBloque = false;
+            // Gestionar visibilidad de tamaños
+            let seccionTamano = document.getElementById('seccion-tamano');
+            let selectTamano = document.getElementById('modal-tamano');
+            if (p.config_tamano === 'elegir_ambos') {
+                seccionTamano.style.display = 'block';
+                selectTamano.innerHTML = `<option value="8oz">Pequeño (8oz)</option><option value="12oz">Grande (12oz) [+Q 4.00]</option>`;
+                selectTamano.value = '8oz';
+            } else if (p.config_tamano === 'fijo_8oz') {
+                seccionTamano.style.display = 'block';
+                selectTamano.innerHTML = `<option value="8oz">Pequeño (8oz)</option>`;
+                selectTamano.value = '8oz';
+            } else if (p.config_tamano === 'fijo_12oz') {
+                seccionTamano.style.display = 'block';
+                selectTamano.innerHTML = `<option value="12oz">Grande (12oz)</option>`;
+                selectTamano.value = '12oz';
+            } else {
+                seccionTamano.style.display = 'none';
+            }
 
-                subItems.forEach(sub => {
-                    let palabrasSub = sub.getAttribute('data-keywords') || "";
-                    let textoVisibleSub = sub.innerText.toLowerCase();
+            // Gestionar opciones de café (leche y endulzante)
+            let seccionLeche = document.getElementById('seccion-leche');
+            let seccionEndulzante = document.getElementById('seccion-endulzante');
+            if (p.admite_extras_cafe) {
+                seccionLeche.style.display = 'block';
+                seccionEndulzante.style.display = 'block';
+                document.getElementById('modal-leche').value = 'Entera';
+                document.getElementById('modal-endulzante').value = 'Azúcar normal';
+            } else {
+                seccionLeche.style.display = 'none';
+                seccionEndulzante.style.display = 'none';
+            }
 
-                    if (palabrasSub.includes(textoBusqueda) || textoVisibleSub.includes(textoBusqueda) || palabrasClaveBloque.includes(textoBusqueda)) {
-                        sub.style.display = 'block';
-                        hayCoincidenciaEnBloque = true;
-                    } else {
-                        sub.style.display = 'none';
-                    }
-                });
+            let myModal = new bootstrap.Modal(document.getElementById('modalProducto'));
+            myModal.show();
+        }
 
-                if (textoBusqueda === "" || hayCoincidenciaEnBloque || palabrasClaveBloque.includes(textoBusqueda)) {
-                    bloque.style.display = 'block';
-                } else {
-                    bloque.style.display = 'none';
-                }
+        function calcularPrecioModal() {
+            let base = parseFloat(document.getElementById('modal-base-precio').value);
+            let tamano = document.getElementById('modal-tamano').value;
+            let precioFinal = base;
+            if (tamano === '12oz' && document.getElementById('seccion-tamano').style.display !== 'none') {
+                precioFinal += 4.00;
+            }
+            document.getElementById('modal-precio').value = precioFinal;
+        }
+
+        function agregarAlCarritoDesdeModal() {
+            let nombre = document.getElementById('modal-nombre').value;
+            let precio = parseFloat(document.getElementById('modal-precio').value);
+            let cliente = document.getElementById('modal-cliente').value || 'General';
+            let nota = document.getElementById('modal-nota').value;
+            let tamano = document.getElementById('seccion-tamano').style.display !== 'none' ? document.getElementById('modal-tamano').value : '';
+            
+            let tipoLeche = '';
+            let tipoEndulzante = '';
+            if (document.getElementById('seccion-leche').style.display !== 'none') {
+                tipoLeche = document.getElementById('modal-leche').value;
+                if (tipoLeche === 'Almendra') precio += 5.00;
+                tipoEndulzante = document.getElementById('modal-endulzante').value;
+            }
+
+            carrito.push({
+                nombre: nombre,
+                precio: precio,
+                cantidad: 1,
+                cliente: cliente,
+                tamano: tamano,
+                tipoLeche: tipoLeche,
+                tipoEndulzante: tipoEndulzante,
+                nota: nota
             });
-        }
 
-        function agregarDirecto(nombre, precio) {
-            carrito.push({ nombre: nombre, precio: precio, cantidad: 1, cliente: 'General' });
             actualizarCarritoVisual();
+            bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
         }
 
+        // --- LÓGICA DE LA TABLITA Y MEDIA TABLITA ---
         function verificarOpcionMixto() {
             const seleccion = document.getElementById('select-tipo-carne').value;
             const contenedorMixtos = document.getElementById('contenedor-mixtos');
@@ -430,9 +472,15 @@
             const cliente = document.getElementById('tablita-cliente').value || 'General';
             
             let detalleCarne = tipoCarne;
+            if (tipoCarne === 'Cochinita Pibil' || tipoCarne === 'Quesillo y Chorizo') {
+                precioBase += 2.00; // Ajuste si la variante base sube de precio según el inventario original
+            }
+
             if (tipoCarne === 'Mixtos') {
                 let seleccionados = [];
-                document.querySelectorAll('.check-mixto:checked').forEach(chk => { seleccionados.push(chk.value); });
+                document.querySelectorAll('.check-mixto:checked').forEach(chk => {
+                    seleccionados.push(chk.value);
+                });
                 if (seleccionados.length !== 2) {
                     alert("Por favor, seleccione exactamente 2 opciones para su combinación mixta.");
                     return;
@@ -474,9 +522,18 @@
                 let subtotal = item.precio * item.cantidad;
                 total += subtotal;
 
+                let extrasHtml = '';
+                if (item.tamano) extrasHtml += `<br><small class="text-secondary">📏 Tamaño: ${item.tamano}</small>`;
+                if (item.tipoLeche) extrasHtml += `<br><small class="text-secondary">🥛 Leche: ${item.tipoLeche}</small>`;
+                if (item.tipoEndulzante) extrasHtml += `<br><small class="text-secondary">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
+                if (item.nota) extrasHtml += `<br><small class="text-secondary">📝 ${item.nota}</small>`;
+
                 html += `
                     <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2 small">
-                        <div><b>[${item.cliente}]</b> ${item.cantidad}x ${item.nombre}</div>
+                        <div>
+                            <b>[${item.cliente}]</b> ${item.cantidad}x ${item.nombre}
+                            ${extrasHtml}
+                        </div>
                         <div class="text-end">
                             <span class="fw-bold">Q ${subtotal.toFixed(2)}</span><br>
                             <button class="btn btn-link text-danger p-0" style="font-size: 0.75rem;" onclick="eliminarDelCarrito(${index})">Eliminar</button>
@@ -490,14 +547,24 @@
         }
 
         async function enviarPedido() {
-            if (carrito.length === 0) { alert("Tu carrito está vacío."); return; }
+            if (carrito.length === 0) {
+                alert("Tu carrito está vacío.");
+                return;
+            }
+
             let total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+            let payload = {
+                mesa: mesaActual,
+                items: carrito,
+                total: total
+            };
 
             try {
                 let response = await fetch('/api/enviar-pedido', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mesa: mesaActual, items: carrito, total: total })
+                    body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
@@ -505,20 +572,26 @@
                     carrito = [];
                     actualizarCarritoVisual();
                 } else {
-                    alert("Error al enviar el pedido.");
+                    alert("Error al enviar el pedido. Intente nuevamente.");
                 }
-            } catch (e) { alert("Error de conexión con el servidor."); }
+            } catch (e) {
+                alert("Error de conexión con el servidor.");
+            }
         }
 
         async function llamarMesero(tipo) {
             try {
-                await fetch('/api/alerta-mesero', {
+                let response = await fetch('/api/alerta-mesero', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mesa: mesaActual, tipo: tipo })
                 });
-                alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Se ha solicitado la cuenta.");
-            } catch (e) { alert("Error al enviar la alerta."); }
+                if (response.ok) {
+                    alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Se ha solicitado la cuenta.");
+                }
+            } catch (e) {
+                alert("Error al enviar la alerta.");
+            }
         }
     </script>
 </body>
