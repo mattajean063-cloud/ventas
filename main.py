@@ -7,7 +7,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 import jinja2
 
-app = FastAPI()
+# Activamos debug=True para ver errores detallados en pantalla si ocurren
+app = FastAPI(debug=True)
 
 # Inicialización segura de plantillas sin conflicto de caché
 env = jinja2.Environment(
@@ -58,6 +59,8 @@ async def panel_admin(request: Request):
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
         if response.status_code == 200:
             productos = response.json()
+        else:
+            print("Error de Supabase en /admin:", response.text)
     except Exception as e:
         print("Error obteniendo productos:", e)
     
