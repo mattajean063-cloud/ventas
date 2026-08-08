@@ -236,7 +236,7 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // Conexión WebSockets mejorada con reconexión automática
+        // 1. Conexión WebSockets principal
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
@@ -251,9 +251,25 @@
             };
         }
 
+        // 2. Respaldo de sondeo HTTP automático (Polling cada 3 segundos por si el WebSocket se bloquea)
+        async function verificarEventosHttp() {
+            try {
+                let response = await fetch('/api/obtener-eventos');
+                let eventos = await response.json();
+                if (eventos && eventos.length > 0) {
+                    eventos.forEach(evento => {
+                        procesarYMostrarEvento(evento);
+                    });
+                }
+            } catch (error) {
+                console.error("Error consultando eventos por HTTP:", error);
+            }
+        }
+
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
+            setInterval(verificarEventosHttp, 3000); // Consulta pasiva de respaldo cada 3 segundos
         };
 
         function pedirPermisoNotificaciones() { 
