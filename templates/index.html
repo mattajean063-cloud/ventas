@@ -23,7 +23,6 @@
             padding-bottom: 180px;
         }
 
-        /* Encabezado y barra de navegación fijos arriba */
         .sticky-container {
             position: sticky;
             top: 0;
@@ -105,7 +104,6 @@
             border-color: var(--accent-gold);
         }
 
-        /* Panel flotante FIJO ABAJO que sigue al usuario */
         .order-panel {
             position: fixed;
             bottom: 15px;
@@ -129,12 +127,11 @@
 </head>
 <body>
 
-    <!-- Contenedor Fijo Superior (Encabezado + Botones de Categoría) -->
     <div class="sticky-container shadow-sm mb-3 pt-3">
         <div class="container d-flex justify-content-between align-items-center mb-2" style="max-width: 600px;">
             <div>
                 <h4 class="text-warning fw-bold m-0">☕ Don Nicolás</h4>
-                <small class="text-muted" style="color: var(--text-muted) !important;">Turno: <strong>{{ turno }}</strong></small>
+                <small class="text-muted" style="color: var(--text-muted) !important;">Turno Comida: <strong>{{ turno }}</strong></small>
             </div>
             <div class="text-end">
                 <span class="badge badge-mesa fs-6 px-3 py-2 rounded-pill shadow-sm">
@@ -148,7 +145,6 @@
             <button class="btn btn-outline-warning btn-sm w-50 py-1" onclick="enviarAlerta('cuenta')">🧾 Pedir Cuenta</button>
         </div>
 
-        <!-- Botones de Filtro por Categoría -->
         <div class="container d-flex justify-content-center gap-2 flex-wrap" style="max-width: 600px;">
             <button class="btn-categoria active" onclick="filtrarCategoria('todos', this)">🌟 Todos</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Bebidas Frías', this)">🥤 Frías</button>
@@ -160,7 +156,7 @@
 
     <div class="container" style="max-width: 600px;">
 
-        <!-- SECCIÓN: BEBIDAS FRÍAS -->
+        <!-- BEBIDAS FRÍAS -->
         {% if categorias['Bebidas Frías'] %}
         <div class="grupo-categoria" data-categoria="Bebidas Frías">
             <h5 class="category-title">🥤 Bebidas Frías</h5>
@@ -175,14 +171,14 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito('{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- SECCIÓN: BEBIDAS CALIENTES -->
+        <!-- BEBIDAS CALIENTES -->
         {% if categorias['Bebidas Calientes'] %}
         <div class="grupo-categoria" data-categoria="Bebidas Calientes">
             <h5 class="category-title">☕ Bebidas Calientes</h5>
@@ -197,14 +193,14 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito('{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- SECCIÓN: COMIDA -->
+        <!-- COMIDA -->
         {% if categorias.Comida %}
         <div class="grupo-categoria" data-categoria="Comida">
             <h5 class="category-title">🍳 Comida y Platillos</h5>
@@ -219,14 +215,14 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito('{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- SECCIÓN: POSTRES -->
+        <!-- POSTRES -->
         {% if categorias.Postres %}
         <div class="grupo-categoria" data-categoria="Postres">
             <h5 class="category-title">🍰 Postres Tradicionales</h5>
@@ -241,7 +237,7 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito('{{ p.nombre }}', {{ p.precio }})">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="agregarAlCarrito({{ p.id }}, '{{ p.nombre }}', {{ p.precio }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -250,12 +246,11 @@
 
     </div>
 
-    <!-- PANEL FLOTANTE Y PLEGABLE FIJO ABAJO QUE SIGUE AL USUARIO -->
+    <!-- PANEL FLOTANTE DE PEDIDO -->
     <div id="contenedor-resumen-pedido" class="order-panel p-3 px-4" style="display: none;">
-        <!-- Cabecera desplegable con el Total visible -->
-        <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseDetallePedido" aria-expanded="false" aria-controls="collapseDetallePedido" style="cursor: pointer;">
+        <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseDetallePedido" aria-expanded="false" style="cursor: pointer;">
             <div>
-                <h5 class="text-warning fw-bold m-0 fs-6">📋 Su Selección</h5>
+                <h5 class="text-warning fw-bold m-0 fs-6">📋 Su Selección (Cuentas Separadas)</h5>
                 <small class="text-muted" style="font-size: 0.75rem;">Toque para desplegar/ocultar</small>
             </div>
             <div class="text-end d-flex align-items-center gap-2">
@@ -264,11 +259,9 @@
             </div>
         </div>
 
-        <!-- Contenido Plegable -->
         <div class="collapse mt-2 pt-2 border-top border-secondary" id="collapseDetallePedido">
             <div id="lista-carrito" class="mb-3" style="max-height: 200px; overflow-y: auto;"></div>
 
-            <!-- Casilla de verificación obligatoria -->
             <div class="form-check mb-3 p-2 rounded" style="background-color: #3d291d; border: 1px solid #5c3f2d;">
                 <input class="form-check-input ms-0 me-2" type="checkbox" id="checkRevisado" onchange="toggleBotonEnviar()">
                 <label class="form-check-label text-light fw-bold" for="checkRevisado" style="font-size: 0.82rem; cursor: pointer;">
@@ -282,10 +275,13 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let numeroMesa = urlParams.get('mesa') || '1';
         document.getElementById('label-mesa').innerText = numeroMesa;
+
+        let carrito = [];
 
         function filtrarCategoria(categoria, boton) {
             document.querySelectorAll('.btn-categoria').forEach(btn => btn.classList.remove('active'));
@@ -300,12 +296,90 @@
             });
         }
 
-        // Función para habilitar o deshabilitar el botón según el checkbox
+        function agregarAlCarrito(id, nombre, precio) {
+            let cliente = prompt("¿A nombre de quién va este producto? (Opcional):", "General");
+            if (cliente === null) return;
+            cliente = cliente.trim() === "" ? "General" : cliente.trim();
+
+            let itemExistente = carrito.find(item => item.id === id && item.cliente === cliente);
+            if (itemExistente) {
+                itemExistente.cantidad += 1;
+            } else {
+                carrito.push({ id, nombre, precio, cantidad: 1, cliente });
+            }
+            actualizarCarritoUI();
+        }
+
+        function actualizarCarritoUI() {
+            const panel = document.getElementById('contenedor-resumen-pedido');
+            const lista = document.getElementById('lista-carrito');
+            const totalSpan = document.getElementById('total-carrito');
+
+            if (carrito.length === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+            lista.innerHTML = '';
+            let total = 0;
+
+            carrito.forEach((item, index) => {
+                let subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                lista.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary py-2 text-light">
+                        <div>
+                            <span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>
+                            <div class="fw-bold">${item.cantidad}x ${item.nombre}</div>
+                            <small class="text-muted">Q ${subtotal.toFixed(2)}</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm py-0 px-2" onclick="removerDelCarrito(${index})">❌</button>
+                    </div>
+                `;
+            });
+
+            totalSpan.innerText = `Q ${total.toFixed(2)}`;
+        }
+
+        function removerDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
+
         function toggleBotonEnviar() {
             const check = document.getElementById('checkRevisado');
             const boton = document.getElementById('btn-enviar-pedido');
             if (check && boton) {
                 boton.disabled = !check.checked;
+            }
+        }
+
+        async function enviarPedido() {
+            if (carrito.length === 0) return;
+
+            let total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            let payload = { mesa: parseInt(numeroMesa), items: carrito, total: total };
+
+            try {
+                let respuesta = await fetch('/api/enviar-pedido', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (respuesta.ok) {
+                    alert("¡Pedido con cuentas separadas enviado con éxito a cocina!");
+                    carrito = [];
+                    actualizarCarritoUI();
+                    document.getElementById('contenedor-resumen-pedido').style.display = 'none';
+                    document.getElementById('checkRevisado').checked = false;
+                    toggleBotonEnviar();
+                } else {
+                    alert("Hubo un error al enviar el pedido.");
+                }
+            } catch (e) {
+                alert("Error de conexión.");
             }
         }
 
@@ -317,16 +391,12 @@
                     body: JSON.stringify({ mesa: parseInt(numeroMesa), tipo: tipo })
                 });
                 if(res.ok) {
-                    alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero de inmediato." : "🧾 Solicitud de cuenta enviada a caja.");
-                } else {
-                    alert("No se pudo conectar con el servidor.");
+                    alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Solicitud de cuenta enviada.");
                 }
             } catch (e) {
-                alert("Error de conexión con el servidor.");
+                alert("Error de conexión.");
             }
         }
     </script>
-    <script src="/static/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
