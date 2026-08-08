@@ -10,7 +10,6 @@ import requests
 
 app = FastAPI()
 
-# --- CONFIGURACIÓN DE RUTAS ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -18,7 +17,6 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
@@ -28,35 +26,25 @@ HEADERS = {
     "Prefer": "return=representation"
 }
 
-# --- HISTORIAL TEMPORAL PARA POLLING (NOTIFICACIONES) ---
 historial_notificaciones = []
-
-# --- ESTADO GLOBAL DEL TURNO (Mañana / Tarde) ---
 TURNO_ACTUAL_SISTEMA = "Mañana"
 
-# --- LÓGICA DE WEBSOCKETS ---
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Set[WebSocket] = set()
-
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.add(websocket)
-
     def disconnect(self, websocket: WebSocket):
         self.active_connections.discard(websocket)
-
     async def broadcast(self, message: dict):
         if self.active_connections:
             for connection in self.active_connections:
-                try:
-                    await connection.send_json(message)
-                except:
-                    pass
+                try: await connection.send_json(message)
+                except: pass
 
 manager = ConnectionManager()
 
-# --- MODELOS PYDANTIC ACTUALIZADOS ---
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
@@ -77,29 +65,22 @@ class AlertaRequest(BaseModel):
     mesa: int
     tipo: str
 
-# --- RUTAS WEB ---
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
     global TURNO_ACTUAL_SISTEMA
     menu_lista = []
     try:
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
-        if response.status_code == 200:
-            menu_lista = response.json()
-    except Exception as e:
-        print("ERROR AL CONSULTAR SUPABASE API (INDEX):", e)
+        if response.status_code == 200: menu_lista = response.json()
+    except Exception as e: print("ERROR SUPABASE (INDEX):", e)
 
-    # Filtrar productos aplicando turno solo a la categoría de Comida
     productos_filtrados = []
     for p in menu_lista:
         categoria = p.get("categoria")
         horario = p.get("horario", "Ambos")
-        
         if categoria == "Comida":
-            if horario == "Ambos" or horario == TURNO_ACTUAL_SISTEMA:
-                productos_filtrados.append(p)
-        else:
-            productos_filtrados.append(p)
+            if horario == "Ambos" or horario == TURNO_ACTUAL_SISTEMA: productos_filtrados.append(p)
+        else: productos_filtrados.append(p)
 
     categorias = {
         "Bebidas Frías": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Frías"],
@@ -109,16 +90,8 @@ async def ver_menu(request: Request, mesa: int = 1):
         "Cócteles y Café Filtrado": [p for p in productos_filtrados if p.get("categoria") == "Cócteles y Café Filtrado"],
         "Extras": [p for p in productos_filtrados if p.get("categoria") == "Extras"]
     }
-    
-    # Definir el nombre del menú según el turno activo (Menú Brunch o Menú de Tarde)
     nombre_menu = "Menú Brunch" if TURNO_ACTUAL_SISTEMA == "Mañana" else "Menú de Tarde"
-    
-    return templates.TemplateResponse(request=request, name="index.html", context={
-        "mesa": mesa, 
-        "categorias": categorias, 
-        "turno": TURNO_ACTUAL_SISTEMA,
-        "nombre_menu": nombre_menu
-    })
+    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias, "turno": TURNO_ACTUAL_SISTEMA, "nombre_menu": nombre_menu})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
@@ -126,38 +99,26 @@ async def ver_admin(request: Request):
     menu_lista = []
     try:
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
-        if response.status_code == 200:
-            menu_lista = response.json()
-    except Exception as e:
-        print("ERROR AL CONSULTAR SUPABASE API (ADMIN):", e)
-
+        if response.status_code == 200: menu_lista = response.json()
+    except Exception as e: print("ERROR SUPABASE (ADMIN):", e)
     return templates.TemplateResponse(request=request, name="admin.html", context={"productos": menu_lista, "turno_actual": TURNO_ACTUAL_SISTEMA})
 
 @app.post("/admin/cambiar-turno")
 async def cambiar_turno(turno: str = Form(...)):
     global TURNO_ACTUAL_SISTEMA
-    if turno in ["Mañana", "Tarde"]:
-        TURNO_ACTUAL_SISTEMA = turno
+    if turno in ["Mañana", "Tarde"]: TURNO_ACTUAL_SISTEMA = turno
     return RedirectResponse(url="/admin", status_code=303)
 
-# --- APIS Y POLLING DE ALERTAS ---
 @app.websocket("/ws/admin")
 async def websocket_admin(websocket: WebSocket):
     await manager.connect(websocket)
     try:
-        while True:
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        while True: await websocket.receive_text()
+    except WebSocketDisconnect: manager.disconnect(websocket)
 
 @app.post("/api/enviar-pedido")
 async def recibir_pedido(pedido: PedidoRequest):
-    nuevo_evento = {
-        "tipo": "nuevo_pedido", 
-        "mesa": pedido.mesa, 
-        "items": [i.dict() for i in pedido.items], 
-        "total": pedido.total
-    }
+    nuevo_evento = {"tipo": "nuevo_pedido", "mesa": pedido.mesa, "items": [i.dict() for i in pedido.items], "total": pedido.total}
     historial_notificaciones.append(nuevo_evento)
     await manager.broadcast(nuevo_evento)
     return {"status": "success"}
@@ -165,12 +126,7 @@ async def recibir_pedido(pedido: PedidoRequest):
 @app.post("/api/alerta-mesero")
 async def alerta_mesero(alerta: AlertaRequest):
     titulo = "🛎️ ¡Llamando al Mesero!" if alerta.tipo == "mesero" else "🧾 ¡Pidiendo la Cuenta!"
-    nuevo_evento = {
-        "tipo": "alerta", 
-        "titulo": titulo, 
-        "mesa": alerta.mesa, 
-        "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."
-    }
+    nuevo_evento = {"tipo": "alerta", "titulo": titulo, "mesa": alerta.mesa, "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."}
     historial_notificaciones.append(nuevo_evento)
     await manager.broadcast(nuevo_evento)
     return {"status": "success"}
@@ -182,7 +138,6 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN DE PRODUCTOS) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -190,7 +145,7 @@ async def agregar_producto(
     categoria: str = Form(...), 
     descripcion: str = Form(default=""), 
     horario: str = Form(default="Ambos"), 
-    admite_tamano: Optional[str] = Form(default=None),
+    config_tamano: str = Form(default="ninguno"),
     admite_promo: Optional[str] = Form(default=None),
     imagen_file: UploadFile = File(...)
 ):
@@ -206,18 +161,13 @@ async def agregar_producto(
             "categoria": categoria,
             "descripcion": descripcion,
             "horario": horario if categoria == "Comida" else "Ambos",
-            "admite_tamano": True if admite_tamano == "true" else False,
+            "config_tamano": config_tamano,
             "admite_promo": True if admite_promo == "true" else False,
             "imagen": imagen_base64
         }
-        
         db_headers = {**HEADERS, "Content-Type": "application/json"}
-        res = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
-        print("RESPUESTA SUPABASE AL AGREGAR:", res.status_code, res.text)
-        
-    except Exception as e:
-        print("ERROR GENERAL EN /admin/agregar:", e)
-
+        requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
+    except Exception as e: print("ERROR EN /admin/agregar:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/actualizar-precio/{producto_id}")
@@ -226,9 +176,7 @@ async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
         payload = {"precio": float(nuevo_precio)}
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
-    except Exception as e:
-        print("ERROR AL ACTUALIZAR PRECIO:", e)
-
+    except Exception as e: print("ERROR:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/actualizar-horario/{producto_id}")
@@ -237,18 +185,13 @@ async def actualizar_horario(producto_id: int, horario: str = Form(...)):
         payload = {"horario": horario}
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
-    except Exception as e:
-        print("ERROR AL ACTUALIZAR HORARIO:", e)
-
+    except Exception as e: print("ERROR:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/eliminar/{producto_id}")
 async def eliminar_producto(producto_id: int):
-    try:
-        requests.delete(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=HEADERS)
-    except Exception as e:
-        print("ERROR AL ELIMINAR:", e)
-
+    try: requests.delete(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=HEADERS)
+    except Exception as e: print("ERROR:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 if __name__ == "__main__":
