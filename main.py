@@ -29,6 +29,72 @@ HEADERS = {
 historial_notificaciones = []
 TURNO_ACTUAL_SISTEMA = "Mañana"
 
+# Menú precargado a partir del PDF e imágenes suministradas
+MENU_INICIAL_COMPLETO = [
+    # Brunch (Mañana)
+    {"nombre": "Chilaquiles", "precio": 55.0, "categoria": "Comida", "descripcion": "Huevos estrellados sobre tortillas fritas, salsa roja, queso mozzarella, crema, pechuga de pollo y cebolla morada curtida.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400"},
+    {"nombre": "Waffle Americano", "precio": 55.0, "categoria": "Comida", "descripcion": "Waffle acompañado de 2 huevos fritos, tiras de tocino, fruta y miel maple.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400"},
+    {"nombre": "Omelette de Claras", "precio": 50.0, "categoria": "Comida", "descripcion": "Relleno de queso mozzarella, espinaca, tomate, chile pimiento, cebolla, papas country, yogurt natural, granola, miel maple y fruta.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=400"},
+    {"nombre": "Omelette Americano", "precio": 35.0, "categoria": "Comida", "descripcion": "Relleno con jamón y queso mozzarella, salsa roja, pan tostado con queso crema, granola y jalea.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400"},
+    {"nombre": "Huevos Ahogados", "precio": 40.0, "categoria": "Comida", "descripcion": "Huevos en salsa roja con chorizo, frijoles volteados y pan tostado con mantequilla de ajo.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400"},
+    {"nombre": "Típico", "precio": 40.0, "categoria": "Comida", "descripcion": "Huevos al gusto, frijoles volteados, queso, crema, salsa roja, plátanos fritos y tortillas.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400"},
+    {"nombre": "Avocado Toast", "precio": 25.0, "categoria": "Comida", "descripcion": "Pan de molde tostado con aderezo de cilantro, aguacate y huevo revuelto con pimienta.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?w=400"},
+    {"nombre": "Waffle Dulce", "precio": 45.0, "categoria": "Postres", "descripcion": "Waffle acompañado de una bola de helado y fruta.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400"},
+    {"nombre": "Tostadas a la Francesa", "precio": 35.0, "categoria": "Postres", "descripcion": "Pan remojado en canela y leche, relleno de queso ricota con mermelada de fresas y fruta.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400"},
+    {"nombre": "Parfait", "precio": 40.0, "categoria": "Postres", "descripcion": "Yogurt natural sin azúcar acompañado de granola, miel maple y fruta.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400"},
+
+    # Tacos y Antojitos
+    {"nombre": "La Tablita (8 tacos - 4 carnes)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos con cebolla, cilantro, salsas de la casa y limón (4 carnes).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
+    {"nombre": "La Tablita (8 tacos - Cochinita Pibil)", "precio": 85.0, "categoria": "Comida", "descripcion": "8 tacos de cochinita pibil con cebolla, cilantro y salsas.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
+    {"nombre": "La Tablita (8 tacos - Quesillo y Chorizo)", "precio": 85.0, "categoria": "Comida", "descripcion": "8 tacos de quesillo y chorizo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400"},
+    {"nombre": "La Tablita (8 tacos - Pollo Maracuyá)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos de pollo con salsa de maracuyá.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=400"},
+    {"nombre": "La Media Tablita (4 tacos - 4 carnes)", "precio": 43.0, "categoria": "Comida", "descripcion": "4 tacos surtidos 4 carnes.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
+    {"nombre": "La Media Tablita (4 tacos - Cochinita)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos de cochinita pibil.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
+    {"nombre": "La Media Tablita (4 tacos - Quesillo/Chorizo)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos de quesillo y chorizo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400"},
+    {"nombre": "La Media Tablita (4 tacos - Pollo Maracuyá)", "precio": 43.0, "categoria": "Comida", "descripcion": "4 tacos de pollo con salsa de maracuyá.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=400"},
+    {"nombre": "Dobladitas Fritas", "precio": 25.0, "categoria": "Comida", "descripcion": "3 tortillas fritas con chorizo y mozzarella, bañadas en salsa verde, mayonesa, cilantro y queso fresco.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?w=400"},
+    {"nombre": "Tostadas (Combo 4)", "precio": 25.0, "categoria": "Comida", "descripcion": "Tostadas fritas con frijol o aguacate, decoradas con salsa y queso (4 unidades).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=400"},
+
+    # Sandwiches y Muffins
+    {"nombre": "Baguette 4 Carnes", "precio": 55.0, "categoria": "Comida", "descripcion": "Cerdo, res, pollo, salchicha, mozzarella, salsa de aguacate, tomate, lechuga y cebolla curtida.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400"},
+    {"nombre": "Baguette de Pollo", "precio": 45.0, "categoria": "Comida", "descripcion": "Filete de pollo a la plancha, salsa de aguacate, lechuga, chile pimiento, cebolla y tomate.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400"},
+    {"nombre": "Baguette Virginia", "precio": 40.0, "categoria": "Comida", "descripcion": "Jamón virginia, queso crema, queso amarillo, aderezo de aguacate, tomate y lechuga.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400"},
+    {"nombre": "Sandwich Croque", "precio": 30.0, "categoria": "Comida", "descripcion": "Pan relleno con bechamel, mozzarella, frijol o jamón, huevo estrellado y salsa de queso.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=400"},
+    {"nombre": "Panito", "precio": 20.0, "categoria": "Comida", "descripcion": "Pan de agua relleno de huevos revueltos con chorizo y bañado en queso mozzarella.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1539252554453-80ab65ce3586?w=400"},
+    {"nombre": "Muffin Tocino, Huevo y Queso", "precio": 25.0, "categoria": "Comida", "descripcion": "Muffin con tocino, huevo y queso amarillo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400"},
+    {"nombre": "Muffin Jamón, Huevo y Queso", "precio": 20.0, "categoria": "Comida", "descripcion": "Muffin con jamón, huevo y queso amarillo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=400"},
+    {"nombre": "Muffin Chorizo y Mozzarella", "precio": 22.0, "categoria": "Comida", "descripcion": "Muffin con chorizo y queso mozzarella.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400"},
+
+    # Menú Tarde (Antojitos y Compartir)
+    {"nombre": "Papas con Queso (Grande)", "precio": 45.0, "categoria": "Comida", "descripcion": "Papas fritas bañadas en salsa de queso cheddar.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400"},
+    {"nombre": "Nachos Locos (Grande)", "precio": 50.0, "categoria": "Comida", "descripcion": "Bañados en queso cheddar, chipotle, cilantro, chilli beans, pico de gallo, cebolla, queso fresco y crema.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400"},
+    {"nombre": "Papas Locas (Grande)", "precio": 50.0, "categoria": "Comida", "descripcion": "Papas con cheddar, chipotle, cilantro, chilli beans, pico de gallo, cebolla, queso fresco y crema.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400"},
+    {"nombre": "Plátanos Fritos", "precio": 18.0, "categoria": "Comida", "descripcion": "Porción de plátanos fritos acompañados de crema.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=400"},
+
+    # Postres Tarde
+    {"nombre": "Waffles con Nutella", "precio": 40.0, "categoria": "Postres", "descripcion": "Waffles tradicionales cubiertos de Nutella.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400"},
+    {"nombre": "Waffles con Dulce de Leche", "precio": 40.0, "categoria": "Postres", "descripcion": "Waffles cubiertos con dulce de leche.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400"},
+    {"nombre": "Galleta Chispas Rellena de Nutella", "precio": 12.0, "categoria": "Postres", "descripcion": "Galleta con chispas de chocolate rellena de Nutella.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400"},
+    {"nombre": "Galleta Red Velvet", "precio": 15.0, "categoria": "Postres", "descripcion": "Galleta Red Velvet rellena de queso crema.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400"},
+    {"nombre": "Brownie", "precio": 20.0, "categoria": "Postres", "descripcion": "Brownie de chocolate casero.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400"},
+    {"nombre": "Affogato", "precio": 20.0, "categoria": "Postres", "descripcion": "Bola de helado con espresso.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1594998893017-36147cff1644?w=400"},
+    {"nombre": "Flan con Caramelo", "precio": 25.0, "categoria": "Postres", "descripcion": "Flan tradicional bañado en caramelo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=400"},
+    {"nombre": "Cheesecake Banano", "precio": 20.0, "categoria": "Postres", "descripcion": "Porción de cheesecake de banano.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400"},
+
+    # Bebidas
+    {"nombre": "Espresso", "precio": 10.0, "categoria": "Bebidas Calientes", "descripcion": "Espresso tradicional de 1 oz.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400"},
+    {"nombre": "Cortado", "precio": 13.0, "categoria": "Bebidas Calientes", "descripcion": "Cortado de 2 oz.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1534778101976-62847782c213?w=400"},
+    {"nombre": "Cappuccino", "precio": 17.0, "categoria": "Bebidas Calientes", "descripcion": "Cappuccino clásico.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400"},
+    {"nombre": "Latte", "precio": 25.0, "categoria": "Bebidas Calientes", "descripcion": "Disponible en caliente o frío (12oz / 16oz).", "horario": "Ambos", "config_tamano": "elegir_ambos", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=400"},
+    {"nombre": "Caramel Latte", "precio": 29.0, "categoria": "Bebidas Calientes", "descripcion": "Latte con toque de caramelo.", "horario": "Ambos", "config_tamano": "elegir_ambos", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1585530927316-04cb5f1d8c89?w=400"},
+    {"nombre": "Mocaccino", "precio": 29.0, "categoria": "Bebidas Calientes", "descripcion": "Café con chocolate y leche espumada.", "horario": "Ambos", "config_tamano": "elegir_ambos", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1578314675249-a6919f3cbce3?w=400"},
+    {"nombre": "Cold Brew", "precio": 29.0, "categoria": "Bebidas Frías", "descripcion": "Café infusionado en frío.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400"},
+    {"nombre": "Frappé Caramelo", "precio": 32.0, "categoria": "Bebidas Frías", "descripcion": "Bebida helada de café con caramelo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400"},
+    {"nombre": "Matcha Latte", "precio": 28.0, "categoria": "Bebidas Calientes", "descripcion": "Té matcha en preparación caliente o fría.", "horario": "Ambos", "config_tamano": "elegir_ambos", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400"},
+    {"nombre": "Zacapa Cold Brew (Cóctel)", "precio": 40.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Cóctel exclusivo con ron Zacapa y cold brew.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400"},
+    {"nombre": "Espresso Martini", "precio": 30.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Cóctel clásico con espresso.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=400"}
+]
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Set[WebSocket] = set()
@@ -64,6 +130,19 @@ class PedidoRequest(BaseModel):
 class AlertaRequest(BaseModel):
     mesa: int
     tipo: str
+
+@app.on_event("startup")
+async def startup_event():
+    # Inicializa los productos automáticamente si la tabla está vacía
+    try:
+        res = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=id", headers=HEADERS)
+        if res.status_code == 200 and len(res.json()) == 0:
+            db_headers = {**HEADERS, "Content-Type": "application/json"}
+            for prod in MENU_INICIAL_COMPLETO:
+                requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=prod)
+            print("¡Menú inicial precargado exitosamente en Supabase!")
+    except Exception as e:
+        print("Error al verificar/precargar menú inicial:", e)
 
 @app.get("/", response_class=HTMLResponse)
 async def ver_menu(request: Request, mesa: int = 1):
