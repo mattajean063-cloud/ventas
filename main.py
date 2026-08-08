@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # ⚠️ REEMPLAZA CON TU LLAVE REAL DE SUPABASE (anon / public)
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "TU_SUPABASE_ANON_KEY_AQUI" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -30,7 +30,7 @@ HEADERS = {
 historial_notificaciones = []
 TURNO_ACTUAL_SISTEMA = "Mañana"
 
-# --- MENÚ COMPLETO Y EXACTO (CON APARTADO DE MÉTODOS) ---
+# --- MENÚ COMPLETO Y EXACTO (CON MÉTODOS Y OPCIONES DE TACOS ADAPTADAS) ---
 MENU_INICIAL_COMPLETO = [
     # 1. Menú Brunch / Salados (Mañana - Incluyen opción de bebida)
     {"nombre": "Chilaquiles", "precio": 55.0, "categoria": "Comida", "descripcion": "Huevos estrellados sobre tortillas fritas, salsa roja, queso mozzarella, crema, pechuga de pollo y cebolla morada curtida.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400"},
@@ -46,18 +46,11 @@ MENU_INICIAL_COMPLETO = [
     {"nombre": "Tostadas a la Francesa", "precio": 35.0, "categoria": "Postres", "descripcion": "2 rebanadas de pan remojadas en canela y leche, relleno de queso ricota con mermelada de fresas y fruta.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400"},
     {"nombre": "Parfait", "precio": 40.0, "categoria": "Postres", "descripcion": "Yogurt natural sin azúcar acompañado de granola, miel maple y fruta.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400"},
 
-    # 3. Tacos y Antojitos
-    {"nombre": "La Tablita (8 tacos - 4 carnes)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos con cebolla, cilantro, salsas de la casa y limón.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
-    {"nombre": "La Tablita (8 tacos - Cochinita Pibil)", "precio": 85.0, "categoria": "Comida", "descripcion": "8 tacos de cochinita pibil con cebolla, cilantro y salsas.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
-    {"nombre": "La Tablita (8 tacos - Quesillo y Chorizo)", "precio": 85.0, "categoria": "Comida", "descripcion": "8 tacos de quesillo y chorizo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400"},
-    {"nombre": "La Tablita (8 tacos - Pollo con salsa de maracuyá)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos de pollo con salsa de maracuyá.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=400"},
-    {"nombre": "La Tablita (Mixtos - 2 opciones)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos combinados con 2 opciones a elegir.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
-    
-    {"nombre": "La Media Tablita (4 tacos - 4 carnes)", "precio": 43.0, "categoria": "Comida", "descripcion": "4 tacos surtidos con cebolla, cilantro y salsas.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
-    {"nombre": "La Media Tablita (4 tacos - Cochinita pibil)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos de cochinita pibil.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
-    {"nombre": "La Media Tablita (4 tacos - Quesillo y chorizo)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos de quesillo y chorizo.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400"},
-    {"nombre": "La Media Tablita (4 tacos - Pollo con salsa de maracuyá)", "precio": 43.0, "categoria": "Comida", "descripcion": "4 tacos de pollo con salsa de maracuyá.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=400"},
-    {"nombre": "La Media Tablita (Mixtos - 2 opciones)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos combinados con 2 opciones a elegir.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
+    # 3. Tacos y Antojitos (Con opciones adaptadas para selección de carnes)
+    {"nombre": "La Tablita (8 tacos - 1 carne)", "precio": 80.0, "categoria": "Comida", "descripcion": "8 tacos con cebolla, cilantro, salsas de la casa y limón.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
+    {"nombre": "La Tablita (8 tacos - Mixtos 2 opciones)", "precio": 85.0, "categoria": "Comida", "descripcion": "8 tacos combinados eligiendo 2 carnes (4 tacos de cada una).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
+    {"nombre": "La Media Tablita (4 tacos - 1 carne)", "precio": 43.0, "categoria": "Comida", "descripcion": "4 tacos surtidos con cebolla, cilantro y salsas.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400"},
+    {"nombre": "La Media Tablita (Mixtos - 2 opciones)", "precio": 45.0, "categoria": "Comida", "descripcion": "4 tacos combinados con 2 opciones a elegir (2 tacos de cada una).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400"},
 
     # 4. Sandwiches y Baguettes
     {"nombre": "Baguette 4 Carnes", "precio": 55.0, "categoria": "Comida", "descripcion": "Cerdo, res, pollo, salchicha, mozzarella, salsa de aguacate, tomate, lechuga y cebolla curtida.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400"},
@@ -83,7 +76,7 @@ MENU_INICIAL_COMPLETO = [
     {"nombre": "Tostadas (Medio combo - 2)", "precio": 15.0, "categoria": "Comida", "descripcion": "Tostadas fritas con frijol o aguacate, decoradas con salsa y queso.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=400"},
     {"nombre": "Tostadas (Combo - 4)", "precio": 25.0, "categoria": "Comida", "descripcion": "Tostadas fritas con frijol o aguacate, decoradas con salsa y queso.", "horario": "Tarde", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=400"},
 
-    # 7. Postres y Waffles (Tarde)
+    # 7. Postres y Waffles
     {"nombre": "Waffles con Nutella", "precio": 40.0, "categoria": "Postres", "descripcion": "Waffles tradicionales cubiertos de Nutella.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400"},
     {"nombre": "Waffles con Dulce de Leche", "precio": 40.0, "categoria": "Postres", "descripcion": "Waffles cubiertos con dulce de leche.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400"},
     {"nombre": "Waffles con Helado y Fruta", "precio": 45.0, "categoria": "Postres", "descripcion": "Waffles acompañados de helado y fruta fresca.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=400"},
@@ -186,8 +179,6 @@ async def startup_event():
                     requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=prod)
                     agregados += 1
             print(f"Sincronización completada. Se añadieron {agregados} productos nuevos.")
-        else:
-            print("Error al conectar con Supabase:", res.status_code, res.text)
     except Exception as e:
         print("Error en startup_event:", e)
 
@@ -260,13 +251,6 @@ async def alerta_mesero(alerta: AlertaRequest):
     await manager.broadcast(nuevo_evento)
     return {"status": "success"}
 
-@app.get("/api/obtener-eventos")
-async def obtener_eventos():
-    global historial_notificaciones
-    eventos = historial_notificaciones.copy()
-    historial_notificaciones.clear()
-    return eventos
-
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
@@ -297,38 +281,6 @@ async def agregar_producto(
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
     except Exception as e: print("ERROR EN /admin/agregar:", e)
-    return RedirectResponse(url="/admin", status_code=303)
-
-@app.post("/admin/actualizar-imagen/{producto_id}")
-async def actualizar_imagen(producto_id: int, nueva_imagen_file: UploadFile = File(...)):
-    try:
-        file_bytes = await nueva_imagen_file.read()
-        encoded_image = base64.b64encode(file_bytes).decode('utf-8')
-        content_type = nueva_imagen_file.content_type or "image/jpeg"
-        imagen_base64 = f"data:{content_type};base64,{encoded_image}"
-        
-        payload = {"imagen": imagen_base64}
-        db_headers = {**HEADERS, "Content-Type": "application/json"}
-        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
-    except Exception as e: print("ERROR AL ACTUALIZAR IMAGEN:", e)
-    return RedirectResponse(url="/admin", status_code=303)
-
-@app.post("/admin/actualizar-precio/{producto_id}")
-async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
-    try:
-        payload = {"precio": float(nuevo_precio)}
-        db_headers = {**HEADERS, "Content-Type": "application/json"}
-        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
-    except Exception as e: print("ERROR:", e)
-    return RedirectResponse(url="/admin", status_code=303)
-
-@app.post("/admin/actualizar-horario/{producto_id}")
-async def actualizar_horario(producto_id: int, horario: str = Form(...)):
-    try:
-        payload = {"horario": horario}
-        db_headers = {**HEADERS, "Content-Type": "application/json"}
-        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
-    except Exception as e: print("ERROR:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/eliminar/{producto_id}")
