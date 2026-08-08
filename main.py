@@ -27,7 +27,6 @@ HEADERS = {
     "Prefer": "return=representation"
 }
 
-historial_notificaciones = []
 TURNO_ACTUAL_SISTEMA = "Mañana"
 
 # --- MENÚ COMPLETO Y EXACTO (CON APARTADO DE MÉTODOS) ---
@@ -247,25 +246,30 @@ async def websocket_admin(websocket: WebSocket):
 
 @app.post("/api/enviar-pedido")
 async def recibir_pedido(pedido: PedidoRequest):
-    nuevo_evento = {"tipo": "nuevo_pedido", "mesa": pedido.mesa, "items": [i.dict() for i in pedido.items], "total": pedido.total}
-    historial_notificaciones.append(nuevo_evento)
+    nuevo_evento = {
+        "tipo": "nuevo_pedido", 
+        "mesa": pedido.mesa, 
+        "items": [i.dict() for i in pedido.items], 
+        "total": pedido.total
+    }
     await manager.broadcast(nuevo_evento)
     return {"status": "success"}
 
 @app.post("/api/alerta-mesero")
 async def alerta_mesero(alerta: AlertaRequest):
     titulo = "🛎️ ¡Llamando al Mesero!" if alerta.tipo == "mesero" else "🧾 ¡Pidiendo la Cuenta!"
-    nuevo_evento = {"tipo": "alerta", "titulo": titulo, "mesa": alerta.mesa, "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."}
-    historial_notificaciones.append(nuevo_evento)
+    nuevo_evento = {
+        "tipo": "alerta", 
+        "titulo": titulo, 
+        "mesa": alerta.mesa, 
+        "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."
+    }
     await manager.broadcast(nuevo_evento)
     return {"status": "success"}
 
 @app.get("/api/obtener-eventos")
 async def obtener_eventos():
-    global historial_notificaciones
-    eventos = historial_notificaciones.copy()
-    historial_notificaciones.clear()
-    return eventos
+    return []
 
 @app.post("/admin/agregar")
 async def agregar_producto(
