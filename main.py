@@ -20,7 +20,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6InFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -106,7 +106,15 @@ async def ver_menu(request: Request, mesa: int = 1):
         "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"]
     }
     
-    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias, "turno": TURNO_ACTUAL_SISTEMA})
+    # Definir el nombre del menú según el turno activo
+    nombre_menu = "Menú Brunch" if TURNO_ACTUAL_SISTEMA == "Mañana" else "Menú de Tarde"
+    
+    return templates.TemplateResponse(request=request, name="index.html", context={
+        "mesa": mesa, 
+        "categorias": categorias, 
+        "turno": TURNO_ACTUAL_SISTEMA,
+        "nombre_menu": nombre_menu
+    })
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
@@ -197,8 +205,6 @@ async def agregar_producto(
         
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         res = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
-        
-        # Esto te mostrará en la terminal de Python si Supabase acepta el guardado o lo rechaza
         print("RESPUESTA SUPABASE AL AGREGAR:", res.status_code, res.text)
         
     except Exception as e:
