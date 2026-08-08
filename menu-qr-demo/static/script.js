@@ -71,7 +71,8 @@ async function enviarPedido() {
     };
 
     try {
-        let respuesta = await fetch('http://127.0.0.1:8000/api/enviar-pedido', {
+        let respuesta = await fetch('
+                                    /api/enviar-pedido', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(datosPedido)
