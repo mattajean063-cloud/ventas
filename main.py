@@ -4,14 +4,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from typing import List, Set
+from typing import List, Set, Optional
 import shutil
 
 app = FastAPI()
 
-# --- RUTAS DINÁMICAS (No importa el nombre de la carpeta raíz) ---
+# --- RUTAS DINÁMICAS ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Busca la carpeta 'templates' y 'static' en la misma ubicación que este archivo
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 UPLOAD_DIR = os.path.join(STATIC_DIR, "uploads")
@@ -37,11 +36,12 @@ class ConnectionManager:
         self.active_connections.add(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        self.active_connections.discard(websocket) # Usamos discard para evitar errores
 
     async def broadcast(self, message: dict):
-        for connection in self.active_connections:
-            await connection.send_json(message)
+        if self.active_connections:
+            for connection in self.active_connections:
+                await connection.send_json(message)
 
 manager = ConnectionManager()
 
@@ -49,7 +49,7 @@ manager = ConnectionManager()
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
-    cantidad: int
+    cantidad: Optional[int] = 1 # Se agregó cantidad opcional para evitar errores
 
 class PedidoRequest(BaseModel):
     mesa: int
@@ -86,15 +86,28 @@ async def websocket_admin(websocket: WebSocket):
 
 @app.post("/api/enviar-pedido")
 async def recibir_pedido(pedido: PedidoRequest):
-    await manager.broadcast({"tipo": "nuevo_pedido", "mesa": pedido.mesa, "items": [i.dict() for i in pedido.items], "total": pedido.total})
+    # Broadcast del pedido estructurado
+    await manager.broadcast({
+        "tipo": "nuevo_pedido", 
+        "mesa": pedido.mesa, 
+        "items": [i.dict() for i in pedido.items], 
+        "total": pedido.total
+    })
     return {"status": "success"}
 
 @app.post("/api/alerta-mesero")
 async def alerta_mesero(alerta: AlertaRequest):
+    # Broadcast de la alerta
     titulo = "🛎️ ¡Llamando al Mesero!" if alerta.tipo == "mesero" else "🧾 ¡Pidiendo la Cuenta!"
-    await manager.broadcast({"tipo": "alerta", "titulo": titulo, "mesa": alerta.mesa, "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."})
+    await manager.broadcast({
+        "tipo": "alerta", 
+        "titulo": titulo, 
+        "mesa": alerta.mesa, 
+        "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."
+    })
     return {"status": "success"}
 
+# --- ADMIN ---
 @app.post("/admin/agregar")
 async def agregar_producto(nombre: str = Form(...), precio: float = Form(...), categoria: str = Form(...), descripcion: str = Form(default=""), imagen_file: UploadFile = File(...)):
     file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
@@ -111,4 +124,4 @@ async def eliminar_producto(producto_id: int):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
