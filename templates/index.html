@@ -72,7 +72,6 @@
             <h4 class="text-warning fw-bold mb-2 text-center" id="titulo-modal-producto">Personalizar Producto</h4>
             <p class="text-muted small text-center mb-3">Personalice su elección:</p>
             
-            <!-- SECCIÓN CONDICIONAL: TAMAÑOS (Solo si admin configuró "elegir_ambos") -->
             <div id="seccion-tamanos" class="mb-3" style="display: none;">
                 <label class="form-label text-warning small fw-bold mb-1">📏 Tamaño:</label>
                 <div class="row g-2">
@@ -81,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN CONDICIONAL: PROMOCIÓN DE DESAYUNOS -->
             <div id="seccion-promo-manana" class="mb-3" style="display: none;">
                 <label class="form-label text-warning small fw-bold mb-1">🌅 Opción Incluida / Cambio a Latte (+Q12):</label>
                 <div class="row g-2 mb-2">
@@ -94,7 +92,6 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN CONDICIONAL: LECHE Y ENDULZANTE -->
             <div id="seccion-leche-endulzante">
                 <label class="form-label text-warning small fw-bold mb-1">🥛 Tipo de Leche:</label>
                 <div class="row g-2 mb-3">
@@ -170,7 +167,6 @@
             </div>
         </div>
 
-        <!-- GENERACIÓN DE CATEGORÍAS EN EL MENÚ -->
         {% for cat_nombre, cat_productos in categorias.items() %}
         {% if cat_productos %}
         <div class="grupo-categoria" data-categoria="{{ 'Bebidas' if 'Bebidas' in cat_nombre else (cat_nombre if cat_nombre in ['Comida', 'Postres', 'Extras'] else 'Cócteles y Café Filtrado') }}">
@@ -288,7 +284,6 @@
             if (!productoPendiente) return;
             productoPendiente.cliente = cliente;
 
-            // Manejo estricto de tamaños según la configuración del admin
             if (productoPendiente.configTamano === 'elegir_ambos') {
                 document.getElementById('seccion-tamanos').style.display = 'block';
                 seleccionTamanoTemp = '';
@@ -303,11 +298,9 @@
                 seleccionTamanoTemp = '';
             }
 
-            // Mostrar promo si es comida / desayunos
             let esComida = productoPendiente.categoria === 'Comida';
             document.getElementById('seccion-promo-manana').style.display = (esComida && productoPendiente.admitePromo) ? 'block' : 'none';
             
-            // Mostrar leche y endulzante solo si es bebida o café filtrado/cóctel con café
             let esBebida = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
             document.getElementById('seccion-leche-endulzante').style.display = esBebida ? 'block' : 'none';
 
