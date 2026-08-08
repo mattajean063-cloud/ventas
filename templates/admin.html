@@ -314,6 +314,8 @@
     <script>
         let qrCodeInstance = null;
         let contadorNotificaciones = 0;
+        // Objeto para evitar duplicados visuales si el WebSocket y el HTTP traen la misma alerta al mismo tiempo
+        let idsEventosProcesados = new Set();
 
         function generarQR() {
             const numMesa = document.getElementById('input-num-mesa').value || 1;
@@ -332,24 +334,34 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // --- SISTEMA DE WEBSOCKET Y CONTADOR ESTILO WHATSAPP ---
+        // --- SISTEMA HÍBRIDO: WEBSOCKET + RESPALDO HTTP AUTOMÁTICO ---
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
 
             ws.onmessage = function(event) {
                 let data = JSON.parse(event.data);
-                
-                // Incrementar contador y reflejar en interfaz + pestaña
-                contadorNotificaciones++;
-                actualizarContadorVisual();
-
                 procesarYMostrarEvento(data);
             };
 
             ws.onclose = function() {
                 setTimeout(conectarWebSocket, 3000);
             };
+        }
+
+        // Respaldo HTTP rápido cada 2 segundos para asegurar que si Render duerme el WebSocket, las notificaciones caigan flash
+        async function verificarEventosHttp() {
+            try {
+                let response = await fetch('/api/obtener-eventos');
+                let eventos = await response.json();
+                if (eventos && eventos.length > 0) {
+                    eventos.forEach(evento => {
+                        procesarYMostrarEvento(evento);
+                    });
+                }
+            } catch (error) {
+                // Silenciar errores de red menores para evitar spam en consola
+            }
         }
 
         function actualizarContadorVisual() {
@@ -369,6 +381,7 @@
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
+            setInterval(verificarEventosHttp, 2000); // Respaldo flash cada 2 segundos
         };
 
         function pedirPermisoNotificaciones() { 
@@ -380,6 +393,15 @@
         }
 
         function procesarYMostrarEvento(data) {
+            // Generar una clave única para evitar duplicados entre WebSocket y HTTP
+            let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
+            if (idsEventosProcesados.has(idUnico)) return;
+            idsEventosProcesados.add(idUnico);
+
+            // Incrementar contador y reflejar en interfaz + pestaña
+            contadorNotificaciones++;
+            actualizarContadorVisual();
+
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
             if (mensajeVacio) mensajeVacio.remove();
