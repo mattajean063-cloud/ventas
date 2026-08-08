@@ -80,6 +80,20 @@
             background: white; 
             border: 1px solid var(--border-subtle);
         }
+
+        /* Estilo para la burbuja de notificación estilo WhatsApp */
+        .badge-whatsapp {
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            box-shadow: 0 2px 5px rgba(37, 211, 102, 0.4);
+        }
     </style>
 </head>
 <body class="p-4">
@@ -88,7 +102,11 @@
         <!-- Cabecera Superior con Interruptor de Turno -->
         <div class="card-colonial p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
+                <div class="d-flex align-items-center">
+                    <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
+                    <!-- Burbuja de notificaciones estilo WhatsApp a la par del título -->
+                    <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
+                </div>
                 
                 <div class="d-flex align-items-center gap-3 bg-white p-2 rounded border border-secondary" style="border-color: var(--border-subtle) !important;">
                     <span class="small fw-bold" style="color: var(--text-muted);">Turno Menú Comida:</span>
@@ -295,6 +313,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let qrCodeInstance = null;
+        let contadorNotificaciones = 0;
+
         function generarQR() {
             const numMesa = document.getElementById('input-num-mesa').value || 1;
             const contenedorQR = document.getElementById('qr-box');
@@ -312,19 +332,34 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // --- SISTEMA DE WEBSOCKET LIMPIO (SIN DUPLICADOS) ---
+        // --- SISTEMA DE WEBSOCKET Y CONTADOR ESTILO WHATSAPP ---
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
 
             ws.onmessage = function(event) {
                 let data = JSON.parse(event.data);
+                
+                // Incrementar contador estilo WhatsApp
+                contadorNotificaciones++;
+                actualizarContadorVisual();
+
                 procesarYMostrarEvento(data);
             };
 
             ws.onclose = function() {
                 setTimeout(conectarWebSocket, 3000);
             };
+        }
+
+        function actualizarContadorVisual() {
+            const badge = document.getElementById('badge-contador');
+            if (contadorNotificaciones > 0) {
+                badge.innerText = contadorNotificaciones;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         window.onload = function() { 
@@ -355,7 +390,9 @@
                         <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
                     </div>
                     <p class="mt-2 mb-2 text-dark">${data.mensaje}</p>
-                    <div class="text-end"><button class="btn btn-sm btn-outline-secondary py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button></div>
+                    <div class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary py-0" onclick="marcarAtendido(this)">Marcar atendido</button>
+                    </div>
                 `;
             } else if (data.tipo === 'nuevo_pedido') {
                 let itemsHtml = data.items.map(i => {
@@ -376,11 +413,20 @@
                     <ul class="mt-2 mb-2 ps-3 text-dark small">${itemsHtml}</ul>
                     <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: var(--border-subtle) !important;">
                         <span class="fw-bold fs-6" style="color: var(--accent-gold);">Total: Q ${data.total.toFixed(2)}</span>
-                        <button class="btn btn-sm btn-amber py-1" onclick="this.closest('.notid-card').remove()">Completar Pedido</button>
+                        <button class="btn btn-sm btn-amber py-1" onclick="marcarAtendido(this)">Completar Pedido</button>
                     </div>
                 `;
             }
             contenedor.prepend(tarjetaFlash);
+        }
+
+        // Función para decrementar el contador estilo WhatsApp cuando atiendes/completas un pedido
+        function marcarAtendido(button) {
+            button.closest('.notid-card').remove();
+            if (contadorNotificaciones > 0) {
+                contadorNotificaciones--;
+                actualizarContadorVisual();
+            }
         }
     </script>
 </body>
