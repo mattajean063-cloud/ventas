@@ -26,6 +26,9 @@ menu_data = [
     {"id": 2, "nombre": "Desayuno Típico Don Nicolás", "precio": 35.00, "categoria": "Comida", "descripcion": "Frijoles, huevos, plátanos y queso.", "imagen": "desayuno.jpg"}
 ]
 
+# --- HISTORIAL TEMPORAL PARA GARANTIZAR ENTREGA (POLLING) ---
+historial_notificaciones = []
+
 # --- LÓGICA DE WEBSOCKETS ---
 class ConnectionManager:
     def __init__(self):
@@ -36,12 +39,15 @@ class ConnectionManager:
         self.active_connections.add(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.discard(websocket) # Usamos discard para evitar errores
+        self.active_connections.discard(websocket)
 
     async def broadcast(self, message: dict):
         if self.active_connections:
             for connection in self.active_connections:
-                await connection.send_json(message)
+                try:
+                    await connection.send_json(message)
+                except:
+                    pass
 
 manager = ConnectionManager()
 
@@ -49,7 +55,7 @@ manager = ConnectionManager()
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
-    cantidad: Optional[int] = 1 # Se agregó cantidad opcional para evitar errores
+    cantidad: Optional[int] = 1
 
 class PedidoRequest(BaseModel):
     mesa: int
@@ -86,26 +92,35 @@ async def websocket_admin(websocket: WebSocket):
 
 @app.post("/api/enviar-pedido")
 async def recibir_pedido(pedido: PedidoRequest):
-    # Broadcast del pedido estructurado
-    await manager.broadcast({
+    nuevo_evento = {
         "tipo": "nuevo_pedido", 
         "mesa": pedido.mesa, 
         "items": [i.dict() for i in pedido.items], 
         "total": pedido.total
-    })
+    }
+    historial_notificaciones.append(nuevo_evento)
+    await manager.broadcast(nuevo_evento)
     return {"status": "success"}
 
 @app.post("/api/alerta-mesero")
 async def alerta_mesero(alerta: AlertaRequest):
-    # Broadcast de la alerta
     titulo = "🛎️ ¡Llamando al Mesero!" if alerta.tipo == "mesero" else "🧾 ¡Pidiendo la Cuenta!"
-    await manager.broadcast({
+    nuevo_evento = {
         "tipo": "alerta", 
         "titulo": titulo, 
         "mesa": alerta.mesa, 
         "mensaje": f"La Mesa #{alerta.mesa} solicita {alerta.tipo}."
-    })
+    }
+    historial_notificaciones.append(nuevo_evento)
+    await manager.broadcast(nuevo_evento)
     return {"status": "success"}
+
+@app.get("/api/obtener-eventos")
+async def obtener_eventos():
+    global historial_notificaciones
+    eventos = historial_notificaciones.copy()
+    historial_notificaciones.clear()
+    return eventos
 
 # --- ADMIN ---
 @app.post("/admin/agregar")
