@@ -18,16 +18,8 @@
             --accent-gold-hover: #9c7546;
         }
 
-        body { 
-            background-color: var(--bg-cream); 
-            color: var(--text-main); 
-            font-family: 'Montserrat', sans-serif; 
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
-        }
+        body { background-color: var(--bg-cream); color: var(--text-main); font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; font-weight: 700; }
         
         .card-colonial { 
             background-color: var(--bg-card-white); 
@@ -36,105 +28,51 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
         
-        .btn-amber { 
-            background-color: var(--accent-gold); 
-            color: white; 
-            font-weight: 600; 
-            border: none;
-        }
-        .btn-amber:hover { 
-            background-color: var(--accent-gold-hover); 
-            color: white; 
-        }
+        .btn-amber { background-color: var(--accent-gold); color: white; font-weight: 600; border: none; }
+        .btn-amber:hover { background-color: var(--accent-gold-hover); color: white; }
 
         .notid-card {
-            background: #ffffff;
-            border: 1px solid var(--accent-gold);
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .notid-card:hover {
-            transform: translateY(-2px);
+            background: #ffffff; border: 1px solid var(--accent-gold);
+            border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
         }
 
         .form-control, .form-select { 
-            background-color: #faf8f5 !important; 
-            color: var(--text-main) !important; 
-            border-color: var(--border-subtle) !important; 
-            border-radius: 8px;
+            background-color: #faf8f5 !important; color: var(--text-main) !important; 
+            border-color: var(--border-subtle) !important; border-radius: 8px;
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-gold) !important;
             box-shadow: 0 0 0 0.2rem rgba(179, 139, 89, 0.15);
         }
 
-        .product-img { 
-            width: 55px; 
-            height: 55px; 
-            object-fit: cover; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-subtle); 
-        }
-        
-        #qr-box img { 
-            margin: 0 auto; 
-            border-radius: 8px; 
-            padding: 5px; 
-            background: white; 
-            border: 1px solid var(--border-subtle);
-        }
-
-        /* Estilo para la burbuja de notificación estilo WhatsApp */
+        .product-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-subtle); }
         .badge-whatsapp {
-            background-color: #25d366;
-            color: white;
-            border-radius: 50px;
-            padding: 0.25rem 0.6rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px;
-            box-shadow: 0 2px 5px rgba(37, 211, 102, 0.4);
+            background-color: #25d366; color: white; border-radius: 50px;
+            padding: 0.25rem 0.6rem; font-size: 0.85rem; font-weight: 700; display: inline-block; vertical-align: middle; margin-left: 8px;
         }
     </style>
 </head>
 <body class="p-4">
     <div class="container-fluid" style="max-width: 1300px;">
         
-        <!-- Cabecera Superior con Interruptor de Turno -->
         <div class="card-colonial p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div class="d-flex align-items-center">
                     <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
-                    <!-- Burbuja de notificaciones a la par del título -->
                     <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
                 </div>
-                
-                <div class="d-flex align-items-center gap-3 bg-white p-2 rounded border border-secondary" style="border-color: var(--border-subtle) !important;">
-                    <span class="small fw-bold" style="color: var(--text-muted);">Turno Menú Comida:</span>
-                    <form action="/admin/cambiar-turno" method="POST" class="m-0">
-                        <select name="turno" class="form-select form-select-sm text-center fw-bold" onchange="this.form.submit()" style="width: 130px; color: var(--accent-gold) !important;">
-                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
-                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
-                        </select>
-                    </form>
-                </div>
-
                 <div>
-                    <button class="btn btn-outline-secondary btn-sm me-2" style="color: var(--text-muted); border-color: var(--border-subtle);" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
+                    <button class="btn btn-outline-secondary btn-sm me-2" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
                     <a href="/?mesa=1" class="btn btn-outline-dark btn-sm">Ver Menú ↗</a>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
-            <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
+            <!-- Pedidos y Alertas en Tiempo Real -->
             <div class="col-lg-8">
                 <div class="card-colonial p-4 h-100">
-                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold);">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
                     <div id="contenedor-alertas">
                         <div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">
                             ⏳ Esperando órdenes o llamadas de las mesas...
@@ -143,12 +81,12 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: QR y Agregar Producto -->
+            <!-- QR y Agregar Producto al Inventario -->
             <div class="col-lg-4 d-flex flex-column gap-4">
                 <div class="card-colonial p-4 text-center">
-                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📱 Generar Código QR</h4>
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold);">📱 Generar Código QR</h4>
                     <div class="mb-3 text-start">
-                        <label class="form-label small fw-bold" style="color: var(--text-muted);">Número de Mesa:</label>
+                        <label class="form-label small fw-bold text-muted">Número de Mesa:</label>
                         <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
                     </div>
                     <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
@@ -156,78 +94,38 @@
                 </div>
 
                 <div class="card-colonial overflow-hidden">
-                    <button class="btn w-100 d-flex justify-content-between align-items-center p-4 fw-bold fs-5 text-start border-0" 
-                            type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent; color: var(--accent-gold);">
-                        <span>➕ Agregar Producto</span>
-                        <span class="fs-6">▼</span>
+                    <button class="btn w-100 d-flex justify-content-between align-items-center p-4 fw-bold fs-5 text-start border-0 text-amber" type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" style="color: var(--accent-gold);">
+                        <span>➕ Agregar Elemento</span><span>▼</span>
                     </button>
                     <div class="collapse" id="formAgregarCollapse">
                         <div class="p-4 pt-0">
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Nombre</label>
-                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
+                                    <label class="form-label small fw-bold text-muted">Nombre del Plato/Subcategoría</label>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Muffin Especial" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio (Q)</label>
+                                    <label class="form-label small fw-bold text-muted">Precio (Q)</label>
                                     <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Categoría</label>
+                                    <label class="form-label small fw-bold text-muted">Categoría General</label>
                                     <select class="form-select" name="categoria" required>
-                                        <option value="" disabled selected>Seleccione</option>
-                                        <option value="Bebidas Frías">Bebidas Frías</option>
+                                        <option value="Comida">Comida / Tacos / Muffins</option>
+                                        <option value="Postres">Postres / Waffles / Galletas</option>
                                         <option value="Bebidas Calientes">Bebidas Calientes</option>
-                                        <option value="Comida">Comida</option>
-                                        <option value="Postres">Postres</option>
-                                        <option value="Métodos">Métodos</option>
-                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
-                                        <option value="Extras">Extras</option>
+                                        <option value="Bebidas Frías">Bebidas Frías</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Horario (Solo Comida)</label>
-                                    <select class="form-select" name="horario" required>
-                                        <option value="Ambos">Mañana y Tarde</option>
-                                        <option value="Mañana">Solo Mañana</option>
-                                        <option value="Tarde">Solo Tarde</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Configuración de Tamaño:</label>
-                                    <select class="form-select" name="config_tamano" required>
-                                        <option value="ninguno">Sin Tamaño / Estándar</option>
-                                        <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)</option>
-                                        <option value="fijo_12oz">Tamaño Fijo: Grande (12oz)</option>
-                                        <option value="elegir_ambos">Elegir entre 8oz y 12oz</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3 p-3 rounded border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
-                                        <label class="form-check-label small" for="checkPromo" style="color: var(--text-main);">
-                                            🌅 Incluir opción de desayuno / bebida matutina
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="admite_extras_cafe" value="true" id="checkExtras" checked>
-                                        <label class="form-check-label small" for="checkExtras" style="color: var(--text-main);">
-                                            🥛 Permitir opciones de Leche y Endulzante
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Descripción</label>
-                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
+                                    <label class="form-label small fw-bold text-muted">Descripción</label>
+                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción corta..." required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Foto</label>
+                                    <label class="form-label small fw-bold text-muted">Foto Referencia</label>
                                     <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
                                 </div>
-                                <button type="submit" class="btn btn-amber w-100 py-2 shadow-sm">Guardar Producto</button>
+                                <button type="submit" class="btn btn-amber w-100 py-2 shadow-sm">Guardar en Supabase</button>
                             </form>
                         </div>
                     </div>
@@ -235,39 +133,31 @@
             </div>
         </div>
 
-        <!-- Inventario Completo -->
+        <!-- Inventario Completo para Editar / Eliminar -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-colonial p-4">
-                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📋 Inventario del Menú</h4>
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold);">📋 Inventario Completo y Edición</h4>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle bg-transparent" style="color: var(--text-main);">
                             <thead>
                                 <tr style="color: var(--accent-gold); border-bottom: 2px solid var(--border-subtle);">
-                                    <th>Imagen y Cambiar</th>
+                                    <th>Imagen</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Precio (Q)</th>
-                                    <th>Tamaño / Config</th>
-                                    <th>Horario Comida</th>
-                                    <th>Acción</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for p in productos %}
                                 <tr style="border-bottom: 1px solid var(--border-subtle);">
                                     <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            {% if p.imagen %}
-                                                <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
-                                            {% else %}
-                                                <span class="text-muted small">Sin foto</span>
-                                            {% endif %}
-                                            <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
-                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm" style="font-size: 0.7rem; width: 140px;" required>
-                                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.75rem; color: var(--text-muted);">📷 Actualizar Foto</button>
-                                            </form>
-                                        </div>
+                                        {% if p.imagen %}
+                                            <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
+                                        {% else %}
+                                            <span class="text-muted small">Sin foto</span>
+                                        {% endif %}
                                     </td>
                                     <td class="fw-bold">{{ p.nombre }}</td>
                                     <td><span class="badge bg-light text-dark border">{{ p.categoria }}</span></td>
@@ -276,29 +166,6 @@
                                             <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
                                             <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
                                         </form>
-                                    </td>
-                                    <td>
-                                        <form action="/admin/actualizar-tamano/{{ p.id }}" method="POST">
-                                            <select name="config_tamano" class="form-select form-select-sm fw-bold" style="width: 145px; color: var(--accent-gold);" onchange="this.form.submit()">
-                                                <option value="ninguno" {% if p.config_tamano == 'ninguno' %}selected{% endif %}>Sin Tamaño</option>
-                                                <option value="fijo_8oz" {% if p.config_tamano == 'fijo_8oz' %}selected{% endif %}>Fijo: 8 oz</option>
-                                                <option value="fijo_12oz" {% if p.config_tamano == 'fijo_12oz' %}selected{% endif %}>Fijo: 12 oz</option>
-                                                <option value="elegir_ambos" {% if p.config_tamano == 'elegir_ambos' %}selected{% endif %}>Elegir 8/12oz</option>
-                                            </select>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        {% if p.categoria == 'Comida' %}
-                                        <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
-                                            <select name="horario" class="form-select form-select-sm fw-bold" style="width: 125px; color: var(--accent-gold);" onchange="this.form.submit()">
-                                                <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
-                                                <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
-                                                <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
-                                            </select>
-                                        </form>
-                                        {% else %}
-                                            <span class="text-muted small">Siempre visible</span>
-                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
@@ -317,7 +184,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let qrCodeInstance = null;
         let contadorNotificaciones = 0;
         let idsEventosProcesados = new Set();
 
@@ -325,8 +191,7 @@
             const numMesa = document.getElementById('input-num-mesa').value || 1;
             const contenedorQR = document.getElementById('qr-box');
             contenedorQR.innerHTML = "";
-            let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
-            qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
+            new QRCode(contenedorQR, { text: `${window.location.origin}/?mesa=${numMesa}`, width: 160, height: 160 });
         }
         
         function descargarQR() {
@@ -338,39 +203,24 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // --- SISTEMA HÍBRIDO: WEBSOCKET + RESPALDO HTTP AUTOMÁTICO ---
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
-
-            ws.onmessage = function(event) {
-                let data = JSON.parse(event.data);
-                procesarYMostrarEvento(data);
-            };
-
-            ws.onclose = function() {
-                setTimeout(conectarWebSocket, 3000);
-            };
+            ws.onmessage = function(event) { procesarYMostrarEvento(JSON.parse(event.data)); };
+            ws.onclose = function() { setTimeout(conectarWebSocket, 3000); };
         }
 
         async function verificarEventosHttp() {
             try {
                 let response = await fetch('/api/obtener-eventos');
                 let eventos = await response.json();
-                if (eventos && eventos.length > 0) {
-                    eventos.forEach(evento => {
-                        procesarYMostrarEvento(evento);
-                    });
-                }
-            } catch (error) {
-                // Silenciar errores menores
-            }
+                if (eventos && eventos.length > 0) { eventos.forEach(e => procesarYMostrarEvento(e)); }
+            } catch (e) {}
         }
 
         function actualizarContadorVisual() {
             const badge = document.getElementById('badge-contador');
             const pageTitle = document.getElementById('page-title');
-            
             if (contadorNotificaciones > 0) {
                 badge.innerText = contadorNotificaciones;
                 badge.style.display = 'inline-block';
@@ -381,139 +231,56 @@
             }
         }
 
-        // --- REPRODUCTOR DE SONIDO NATIVO ---
         function reproducirSonidoAlerta() {
             try {
                 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
-                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
-                
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {
-                console.log("Audio bloqueado temporalmente por políticas del navegador.");
-            }
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {}
         }
 
-        window.onload = function() { 
-            generarQR(); 
-            conectarWebSocket(); 
-            setInterval(verificarEventosHttp, 2000); 
-        };
+        window.onload = function() { generarQR(); conectarWebSocket(); setInterval(verificarEventosHttp, 2000); };
 
-        function pedirPermisoNotificaciones() { 
-            if (!window.Notification) {
-                alert("Este navegador no soporta notificaciones de escritorio.");
-                return;
-            }
-            
+        function pedirPermisoNotificaciones() {
             Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    alert("¡Notificaciones de escritorio estilo WhatsApp activadas!");
-                    reproducirSonidoAlerta();
-                    new Notification("Don Nicolás", {
-                        body: "Las alertas en la esquina de tu pantalla están listas.",
-                        icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png"
-                    });
-                } else {
-                    alert("Has denegado los permisos de notificación.");
-                }
+                if (permission === "granted") alert("¡Notificaciones activadas!");
             });
         }
 
         function procesarYMostrarEvento(data) {
-            let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
-            
+            let idUnico = data.id || `${data.tipo}-${data.mesa}-${JSON.stringify(data.total || 0)}`;
             if (idsEventosProcesados.has(idUnico)) return;
             idsEventosProcesados.add(idUnico);
 
-            // 1. Contador y sonido
             contadorNotificaciones++;
             actualizarContadorVisual();
             reproducirSonidoAlerta();
 
-            // 2. Notificación flotante en la esquina estilo WhatsApp
             if (window.Notification && Notification.permission === "granted") {
-                let tituloNoti = data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`;
-                let cuerpoNoti = data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`;
-                
-                let notificacionFlotante = new Notification(tituloNoti, {
-                    body: cuerpoNoti,
-                    icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png",
-                    tag: 'don-nicolas-alerta'
+                new Notification(data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`, {
+                    body: data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`
                 });
-
-                notificacionFlotante.onclick = function() {
-                    window.focus();
-                    notificacionFlotante.close();
-                };
             }
 
-            // 3. Pintar tarjeta en el monitor interno
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
             if (mensajeVacio) mensajeVacio.remove();
 
             let tarjetaFlash = document.createElement('div');
             tarjetaFlash.className = 'notid-card p-3 mb-3';
-
-            if (data.tipo === 'alerta') {
-                tarjetaFlash.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">${data.titulo}</h5>
-                        <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
-                    </div>
-                    <p class="mt-2 mb-2 text-dark">${data.mensaje}</p>
-                    <div class="text-end">
-                        <button class="btn btn-sm btn-outline-secondary py-0" onclick="marcarAtendido(this)">Marcar atendido</button>
-                    </div>
-                `;
-            } else if (data.tipo === 'nuevo_pedido') {
-                let itemsHtml = data.items.map(i => {
-                    let detalles = '';
-                    if (i.tamano) detalles += `<br><small class="text-secondary ms-3">📏 Tamaño: ${i.tamano}</small>`;
-                    if (i.promo) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🌅 Promo: ${i.promo}</small>`;
-                    if (i.tipoLeche) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🥛 Leche: ${i.tipoLeche}</small>`;
-                    if (i.tipoEndulzante) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🍯 Endulzante: ${i.tipoEndulzante}</small>`;
-                    if (i.nota) detalles += `<br><small class="text-secondary ms-3">📝 Nota: ${i.nota}</small>`;
-                    return `<li class="mb-2"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})${detalles}</li>`;
-                }).join('');
-
-                tarjetaFlash.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">🚀 Nuevo Pedido</h5>
-                        <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
-                    </div>
-                    <ul class="mt-2 mb-2 ps-3 text-dark small">${itemsHtml}</ul>
-                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: var(--border-subtle) !important;">
-                        <span class="fw-bold fs-6" style="color: var(--accent-gold);">Total: Q ${data.total.toFixed(2)}</span>
-                        <button class="btn btn-sm btn-amber py-1" onclick="marcarAtendido(this)">Completar Pedido</button>
-                    </div>
-                `;
-            }
+            tarjetaFlash.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">${data.tipo === 'alerta' ? data.titulo : '🚀 Nuevo Pedido'}</h5>
+                    <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                </div>
+                <div class="mt-2 text-dark small">Total: Q ${(data.total || 0).toFixed(2)}</div>
+                <div class="text-end mt-2"><button class="btn btn-sm btn-amber py-0" onclick="this.closest('.notid-card').remove(); contadorNotificaciones--; actualizarContadorVisual();">Marcar atendido</button></div>
+            `;
             contenedor.prepend(tarjetaFlash);
-        }
-
-        function marcarAtendido(button) {
-            button.closest('.notid-card').remove();
-            if (contadorNotificaciones > 0) {
-                contadorNotificaciones--;
-                actualizarContadorVisual();
-            }
-            const contenedor = document.getElementById('contenedor-alertas');
-            if (contenedor.children.length === 0) {
-                contenedor.innerHTML = `<div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">⏳ Esperando órdenes o llamadas de las mesas...</div>`;
-            }
         }
     </script>
 </body>
