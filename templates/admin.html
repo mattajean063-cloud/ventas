@@ -18,8 +18,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
         }
         .form-control, .form-select { background-color: #2b1d14 !important; color: #f4ecd8 !important; border-color: #5c3f2d !important; }
-        .product-img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid #5c3f2d; cursor: pointer; transition: transform 0.2s; }
-        .product-img:hover { transform: scale(1.08); }
+        .product-img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid #5c3f2d; }
         #qr-box img { margin: 0 auto; border-radius: 8px; padding: 5px; background: white; }
     </style>
 </head>
@@ -156,7 +155,7 @@
                         <table class="table table-dark table-hover align-middle bg-transparent">
                             <thead>
                                 <tr class="text-warning">
-                                    <th>Foto / Cambiar</th>
+                                    <th>Imagen y Cambiar</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Precio (Q)</th>
@@ -170,13 +169,15 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             {% if p.imagen %}
-                                                <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}" title="Haz clic para cambiar imagen" onclick="document.getElementById('input-img-{{ p.id }}').click()">
+                                                <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
                                             {% else %}
-                                                <span class="text-muted small" style="cursor:pointer;" onclick="document.getElementById('input-img-{{ p.id }}').click()">Sin foto</span>
+                                                <span class="text-muted small">Sin foto</span>
                                             {% endif %}
-                                            <!-- Formulario oculto para actualizar imagen individual -->
-                                            <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" style="display: none;">
-                                                <input type="file" id="input-img-{{ p.id }}" name="imagen_file" accept="image/*" onchange="this.form.submit()">
+                                            
+                                            <!-- Formulario visible con botón para cambiar imagen -->
+                                            <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
+                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm text-xs" style="font-size: 0.7rem; width: 140px;" required>
+                                                <button type="submit" class="btn btn-outline-warning btn-sm py-0" style="font-size: 0.75rem;">📷 Actualizar Foto</button>
                                             </form>
                                         </div>
                                     </td>
@@ -235,6 +236,7 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
+        // Conexión WebSockets mejorada con reconexión automática
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
