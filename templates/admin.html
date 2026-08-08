@@ -159,6 +159,7 @@
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Precio (Q)</th>
+                                    <th>Tamaño / Config</th>
                                     <th>Horario Comida</th>
                                     <th>Acción</th>
                                 </tr>
@@ -173,8 +174,6 @@
                                             {% else %}
                                                 <span class="text-muted small">Sin foto</span>
                                             {% endif %}
-                                            
-                                            <!-- Formulario visible con botón para cambiar imagen -->
                                             <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
                                                 <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm text-xs" style="font-size: 0.7rem; width: 140px;" required>
                                                 <button type="submit" class="btn btn-outline-warning btn-sm py-0" style="font-size: 0.75rem;">📷 Actualizar Foto</button>
@@ -187,6 +186,17 @@
                                         <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
                                             <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
                                             <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <!-- NUEVO: Selector para editar el tamaño o dejarlo fijo desde el admin -->
+                                        <form action="/admin/actualizar-tamano/{{ p.id }}" method="POST">
+                                            <select name="config_tamano" class="form-select form-select-sm text-info fw-bold" style="width: 145px;" onchange="this.form.submit()">
+                                                <option value="ninguno" {% if p.config_tamano == 'ninguno' %}selected{% endif %}>Sin Tamaño</option>
+                                                <option value="fijo_8oz" {% if p.config_tamano == 'fijo_8oz' %}selected{% endif %}>Fijo: 8 oz</option>
+                                                <option value="fijo_12oz" {% if p.config_tamano == 'fijo_12oz' %}selected{% endif %}>Fijo: 12 oz</option>
+                                                <option value="elegir_ambos" {% if p.config_tamano == 'elegir_ambos' %}selected{% endif %}>Elegir 8/12oz</option>
+                                            </select>
                                         </form>
                                     </td>
                                     <td>
@@ -236,7 +246,7 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // 1. Conexión WebSockets principal
+        // Conexión WebSockets principal
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
@@ -251,7 +261,7 @@
             };
         }
 
-        // 2. Respaldo de sondeo HTTP automático (Polling cada 3 segundos por si el WebSocket se bloquea)
+        // Respaldo de sondeo HTTP automático (Polling cada 3 segundos)
         async function verificarEventosHttp() {
             try {
                 let response = await fetch('/api/obtener-eventos');
@@ -269,7 +279,7 @@
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
-            setInterval(verificarEventosHttp, 3000); // Consulta pasiva de respaldo cada 3 segundos
+            setInterval(verificarEventosHttp, 3000); // Consulta pasiva cada 3 segundos
         };
 
         function pedirPermisoNotificaciones() { 
