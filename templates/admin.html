@@ -44,7 +44,7 @@
                 <div class="card-colonial p-4 shadow h-100">
                     <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
                     <div id="contenedor-alertas">
-                        <div class="p-4 text-center text-muted" style="color: #d1c7bd !important;">
+                        <div id="mensaje-vacio" class="p-4 text-center text-muted" style="color: #d1c7bd !important;">
                             ⏳ Esperando órdenes o llamadas de las mesas...
                         </div>
                     </div>
@@ -160,8 +160,8 @@
             const contenedorQR = document.getElementById('qr-box');
             contenedorQR.innerHTML = "";
             
-            // Reemplaza esta URL de ejemplo por tu dominio real de Render
-            const dominioWeb = "https://tu-app.onrender.com"; 
+            // Toma automáticamente el dominio actual (Render o Localhost)
+            const dominioWeb = window.location.origin; 
             let urlMesa = `${dominioWeb}/?mesa=${numMesa}`;
             
             qrCodeInstance = new QRCode(contenedorQR, {
@@ -193,12 +193,74 @@
 
         window.onload = function() {
             generarQR();
+            iniciarWebSocketAdmin();
         };
 
         function pedirPermisoNotificaciones() {
             if (window.Notification && Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
+        }
+
+        // --- CONEXIÓN WEBSOCKET Y NOTIFICACIONES FLASH ---
+        function iniciarWebSocketAdmin() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const contenedor = document.getElementById('contenedor-alertas');
+                const mensajeVacio = document.getElementById('mensaje-vacio');
+                
+                if (mensajeVacio) {
+                    mensajeVacio.remove();
+                }
+
+                let tarjetaFlash = document.createElement('div');
+                tarjetaFlash.className = 'notid-card p-3 mb-3 text-light';
+
+                if (data.tipo === 'alerta') {
+                    tarjetaFlash.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-warning m-0 fw-bold">${data.titulo}</h5>
+                            <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                        </div>
+                        <p class="mt-2 mb-2 text-light">${data.mensaje}</p>
+                        <div class="text-end">
+                            <button class="btn btn-sm btn-outline-light py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button>
+                        </div>
+                    `;
+                    
+                    // Notificación de Escritorio nativa si el usuario dio permisos
+                    if (window.Notification && Notification.permission === "granted") {
+                        new Notification(data.titulo, { body: data.mensaje });
+                    }
+                } else if (data.tipo === 'nuevo_pedido') {
+                    let itemsHtml = data.items.map(i => `<li>${i.cantidad}x ${i.nombre} (Q ${(i.precio * i.cantidad).toFixed(2)})</li>`).join('');
+                    tarjetaFlash.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-warning m-0 fw-bold">🚀 Nuevo Pedido Recibido</h5>
+                            <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                        </div>
+                        <ul class="mt-2 mb-2 ps-3 text-light small">${itemsHtml}</ul>
+                        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary">
+                            <span class="text-success fw-bold fs-6">Total: Q ${data.total.toFixed(2)}</span>
+                            <button class="btn btn-sm btn-amber py-1" onclick="this.closest('.notid-card').remove()">Completar Pedido</button>
+                        </div>
+                    `;
+
+                    if (window.Notification && Notification.permission === "granted") {
+                        new Notification("Nuevo Pedido", { body: `Pedido de Q ${data.total.toFixed(2)} para la Mesa #${data.mesa}` });
+                    }
+                }
+
+                contenedor.prepend(tarjetaFlash);
+            };
+
+            ws.onclose = function() {
+                // Reconectar automáticamente si se cae el socket
+                setTimeout(iniciarWebSocketAdmin, 3000);
+            };
         }
     </script>
 </body>
