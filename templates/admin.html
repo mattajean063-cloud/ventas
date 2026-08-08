@@ -28,21 +28,21 @@
         <!-- Cabecera Superior con Interruptor de Turno -->
         <div class="card-colonial p-4 mb-4 shadow">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <h2 class="text-warning fw-bold m-0">🖥️ Monitor y Gestión - Don Nicolás[cite: 3]</h2>
+                <h2 class="text-warning fw-bold m-0">🖥️ Monitor y Gestión - Don Nicolás</h2>
                 
                 <div class="d-flex align-items-center gap-3 bg-dark p-2 rounded border border-secondary">
                     <span class="text-warning small fw-bold">Turno Menú Comida:</span>
                     <form action="/admin/cambiar-turno" method="POST" class="m-0">
                         <select name="turno" class="form-select form-select-sm text-center fw-bold text-warning" onchange="this.form.submit()" style="width: 130px;">
-                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana[cite: 3]</option>
-                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde[cite: 3]</option>
+                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
+                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
                         </select>
                     </form>
                 </div>
 
                 <div>
-                    <button class="btn btn-outline-warning btn-sm me-2" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos[cite: 3]</button>
-                    <a href="/?mesa=1" class="btn btn-outline-light btn-sm" target="_blank">Ver Menú ↗[cite: 3]</a>
+                    <button class="btn btn-outline-warning btn-sm me-2" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
+                    <a href="/?mesa=1" class="btn btn-outline-light btn-sm" target="_blank">Ver Menú ↗</a>
                 </div>
             </div>
         </div>
@@ -51,10 +51,10 @@
             <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
             <div class="col-lg-8">
                 <div class="card-colonial p-4 shadow h-100">
-                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">🔔 Pedidos y Solicitudes en Tiempo Real[cite: 3]</h4>
+                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
                     <div id="contenedor-alertas">
                         <div id="mensaje-vacio" class="p-4 text-center text-muted" style="color: #d1c7bd !important;">
-                            ⏳ Esperando órdenes o llamadas de las mesas...[cite: 3]
+                            ⏳ Esperando órdenes o llamadas de las mesas...
                         </div>
                     </div>
                 </div>
@@ -63,83 +63,82 @@
             <!-- COLUMNA DERECHA: QR y Agregar Producto -->
             <div class="col-lg-4 d-flex flex-column gap-4">
                 <div class="card-colonial p-4 shadow text-center">
-                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📱 Generar Código QR[cite: 3]</h4>
+                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📱 Generar Código QR</h4>
                     <div class="mb-3">
-                        <label class="form-label text-warning small fw-bold">Número de Mesa:[cite: 3]</label>
-                        <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">[cite: 3]
+                        <label class="form-label text-warning small fw-bold">Número de Mesa:</label>
+                        <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
                     </div>
-                    <div id="qr-box" class="my-3 d-flex justify-content-center"></div>[cite: 3]
-                    <button class="btn btn-amber w-100 py-2 shadow mt-2" onclick="descargarQR()">📥 Descargar Imagen QR[cite: 3]</button>
+                    <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
+                    <button class="btn btn-amber w-100 py-2 shadow mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
                 </div>
 
                 <div class="card-colonial shadow overflow-hidden">
                     <button class="btn w-100 d-flex justify-content-between align-items-center p-4 text-warning fw-bold fs-5 text-start border-0" 
                             type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent;">
-                        <span>➕ Agregar Producto[cite: 3]</span>
+                        <span>➕ Agregar Producto</span>
                         <span class="fs-6">▼</span>
                     </button>
                     <div class="collapse" id="formAgregarCollapse">
                         <div class="p-4 pt-0">
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Nombre[cite: 3]</label>
-                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>[cite: 3]
+                                    <label class="form-label text-warning small fw-bold">Nombre</label>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Precio (Q)[cite: 3]</label>
-                                    <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>[cite: 3]
+                                    <label class="form-label text-warning small fw-bold">Precio (Q)</label>
+                                    <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Categoría[cite: 3]</label>
+                                    <label class="form-label text-warning small fw-bold">Categoría</label>
                                     <select class="form-select" name="categoria" required>
-                                        <option value="" disabled selected>Seleccione[cite: 3]</option>
-                                        <option value="Bebidas Frías">Bebidas Frías[cite: 3]</option>
-                                        <option value="Bebidas Calientes">Bebidas Calientes[cite: 3]</option>
-                                        <option value="Comida">Comida[cite: 3]</option>
-                                        <option value="Postres">Postres[cite: 3]</option>
+                                        <option value="" disabled selected>Seleccione</option>
+                                        <option value="Bebidas Frías">Bebidas Frías</option>
+                                        <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                        <option value="Comida">Comida</option>
+                                        <option value="Postres">Postres</option>
                                         <option value="Métodos">Métodos</option>
-                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado[cite: 3]</option>
-                                        <option value="Extras">Extras[cite: 3]</option>
+                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
+                                        <option value="Extras">Extras</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Horario (Solo Comida)[cite: 3]</label>
+                                    <label class="form-label text-warning small fw-bold">Horario (Solo Comida)</label>
                                     <select class="form-select" name="horario" required>
-                                        <option value="Ambos">Mañana y Tarde[cite: 3]</option>
-                                        <option value="Mañana">Solo Mañana[cite: 3]</option>
-                                        <option value="Tarde">Solo Tarde[cite: 3]</option>
+                                        <option value="Ambos">Mañana y Tarde</option>
+                                        <option value="Mañana">Solo Mañana</option>
+                                        <option value="Tarde">Solo Tarde</option>
                                     </select>
                                 </div>
                                 
-                                <!-- Configuración de Tamaños -->
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Configuración de Tamaño:[cite: 3]</label>
+                                    <label class="form-label text-warning small fw-bold">Configuración de Tamaño:</label>
                                     <select class="form-select" name="config_tamano" required>
-                                        <option value="ninguno">Sin Tamaño / Estándar[cite: 3]</option>
-                                        <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)[cite: 3]</option>
-                                        <option value="fijo_12oz">Tamaño Fijo: Grande (12oz)[cite: 3]</option>
-                                        <option value="elegir_ambos">Elegir entre 8oz y 12oz[cite: 3]</option>
+                                        <option value="ninguno">Sin Tamaño / Estándar</option>
+                                        <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)</option>
+                                        <option value="fijo_12oz">Tamaño Fijo: Grande (12oz)</option>
+                                        <option value="elegir_ambos">Elegir entre 8oz y 12oz</option>
                                     </select>
                                 </div>
 
                                 <div class="mb-3 p-2 rounded bg-dark border border-secondary">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>[cite: 3]
+                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
                                         <label class="form-check-label text-light small" for="checkPromo">
-                                            🌅 Incluir opción de desayuno / bebida matutina[cite: 3]
+                                            🌅 Incluir opción de desayuno / bebida matutina
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Descripción[cite: 3]</label>
-                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>[cite: 3]
+                                    <label class="form-label text-warning small fw-bold">Descripción</label>
+                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Foto[cite: 3]</label>
-                                    <input type="file" class="form-control" name="imagen_file" accept="image/*" required>[cite: 3]
+                                    <label class="form-label text-warning small fw-bold">Foto</label>
+                                    <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
                                 </div>
-                                <button type="submit" class="btn btn-amber w-100 py-2 shadow">Guardar Producto[cite: 3]</button>
+                                <button type="submit" class="btn btn-amber w-100 py-2 shadow">Guardar Producto</button>
                             </form>
                         </div>
                     </div>
@@ -151,17 +150,17 @@
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-colonial p-4 shadow">
-                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú[cite: 3]</h4>
+                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú</h4>
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle bg-transparent">
                             <thead>
                                 <tr class="text-warning">
-                                    <th>Foto[cite: 3]</th>
-                                    <th>Nombre[cite: 3]</th>
-                                    <th>Categoría[cite: 3]</th>
-                                    <th>Precio (Q)[cite: 3]</th>
-                                    <th>Horario Comida[cite: 3]</th>
-                                    <th>Acción[cite: 3]</th>
+                                    <th>Foto</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio (Q)</th>
+                                    <th>Horario Comida</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -169,35 +168,35 @@
                                 <tr>
                                     <td>
                                         {% if p.imagen %}
-                                            <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">[cite: 3]
+                                            <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
                                         {% else %}
-                                            <span class="text-muted small">Sin foto[cite: 3]</span>
+                                            <span class="text-muted small">Sin foto</span>
                                         {% endif %}
                                     </td>
-                                    <td class="fw-bold text-light">{{ p.nombre }}[cite: 3]</td>
-                                    <td><span class="badge bg-secondary">{{ p.categoria }}</span>[cite: 3]</td>
+                                    <td class="fw-bold text-light">{{ p.nombre }}</td>
+                                    <td><span class="badge bg-secondary">{{ p.categoria }}</span></td>
                                     <td>
                                         <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
-                                            <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>[cite: 3]
-                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar[cite: 3]</button>
+                                            <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
+                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
                                         </form>
                                     </td>
                                     <td>
                                         {% if p.categoria == 'Comida' %}
                                         <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
                                             <select name="horario" class="form-select form-select-sm text-warning fw-bold" style="width: 125px;" onchange="this.form.submit()">
-                                                <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos[cite: 3]</option>
-                                                <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana[cite: 3]</option>
-                                                <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde[cite: 3]</option>
+                                                <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
+                                                <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
+                                                <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
                                             </select>
                                         </form>
                                         {% else %}
-                                            <span class="text-muted small">Siempre visible[cite: 3]</span>
+                                            <span class="text-muted small">Siempre visible</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar[cite: 3]</button>
+                                            <button type="submit" class="btn btn-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -229,7 +228,6 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // Conexión por WebSocket en tiempo real optimizada
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
@@ -240,7 +238,7 @@
             };
 
             ws.onclose = function() {
-                setTimeout(conectarWebSocket, 3000); // Reconexión automática si se cae
+                setTimeout(conectarWebSocket, 3000);
             };
         }
 
@@ -252,7 +250,7 @@
         function pedirPermisoNotificaciones() { 
             if (window.Notification) {
                 Notification.requestPermission().then(permission => {
-                    if (permission === "granted") alert("¡Avisos de escritorio activados!");[cite: 3]
+                    if (permission === "granted") alert("¡Avisos de escritorio activados!");
                 });
             }
         }
