@@ -93,8 +93,8 @@
             color: var(--text-light);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 6px 16px;
-            font-size: 0.9rem;
+            padding: 6px 14px;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
@@ -148,8 +148,9 @@
             border: 1px solid var(--border-color);
             color: var(--text-light);
             border-radius: 10px;
-            padding: 10px;
+            padding: 8px;
             font-weight: bold;
+            font-size: 0.85rem;
             transition: all 0.2s;
             text-align: center;
             cursor: pointer;
@@ -159,6 +160,15 @@
             background-color: var(--accent-gold);
             color: white;
             border-color: var(--accent-gold);
+        }
+        
+        .promo-banner {
+            background: linear-gradient(135deg, #3d291d 0%, #2b1d14 100%);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -191,7 +201,7 @@
                 Por favor, ¿podría indicarnos amablemente su nombre para asociar este platillo a su cuenta personal?
             </p>
             <div class="mb-3">
-                <input type="text" id="input-nombre-personal" class="form-control bg-dark text-light border-secondary text-center fw-bold fs-5" placeholder="Escriba su nombre aquí..." style="color: var(--text-light) !important;">
+                <input type="text" id="input-nombre-personal" class="form-control bg-dark text-light border-secondary text-center fw-bold fs-5" placeholder="Escriba su nombre aquí...">
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-light w-50 py-2" onclick="cancelarNombreCliente()">Cancelar</button>
@@ -200,28 +210,51 @@
         </div>
     </div>
 
-    <!-- MODAL PARA PERSONALIZAR BEBIDAS (Leche, Endulzante, Nota) -->
+    <!-- MODAL PARA PERSONALIZAR BEBIDAS Y OPCIONES -->
     <div id="modal-personalizar" class="modal-overlay" style="display: none;">
         <div class="modal-colonial shadow-lg">
-            <h4 class="text-warning fw-bold mb-2 text-center" id="titulo-modal-producto">Personalizar Bebida</h4>
-            <p class="text-muted small text-center mb-3">Seleccione las preferencias para su bebida:</p>
+            <h4 class="text-warning fw-bold mb-2 text-center" id="titulo-modal-producto">Personalizar Producto</h4>
+            <p class="text-muted small text-center mb-3">Personalice su elección:</p>
             
-            <!-- Selección de Leche -->
-            <label class="form-label text-warning small fw-bold mb-1">🥛 Tipo de Leche:</label>
-            <div class="row g-2 mb-3">
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Entera', this)">Entera</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Deslactosada', this)">Deslactosada</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Descremada', this)">Descremada</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Almendra', this)">Almendra</div></div>
+            <!-- SECCIÓN CONDICIONAL: TAMAÑOS (Solo si aplica) -->
+            <div id="seccion-tamanos" class="mb-3" style="display: none;">
+                <label class="form-label text-warning small fw-bold mb-1">📏 Tamaño:</label>
+                <div class="row g-2">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Pequeño 8oz', this)">Pequeño (8oz)</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Grande 12oz', this)">Grande (12oz)</div></div>
+                </div>
             </div>
 
-            <!-- Selección de Endulzante -->
-            <label class="form-label text-warning small fw-bold mb-1">🍯 Tipo de Endulzante:</label>
-            <div class="row g-2 mb-3">
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Azúcar', this)">Azúcar</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Splenda', this)">Splenda</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Morena', this)">Morena</div></div>
-                <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Sin Endulzante', this)">Ninguno</div></div>
+            <!-- SECCIÓN CONDICIONAL: PROMOCIÓN DE MAÑANA / BEBIDA EXTRA -->
+            <div id="seccion-promo-manana" class="mb-3" style="display: none;">
+                <label class="form-label text-warning small fw-bold mb-1">☕ Opción de Bebida Matutina (+Q12):</label>
+                <div class="row g-2 mb-2">
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Café Negro', this)">Café Negro</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Jugo Naranja', this)">Jugo Naranja</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Té Caliente', this)">Té Caliente</div></div>
+                </div>
+                <div class="d-grid">
+                    <div class="opcion-btn text-warning" onclick="seleccionarOpcion('promo', 'Cambiar a Latte', this)">✨ Cambiar a Latte (+Q12)</div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN CONDICIONAL: LECHE Y ENDULZANTE -->
+            <div id="seccion-leche-endulzante">
+                <label class="form-label text-warning small fw-bold mb-1">🥛 Tipo de Leche:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Entera', this, 0)">Entera</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Deslactosada', this, 0)">Deslactosada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Descremada', this, 0)">Descremada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Leche Vegetal (+Q8)', this, 8)">Leche Vegetal (+Q8)</div></div>
+                </div>
+
+                <label class="form-label text-warning small fw-bold mb-1">🍯 Tipo de Endulzante:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Azúcar', this)">Azúcar</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Splenda', this)">Splenda</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Morena', this)">Morena</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Sin Endulzante', this)">Ninguno</div></div>
+                </div>
             </div>
 
             <!-- Nota Adicional -->
@@ -270,16 +303,24 @@
             <button class="btn btn-outline-warning btn-sm w-50 py-1" onclick="enviarAlerta('cuenta')">🧾 Pedir Cuenta</button>
         </div>
 
-        <!-- Botones de Filtro Superiores Simplificados -->
-        <div class="container d-flex justify-content-center gap-2 flex-wrap" style="max-width: 600px;">
+        <!-- Botones de Filtro Superiores con las nuevas categorías -->
+        <div class="container d-flex justify-content-center gap-1 flex-wrap" style="max-width: 600px;">
             <button class="btn-categoria active" onclick="filtrarCategoria('todos', this)">🌟 Todos</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Bebidas', this)">🥤 Bebidas</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Comida', this)">🍳 Comida</button>
             <button class="btn-categoria" onclick="filtrarCategoria('Postres', this)">🍰 Postres</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Cócteles y Café Filtrado', this)">🍸 Cócteles</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('Extras', this)">➕ Extras</button>
         </div>
     </div>
 
     <div class="container" style="max-width: 600px;">
+        
+        <!-- Banner Informativo del Menú de Mañana -->
+        <div class="promo-banner text-light text-center shadow-sm">
+            <span class="text-warning fw-bold">🌅 Promoción Menú de Mañana:</span> Su platillo matutino puede incluir Café Negro, Jugo de Naranja o Té Caliente por **Q 12.00 extra** (o cámbielo por un delicioso **Latte** eligiendo tamaño pequeño de 8oz o grande de 12oz).
+        </div>
+
         <!-- BEBIDAS FRÍAS Y CALIENTES -->
         {% if categorias['Bebidas Frías'] or categorias['Bebidas Calientes'] %}
         <div class="grupo-categoria" data-categoria="Bebidas">
@@ -295,7 +336,7 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida')">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida', false, false)">➕</button>
                 </div>
                 {% endfor %}
                 {% for p in categorias['Bebidas Calientes'] %}
@@ -308,7 +349,8 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida')">➕</button>
+                    <!-- Si el administrador marca que lleva opción de tamaño o promo -->
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida', {{ p.admite_tamano|tojson|default('false') }}, {{ p.admite_promo|tojson|default('false') }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -330,7 +372,7 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Comida')">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Comida', {{ p.admite_tamano|tojson|default('false') }}, {{ p.admite_promo|tojson|default('true') }})">➕</button>
                 </div>
                 {% endfor %}
             </div>
@@ -352,12 +394,57 @@
                             <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Postre')">➕</button>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Postre', false, false)">➕</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
+
+        <!-- CÓCTELES Y CAFÉ FILTRADO -->
+        {% if categorias['Cócteles y Café Filtrado'] %}
+        <div class="grupo-categoria" data-categoria="Cócteles y Café Filtrado" style="display: none;">
+            <h5 class="category-title">🍸 Cócteles y Café Filtrado</h5>
+            <div class="d-flex flex-column gap-3">
+                {% for p in categorias['Cócteles y Café Filtrado'] %}
+                <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
+                        <div>
+                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }}</h6>
+                            <p class="text-muted small mb-2" style="color: var(--text-muted) !important; font-size: 0.82rem; line-height: 1.2;">{{ p.descripcion }}</p>
+                            <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Bebida', true, false)">➕</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- EXTRAS -->
+        {% if categorias.Extras %}
+        <div class="grupo-categoria" data-categoria="Extras" style="display: none;">
+            <h5 class="category-title">➕ Extras</h5>
+            <div class="d-flex flex-column gap-3">
+                {% for p in categorias.Extras %}
+                <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
+                        <div>
+                            <h6 class="mb-1 text-warning fw-bold">{{ p.nombre }}</h6>
+                            <p class="text-muted small mb-2" style="color: var(--text-muted) !important; font-size: 0.82rem; line-height: 1.2;">{{ p.descripcion }}</p>
+                            <span class="text-success fw-bold fs-6">Q {{ "%.2f"|format(p.precio) }}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, 'Extra', false, false)">➕</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
     </div>
 
     <!-- PANEL FLOTANTE DE PEDIDO -->
@@ -401,6 +488,10 @@
         let productoPendiente = null;
         let seleccionLecheTemp = 'Entera';
         let seleccionEndulzanteTemp = 'Azúcar';
+        let seleccionTamanoTemp = '';
+        let seleccionPromoTemp = '';
+        let costoExtraLeche = 0;
+        let costoExtraPromo = 0;
 
         function seleccionarTipoCuenta(tipo) {
             tipoCuentaSeleccionada = tipo;
@@ -421,10 +512,9 @@
             });
         }
 
-        function iniciarAgregarProducto(id, nombre, precio, tipoItem) {
-            productoPendiente = { id, nombre, precio, tipoItem };
+        function iniciarAgregarProducto(id, nombre, precio, tipoItem, admiteTamano, admitePromo) {
+            productoPendiente = { id, nombre, precio, tipoItem, admiteTamano, admitePromo };
 
-            // Si son cuentas separadas, mostramos el modal estilizado para pedir el nombre
             if (tipoCuentaSeleccionada === 'separadas') {
                 document.getElementById('input-nombre-personal').value = '';
                 document.getElementById('modal-nombre-cliente').style.display = 'flex';
@@ -450,24 +540,40 @@
             if (!productoPendiente) return;
             productoPendiente.cliente = cliente;
 
-            if (productoPendiente.tipoItem === 'Bebida') {
-                seleccionLecheTemp = 'Entera';
-                seleccionEndulzanteTemp = 'Azúcar';
-                document.getElementById('input-nota-custom').value = '';
-                document.querySelectorAll('#modal-personalizar .opcion-btn').forEach(b => b.classList.remove('selected'));
-                document.getElementById('titulo-modal-producto').innerText = productoPendiente.nombre;
-                document.getElementById('modal-personalizar').style.display = 'flex';
-            } else {
-                procesarAdicionFinal('', '');
-            }
+            // Mostrar u ocultar secciones según lo que el producto permita
+            document.getElementById('seccion-tamanos').style.display = productoPendiente.admiteTamano ? 'block' : 'none';
+            document.getElementById('seccion-promo-manana').style.display = productoPendiente.admitePromo ? 'block' : 'none';
+            
+            // Si es bebida o extra o café filtrado, habilitamos opciones
+            document.getElementById('seccion-leche-endulzante').style.display = (productoPendiente.tipoItem === 'Bebida') ? 'block' : 'none';
+
+            seleccionLecheTemp = 'Entera';
+            seleccionEndulzanteTemp = 'Azúcar';
+            seleccionTamanoTemp = '';
+            seleccionPromoTemp = '';
+            costoExtraLeche = 0;
+            costoExtraPromo = 0;
+            document.getElementById('input-nota-custom').value = '';
+            
+            document.querySelectorAll('#modal-personalizar .opcion-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('titulo-modal-producto').innerText = productoPendiente.nombre;
+            document.getElementById('modal-personalizar').style.display = 'flex';
         }
 
-        function seleccionarOpcion(categoria, valor, elemento) {
-            elemento.parentElement.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
+        function seleccionarOpcion(categoria, valor, elemento, extra = 0) {
+            elemento.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
             elemento.classList.add('selected');
 
-            if (categoria === 'leche') seleccionLecheTemp = valor;
+            if (categoria === 'leche') {
+                seleccionLecheTemp = valor;
+                costoExtraLeche = extra;
+            }
             if (categoria === 'endulzante') seleccionEndulzanteTemp = valor;
+            if (categoria === 'tamano') seleccionTamanoTemp = valor;
+            if (categoria === 'promo') {
+                seleccionPromoTemp = valor;
+                costoExtraPromo = 12; // Cargo extra de 12 por la promo de mañana o latte
+            }
         }
 
         function cerrarModalPersonalizar() {
@@ -478,15 +584,25 @@
         function confirmarPersonalizacionBebida() {
             if (!productoPendiente) return;
             let nota = document.getElementById('input-nota-custom').value.trim();
-            procesarAdicionFinal(seleccionLecheTemp, seleccionEndulzanteTemp, nota);
+            
+            let precioFinal = productoPendiente.precio + costoExtraLeche + costoExtraPromo;
+            
+            procesarAdicionFinal(
+                precioFinal, 
+                seleccionLecheTemp, 
+                seleccionEndulzanteTemp, 
+                seleccionTamanoTemp, 
+                seleccionPromoTemp, 
+                nota
+            );
             cerrarModalPersonalizar();
         }
 
-        function procesarAdicionFinal(tipoLeche = '', tipoEndulzante = '', nota = '') {
+        function procesarAdicionFinal(precioFinal, tipoLeche = '', tipoEndulzante = '', tamano = '', promo = '', nota = '') {
             if (!productoPendiente) return;
 
-            let { id, nombre, precio, cliente } = productoPendiente;
-            let itemKey = `${id}-${cliente}-${tipoLeche}-${tipoEndulzante}-${nota}`;
+            let { id, nombre, cliente } = productoPendiente;
+            let itemKey = `${id}-${cliente}-${tipoLeche}-${tipoEndulzante}-${tamano}-${promo}-${nota}`;
             let itemExistente = carrito.find(item => item.key === itemKey);
 
             if (itemExistente) {
@@ -496,11 +612,13 @@
                     key: itemKey,
                     id,
                     nombre,
-                    precio,
+                    precio: precioFinal,
                     cantidad: 1,
                     cliente,
-                    tipoLeche,
-                    tipoEndulzante,
+                    tipoLeche: productoPendiente.tipoItem === 'Bebida' ? tipoLeche : '',
+                    tipoEndulzante: productoPendiente.tipoItem === 'Bebida' ? tipoEndulzante : '',
+                    tamano,
+                    promo,
                     nota
                 });
             }
@@ -528,15 +646,11 @@
 
                 let badgeCliente = tipoCuentaSeleccionada === 'separadas' ? `<span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>` : '';
                 let detallesExtras = '';
-                if (item.tipoLeche) {
-                    detallesExtras += `<br><small class="text-warning">🥛 Leche: ${item.tipoLeche}</small>`;
-                }
-                if (item.tipoEndulzante) {
-                    detallesExtras += `<br><small class="text-warning">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
-                }
-                if (item.nota) {
-                    detallesExtras += `<br><small class="text-info">📝 Nota: ${item.nota}</small>`;
-                }
+                if (item.tamano) detallesExtras += `<br><small class="text-info">📏 Tamaño: ${item.tamano}</small>`;
+                if (item.promo) detallesExtras += `<br><small class="text-warning">🌅 Opción Mañana: ${item.promo} (+Q12)</small>`;
+                if (item.tipoLeche && item.tipoLeche !== 'Entera') detallesExtras += `<br><small class="text-warning">🥛 Leche: ${item.tipoLeche}</small>`;
+                if (item.tipoEndulzante && item.tipoEndulzante !== 'Azúcar') detallesExtras += `<br><small class="text-warning">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
+                if (item.nota) detallesExtras += `<br><small class="text-muted">📝 Nota: ${item.nota}</small>`;
 
                 lista.innerHTML += `
                     <div class="d-flex justify-content-between align-items-start border-bottom border-secondary py-2 text-light">
