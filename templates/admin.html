@@ -52,6 +52,11 @@
             border: 1px solid var(--accent-gold);
             border-radius: 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .notid-card:hover {
+            transform: translateY(-2px);
         }
 
         .form-control, .form-select { 
@@ -104,7 +109,7 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div class="d-flex align-items-center">
                     <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
-                    <!-- Burbuja de notificaciones estilo WhatsApp a la par del título -->
+                    <!-- Burbuja de notificaciones a la par del título -->
                     <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
                 </div>
                 
@@ -314,7 +319,6 @@
     <script>
         let qrCodeInstance = null;
         let contadorNotificaciones = 0;
-        // Objeto para evitar duplicados visuales si el WebSocket y el HTTP traen la misma alerta al mismo tiempo
         let idsEventosProcesados = new Set();
 
         function generarQR() {
@@ -349,7 +353,6 @@
             };
         }
 
-        // Respaldo HTTP rápido cada 2 segundos para asegurar que si Render duerme el WebSocket, las notificaciones caigan flash
         async function verificarEventosHttp() {
             try {
                 let response = await fetch('/api/obtener-eventos');
@@ -360,7 +363,7 @@
                     });
                 }
             } catch (error) {
-                // Silenciar errores de red menores para evitar spam en consola
+                // Silenciar errores de red menores
             }
         }
 
@@ -378,30 +381,63 @@
             }
         }
 
+        // --- REPRODUCTOR DE SONIDO NATIVO ---
+        function reproducirSonidoAlerta() {
+            try {
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = 'sine'; // Tono suave
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Frecuencia inicial
+                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3); // Caída rápida
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); // Volumen inicial
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); // Fade out
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {
+                console.log("El navegador bloqueó el audio nativo porque el usuario no ha interactuado con la página aún.");
+            }
+        }
+
         window.onload = function() { 
             generarQR(); 
             conectarWebSocket(); 
-            setInterval(verificarEventosHttp, 2000); // Respaldo flash cada 2 segundos
+            setInterval(verificarEventosHttp, 2000); // Respaldo cada 2s
         };
 
         function pedirPermisoNotificaciones() { 
             if (window.Notification) {
                 Notification.requestPermission().then(permission => {
-                    if (permission === "granted") alert("¡Avisos de escritorio activados!");
+                    if (permission === "granted") {
+                        alert("¡Avisos de escritorio activados! (El sonido nativo también está habilitado ahora).");
+                        // Al hacer clic, también reproducimos el sonido una vez silencioso o normal para que el navegador desbloquee el AudioContext
+                        reproducirSonidoAlerta();
+                    }
                 });
             }
         }
 
         function procesarYMostrarEvento(data) {
-            // Generar una clave única para evitar duplicados entre WebSocket y HTTP
             let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
+            
+            // Evitar duplicados si el WebSocket y el HTTP detectan la orden simultáneamente
             if (idsEventosProcesados.has(idUnico)) return;
             idsEventosProcesados.add(idUnico);
 
-            // Incrementar contador y reflejar en interfaz + pestaña
+            // 1. Aumentar conteo
             contadorNotificaciones++;
             actualizarContadorVisual();
 
+            // 2. Reproducir sonido flash instantáneo
+            reproducirSonidoAlerta();
+
+            // 3. Pintar en pantalla
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
             if (mensajeVacio) mensajeVacio.remove();
@@ -446,12 +482,16 @@
             contenedor.prepend(tarjetaFlash);
         }
 
-        // Función para decrementar el contador al atender o completar pedidos
         function marcarAtendido(button) {
             button.closest('.notid-card').remove();
             if (contadorNotificaciones > 0) {
                 contadorNotificaciones--;
                 actualizarContadorVisual();
+            }
+            // Mostrar mensaje si ya no hay nada
+            const contenedor = document.getElementById('contenedor-alertas');
+            if (contenedor.children.length === 0) {
+                contenedor.innerHTML = `<div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">⏳ Esperando órdenes o llamadas de las mesas...</div>`;
             }
         }
     </script>
