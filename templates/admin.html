@@ -253,11 +253,16 @@
             } else if (data.tipo === 'nuevo_pedido') {
                 let itemsHtml = data.items.map(i => {
                     let detalles = '';
-                    if (i.tipoLeche) detalles += ` | 🥛 ${i.tipoLeche}`;
-                    if (i.tipoEndulzante) detalles += ` | 🍯 ${i.tipoEndulzante}`;
-                    if (i.nota) detalles += ` | 📝 ${i.nota}`;
+                    // Capturamos tanto si vienen con camelCase o con snake_case
+                    let leche = i.tipoLeche || i.tipo_leche;
+                    let endulzante = i.tipoEndulzante || i.tipo_endulzante;
+                    let nota = i.nota;
 
-                    return `<li class="mb-1"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} <span class="text-warning small">${detalles}</span> (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})</li>`;
+                    if (leche) detalles += `<br><small class="text-warning ms-3">🥛 Leche: ${leche}</small>`;
+                    if (endulzante) detalles += `<br><small class="text-warning ms-3">🍯 Endulzante: ${endulzante}</small>`;
+                    if (nota) detalles += `<br><small class="text-info ms-3">📝 Nota: ${nota}</small>`;
+
+                    return `<li class="mb-2"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})${detalles}</li>`;
                 }).join('');
 
                 tarjetaFlash.innerHTML = `
