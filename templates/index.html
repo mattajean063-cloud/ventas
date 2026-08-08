@@ -118,20 +118,74 @@
             z-index: 1050;
             backdrop-filter: blur(10px);
         }
-        
-        .form-check-input:checked {
-            background-color: #d97706;
-            border-color: #d97706;
+
+        /* Estilo para los Modales / Pantallas superpuestas */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 10, 7, 0.9);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-colonial {
+            background-color: var(--bg-card);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
 
+    <!-- MODAL DE BIENVENIDA Y SELECCIÓN DE CUENTA -->
+    <div id="modal-bienvenida" class="modal-overlay">
+        <div class="modal-colonial shadow-lg">
+            <h3 class="text-warning fw-bold mb-3">☕ ¡Bienvenidos a Don Nicolás!</h3>
+            <p class="text-light mb-4" style="line-height: 1.5; color: var(--text-muted) !important;">
+                Nos alegra mucho atenderle en la <strong>Mesa #{{ mesa }}</strong>. Por favor, indíquenos cómo desean gestionar su cuenta el día de hoy:
+            </p>
+            <div class="d-grid gap-3">
+                <button class="btn btn-amber py-2 fs-6 shadow-sm" onclick="seleccionarTipoCuenta('juntas')">
+                    👥 Cuentas Juntas
+                </button>
+                <button class="btn btn-outline-warning py-2 fs-6 shadow-sm" onclick="seleccionarTipoCuenta('separadas')">
+                    👤 Cuentas Separadas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AGRADECIMIENTO AL ENVIAR PEDIDO -->
+    <div id="modal-agradecimiento" class="modal-overlay" style="display: none;">
+        <div class="modal-colonial shadow-lg">
+            <div class="fs-1 mb-2">🎉</div>
+            <h3 class="text-warning fw-bold mb-3">¡Muchas gracias por su pedido!</h3>
+            <p class="text-light mb-4" style="color: var(--text-muted) !important;">
+                Su orden ha sido recibida con éxito en cocina y será atendida de inmediato en su mesa.
+            </p>
+            <button class="btn btn-amber w-100 py-2 shadow-sm" onclick="cerrarMensajeAgradecimiento()">
+                Continuar viendo el menú
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor Fijo Superior -->
     <div class="sticky-container shadow-sm mb-3 pt-3">
         <div class="container d-flex justify-content-between align-items-center mb-2" style="max-width: 600px;">
             <div>
                 <h4 class="text-warning fw-bold m-0">☕ Don Nicolás</h4>
-                <small class="text-muted" style="color: var(--text-muted) !important;">Turno Comida: <strong>{{ turno }}</strong></small>
+                <small class="text-muted" style="color: var(--text-muted) !important;">Modo Cuenta: <strong id="label-tipo-cuenta" class="text-warning">Juntas</strong></small>
             </div>
             <div class="text-end">
                 <span class="badge badge-mesa fs-6 px-3 py-2 rounded-pill shadow-sm">
@@ -155,7 +209,6 @@
     </div>
 
     <div class="container" style="max-width: 600px;">
-
         <!-- BEBIDAS FRÍAS -->
         {% if categorias['Bebidas Frías'] %}
         <div class="grupo-categoria" data-categoria="Bebidas Frías">
@@ -243,14 +296,13 @@
             </div>
         </div>
         {% endif %}
-
     </div>
 
     <!-- PANEL FLOTANTE DE PEDIDO -->
     <div id="contenedor-resumen-pedido" class="order-panel p-3 px-4" style="display: none;">
         <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseDetallePedido" aria-expanded="false" style="cursor: pointer;">
             <div>
-                <h5 class="text-warning fw-bold m-0 fs-6">📋 Su Selección (Cuentas Separadas)</h5>
+                <h5 class="text-warning fw-bold m-0 fs-6">📋 Su Selección</h5>
                 <small class="text-muted" style="font-size: 0.75rem;">Toque para desplegar/ocultar</small>
             </div>
             <div class="text-end d-flex align-items-center gap-2">
@@ -282,6 +334,13 @@
         document.getElementById('label-mesa').innerText = numeroMesa;
 
         let carrito = [];
+        let tipoCuentaSeleccionada = 'juntas'; // 'juntas' o 'separadas'
+
+        function seleccionarTipoCuenta(tipo) {
+            tipoCuentaSeleccionada = tipo;
+            document.getElementById('label-tipo-cuenta').innerText = tipo === 'juntas' ? 'Juntas' : 'Separadas';
+            document.getElementById('modal-bienvenida').style.display = 'none';
+        }
 
         function filtrarCategoria(categoria, boton) {
             document.querySelectorAll('.btn-categoria').forEach(btn => btn.classList.remove('active'));
@@ -297,9 +356,14 @@
         }
 
         function agregarAlCarrito(id, nombre, precio) {
-            let cliente = prompt("¿A nombre de quién va este producto? (Opcional):", "General");
-            if (cliente === null) return;
-            cliente = cliente.trim() === "" ? "General" : cliente.trim();
+            let cliente = "General";
+
+            // Si eligieron cuentas separadas, mostramos un mensaje en pantalla amigable pidiendo el nombre
+            if (tipoCuentaSeleccionada === 'separadas') {
+                let nombreIngresado = prompt("Por favor, ¿podría indicarnos amablemente su nombre para asociar este platillo a su cuenta personal?");
+                if (nombreIngresado === null) return; // Si cancela, no agrega
+                cliente = nombreIngresado.trim() === "" ? "Invitado" : nombreIngresado.trim();
+            }
 
             let itemExistente = carrito.find(item => item.id === id && item.cliente === cliente);
             if (itemExistente) {
@@ -327,10 +391,11 @@
             carrito.forEach((item, index) => {
                 let subtotal = item.precio * item.cantidad;
                 total += subtotal;
+                let badgeCliente = tipoCuentaSeleccionada === 'separadas' ? `<span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>` : '';
                 lista.innerHTML += `
                     <div class="d-flex justify-content-between align-items-center border-bottom border-secondary py-2 text-light">
                         <div>
-                            <span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>
+                            ${badgeCliente}
                             <div class="fw-bold">${item.cantidad}x ${item.nombre}</div>
                             <small class="text-muted">Q ${subtotal.toFixed(2)}</small>
                         </div>
@@ -369,18 +434,25 @@
                 });
 
                 if (respuesta.ok) {
-                    alert("¡Pedido con cuentas separadas enviado con éxito a cocina!");
+                    // Limpiar carrito y ocultar panel
                     carrito = [];
                     actualizarCarritoUI();
                     document.getElementById('contenedor-resumen-pedido').style.display = 'none';
                     document.getElementById('checkRevisado').checked = false;
                     toggleBotonEnviar();
+
+                    // Mostrar modal de agradecimiento con el estilo de la página
+                    document.getElementById('modal-agradecimiento').style.display = 'flex';
                 } else {
                     alert("Hubo un error al enviar el pedido.");
                 }
             } catch (e) {
                 alert("Error de conexión.");
             }
+        }
+
+        function cerrarMensajeAgradecimiento() {
+            document.getElementById('modal-agradecimiento').style.display = 'none';
         }
 
         async function enviarAlerta(tipo) {
