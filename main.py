@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # ⚠️ REEMPLAZA CON TU LLAVE REAL DE SUPABASE (anon / public)
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxMTUzODQ2LCJleHAiOjIxMDE3Mjk4NDZ9.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -300,11 +300,11 @@ async def agregar_producto(
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/actualizar-imagen/{producto_id}")
-async def actualizar_imagen(producto_id: int, nueva_imagen_file: UploadFile = File(...)):
+async def actualizar_imagen(producto_id: int, imagen_file: UploadFile = File(...)):
     try:
-        file_bytes = await nueva_imagen_file.read()
+        file_bytes = await imagen_file.read()
         encoded_image = base64.b64encode(file_bytes).decode('utf-8')
-        content_type = nueva_imagen_file.content_type or "image/jpeg"
+        content_type = imagen_file.content_type or "image/jpeg"
         imagen_base64 = f"data:{content_type};base64,{encoded_image}"
         
         payload = {"imagen": imagen_base64}
@@ -329,6 +329,16 @@ async def actualizar_horario(producto_id: int, horario: str = Form(...)):
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e: print("ERROR:", e)
+    return RedirectResponse(url="/admin", status_code=303)
+
+@app.post("/admin/actualizar-tamano/{producto_id}")
+async def actualizar_tamano(producto_id: int, config_tamano: str = Form(...)):
+    try:
+        payload = {"config_tamano": config_tamano}
+        db_headers = {**HEADERS, "Content-Type": "application/json"}
+        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
+    except Exception as e: 
+        print("ERROR AL ACTUALIZAR TAMAÑO:", e)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/eliminar/{producto_id}")
