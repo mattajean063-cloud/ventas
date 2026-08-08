@@ -20,7 +20,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRhdGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -56,7 +56,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# --- MODELOS PYDANTIC ACTUALIZADOS PARA OPCIONES DE BEBIDAS ---
+# --- MODELOS PYDANTIC ---
 class ItemPedido(BaseModel):
     nombre: str
     precio: float
@@ -196,7 +196,10 @@ async def agregar_producto(
         }
         
         db_headers = {**HEADERS, "Content-Type": "application/json"}
-        requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
+        res = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
+        
+        # Esto te mostrará en la terminal de Python si Supabase acepta el guardado o lo rechaza
+        print("RESPUESTA SUPABASE AL AGREGAR:", res.status_code, res.text)
         
     except Exception as e:
         print("ERROR GENERAL EN /admin/agregar:", e)
