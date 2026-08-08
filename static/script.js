@@ -1,91 +1,99 @@
+// --- CARRITO DE COMPRAS Y GESTIÓN DE PEDIDOS ---
 let carrito = [];
 
+// Agregar productos al carrito desde el menú
 function agregarAlCarrito(nombre, precio) {
-    let encontrado = carrito.find(item => item.nombre === nombre);
-    if (encontrado) {
-        encontrado.cantidad += 1;
+    let itemExistente = carrito.find(item => item.nombre === nombre);
+    if (itemExistente) {
+        itemExistente.cantidad += 1;
     } else {
         carrito.push({ nombre: nombre, precio: precio, cantidad: 1 });
     }
-    actualizarCarritoUI();
+    actualizarVistaCarrito();
 }
 
-function cambiarCantidad(index, cambio) {
-    carrito[index].cantidad += cambio;
-    if (carrito[index].cantidad <= 0) {
-        carrito.splice(index, 1);
+// Modificar cantidad de un producto en el resumen
+function cambiarCantidad(nombre, cambio) {
+    let item = carrito.find(item => item.nombre === nombre);
+    if (item) {
+        item.cantidad += cambio;
+        if (item.cantidad <= 0) {
+            carrito = carrito.filter(i => i.nombre !== nombre);
+        }
     }
-    actualizarCarritoUI();
+    actualizarVistaCarrito();
 }
 
-function actualizarCarritoUI() {
-    let lista = document.getElementById("lista-carrito");
-    let totalSpan = document.getElementById("total-carrito");
-    let contenedorResumen = document.getElementById("contenedor-resumen-pedido");
-    
-    lista.innerHTML = "";
-    
+// Renderizar la interfaz del carrito y actualizar totales
+function actualizarVistaCarrito() {
+    let contenedorLista = document.getElementById('lista-carrito');
+    let contenedorPanel = document.getElementById('contenedor-resumen-pedido');
+    let spanTotal = document.getElementById('total-carrito');
+
+    if (!contenedorLista) return;
+
     if (carrito.length === 0) {
-        contenedorResumen.style.display = "none";
+        contenedorPanel.style.display = 'none';
+        contenedorLista.innerHTML = '';
         return;
-    } else {
-        contenedorResumen.style.display = "block";
     }
 
-    let total = 0;
-    carrito.forEach((item, index) => {
+    contenedorPanel.style.display = 'block';
+    contenedorLista.innerHTML = '';
+    let totalGeneral = 0;
+
+    carrito.forEach(item => {
         let subtotal = item.precio * item.cantidad;
-        total += subtotal;
-        
-        lista.innerHTML += `
-            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary">
-                <div style="max-width: 55%;">
-                    <h6 class="mb-0 text-light fw-bold" style="font-size: 0.95rem;">${item.nombre}</h6>
-                    <small class="text-success">Q ${item.precio.toFixed(2)} c/u</small>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-outline-warning py-0 px-2 fw-bold" onclick="cambiarCantidad(${index}, -1)">-</button>
-                    <span class="text-warning fw-bold">${item.cantidad}</span>
-                    <button class="btn btn-sm btn-outline-warning py-0 px-2 fw-bold" onclick="cambiarCantidad(${index}, 1)">+</button>
-                    <button class="btn btn-sm text-danger ms-1 p-0" onclick="cambiarCantidad(${index}, -${item.cantidad})" title="Eliminar">🗑️</button>
-                </div>
+        totalGeneral += subtotal;
+
+        let divItem = document.createElement('div');
+        divItem.className = 'd-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary';
+        divItem.innerHTML = `
+            <div>
+                <span class="text-light fw-bold" style="font-size: 0.85rem;">${item.nombre}</span><br>
+                <small class="text-warning" style="font-size: 0.75rem;">Q ${item.precio.toFixed(2)} x ${item.cantidad}</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-success fw-bold" style="font-size: 0.85rem;">Q ${subtotal.toFixed(2)}</span>
+                <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="cambiarCantidad('${item.nombre}', -1)">-</button>
+                <button class="btn btn-sm btn-outline-warning py-0 px-1" onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
             </div>
         `;
+        contenedorLista.appendChild(divItem);
     });
-    totalSpan.innerText = `Q ${total.toFixed(2)}`;
+
+    spanTotal.innerText = `Q ${totalGeneral.toFixed(2)}`;
 }
 
+// --- ENVÍO DE PEDIDO AL SERVIDOR (Ruta relativa arreglada) ---
 async function enviarPedido() {
-    if (carrito.length === 0) {
-        alert("Por favor seleccione al menos un producto.");
-        return;
-    }
-
-    let mesaActual = localStorage.getItem('mesa_actual') || 1;
-    let totalCalculado = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-
-    let datosPedido = {
-        mesa: parseInt(mesaActual),
-        items: carrito,
-        total: totalCalculado
-    };
+    let totalGeneral = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
 
     try {
-        let respuesta = await fetch('http://127.0.0.1:8000/api/enviar-pedido', {
+        let respuesta = await fetch('/api/enviar-pedido', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datosPedido)
+            body: JSON.stringify({
+                mesa: parseInt(numeroMesa),
+                items: carrito,
+                total: totalGeneral
+            })
         });
 
-        let resultado = await respuesta.json();
-        if (resultado.status === "success") {
-            alert(`🎉 ¡Pedido enviado con éxito desde la Mesa #${mesaActual}! Nuestra cocina ha comenzado la preparación.`);
+        if (respuesta.ok) {
+            alert("🚀 ¡Pedido enviado con éxito a la cocina!");
             carrito = [];
-            actualizarCarritoUI();
+            actualizarVistaCarrito();
+            // Desmarcar el checkbox de confirmación si existe
+            let check = document.getElementById('checkRevisado');
+            if (check) check.checked = false;
+            let boton = document.getElementById('btn-enviar-pedido');
+            if (boton) boton.disabled = true;
         } else {
-            alert("No se pudo conectar con el servidor.");
+            alert("Hubo un problema al procesar el pedido con el servidor.");
         }
     } catch (error) {
+        console.error("Error de conexión:", error);
         alert("Error de conexión con el servidor.");
     }
 }
