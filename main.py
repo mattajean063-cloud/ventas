@@ -25,15 +25,14 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# --- CONFIGURACIÓN DE BASE DE DATOS (SUPABASE) ---
-# Usamos tu URL de conexión de Supabase (ajustando postgresql:// a postgresql+psycopg2:// para mejor compatibilidad)
-DATABASE_URL = "postgresql+psycopg2://postgres:matamata675411302603@db.picteudhhdsytfvpvoja.supabase.co:5432/postgres"
+# --- CONFIGURACIÓN DE BASE DE DATOS (SUPABASE CON POOLER 6543) ---
+DATABASE_URL = "postgresql+psycopg2://postgres:matamata675411302603@db.picteudhhdsytfvpvoja.supabase.co:6543/postgres?sslmode=require"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Definición del modelo de la tabla productos que ya creaste en Supabase
+# Definición del modelo de la tabla productos en Supabase
 class ProductoModel(Base):
     __tablename__ = "productos"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -89,7 +88,6 @@ async def ver_menu(request: Request, mesa: int = 1):
     db = SessionLocal()
     try:
         productos_db = db.query(ProductoModel).all()
-        # Convertir a formato de diccionario para el template
         menu_lista = [
             {
                 "id": p.id,
