@@ -32,7 +32,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Definición del modelo de la tabla productos en Supabase
+# Definición exacta del modelo de la tabla productos en Supabase
 class ProductoModel(Base):
     __tablename__ = "productos"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
