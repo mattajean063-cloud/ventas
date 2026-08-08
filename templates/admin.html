@@ -25,10 +25,22 @@
 <body class="p-4">
     <div class="container-fluid" style="max-width: 1300px;">
         
-        <!-- Cabecera Superior -->
+        <!-- Cabecera Superior con Interruptor de Turno -->
         <div class="card-colonial p-4 mb-4 shadow">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h2 class="text-warning fw-bold m-0">🖥️ Monitor y Gestión - Don Nicolás</h2>
+                
+                <!-- Interruptor de Turno en la Esquina -->
+                <div class="d-flex align-items-center gap-3 bg-dark p-2 rounded border border-secondary">
+                    <span class="text-warning small fw-bold">Turno Activo Menú Comida:</span>
+                    <form action="/admin/cambiar-turno" method="POST" class="m-0">
+                        <select name="turno" class="form-select form-select-sm text-center fw-bold text-warning" onchange="this.form.submit()" style="width: 130px;">
+                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
+                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
+                        </select>
+                    </form>
+                </div>
+
                 <div>
                     <button class="btn btn-outline-warning btn-sm me-2" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
                     <a href="/?mesa=1" class="btn btn-outline-light btn-sm" target="_blank">Ver Menú ↗</a>
@@ -80,7 +92,7 @@
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Nombre del Producto</label>
-                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Helado" required>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Caldo de Gallina" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Precio (Q)</label>
@@ -97,11 +109,11 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Turno / Horario</label>
+                                    <label class="form-label text-warning small fw-bold">Horario (Solo aplica para Comida)</label>
                                     <select class="form-select" name="horario" required>
-                                        <option value="Ambos">Todo el día (Mañana y Tarde)</option>
-                                        <option value="Mañana">Solo Mañana</option>
-                                        <option value="Tarde">Solo Tarde</option>
+                                        <option value="Ambos">Mañana y Tarde</option>
+                                        <option value="Mañana">Solo Menú Mañana</option>
+                                        <option value="Tarde">Solo Menú Tarde</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -126,7 +138,7 @@
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-colonial p-4 shadow">
-                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú</h4>
+                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú (Configuración de Comidas)</h4>
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle bg-transparent">
                             <thead>
@@ -135,7 +147,7 @@
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Precio (Q) / Editar</th>
-                                    <th>Horario / Turno</th>
+                                    <th>Horario Comida</th>
                                     <th>Acción</th>
                                 </tr>
                             </thead>
@@ -152,31 +164,29 @@
                                     <td class="fw-bold text-light">{{ p.nombre }}</td>
                                     <td><span class="badge bg-secondary">{{ p.categoria }}</span></td>
                                     <td>
-                                        <!-- Formulario para editar precio -->
                                         <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
                                             <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
                                             <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
                                         </form>
                                     </td>
                                     <td>
-                                        <!-- Formulario para cambiar el turno/horario -->
-                                        <form action="/admin/actualizar-horario/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
-                                            <select name="horario" class="form-select form-select-sm" style="width: 110px;" onchange="this.form.submit()">
+                                        {% if p.categoria == 'Comida' %}
+                                        <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
+                                            <select name="horario" class="form-select form-select-sm text-warning fw-bold" style="width: 125px;" onchange="this.form.submit()">
                                                 <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
                                                 <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
                                                 <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
                                             </select>
                                         </form>
+                                        {% else %}
+                                            <span class="text-muted small">Siempre visible</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
                                             <button type="submit" class="btn btn-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
                                         </form>
                                     </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted py-3">No hay productos registrados todavía.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
