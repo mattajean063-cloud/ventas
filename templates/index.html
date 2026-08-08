@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú - Don Nicolás</title>
+    <title id="page-title">Panel Administrativo - Don Nicolás</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --bg-cream: #f7f4ed;
@@ -46,26 +47,16 @@
             color: white; 
         }
 
-        .product-card {
+        .notid-card {
             background: #ffffff;
-            border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            height: 100%;
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
         }
 
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-        }
-
-        .product-img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            border-bottom: 1px solid var(--border-subtle);
+        .notid-card:hover {
+            transform: translateY(-2px);
         }
 
         .form-control, .form-select { 
@@ -79,274 +70,246 @@
             box-shadow: 0 0 0 0.2rem rgba(179, 139, 89, 0.15);
         }
 
-        .nav-pills .nav-link {
-            color: var(--text-muted);
-            font-weight: 600;
-            border-radius: 8px;
-            margin-right: 5px;
-            transition: all 0.2s;
+        .product-img { 
+            width: 55px; 
+            height: 55px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-subtle); 
+        }
+        
+        #qr-box img { 
+            margin: 0 auto; 
+            border-radius: 8px; 
+            padding: 5px; 
+            background: white; 
+            border: 1px solid var(--border-subtle);
         }
 
-        .nav-pills .nav-link.active {
-            background-color: var(--accent-gold) !important;
-            color: white !important;
+        /* Estilo para la burbuja de notificación estilo WhatsApp */
+        .badge-whatsapp {
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            box-shadow: 0 2px 5px rgba(37, 211, 102, 0.4);
         }
     </style>
 </head>
-<body class="p-3 p-md-4">
-    <div class="container" style="max-width: 1200px;">
+<body class="p-4">
+    <div class="container-fluid" style="max-width: 1300px;">
         
-        <!-- Cabecera del Menú -->
-        <div class="card-colonial p-4 mb-4 text-center">
-            <h1 style="color: var(--accent-gold);" class="display-5 fw-bold mb-1">☕ Don Nicolás</h1>
-            <p class="text-muted mb-2">Mesa Asignada: <span class="badge bg-dark fs-6 px-3 py-1">#{{ mesa }}</span></p>
-            <span class="badge px-3 py-2 text-dark border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
-                🕒 Menú activo: <b style="color: var(--accent-gold);">{{ nombre_menu }}</b>
-            </span>
+        <!-- Cabecera Superior con Interruptor de Turno -->
+        <div class="card-colonial p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
+                    <!-- Burbuja de notificaciones a la par del título -->
+                    <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3 bg-white p-2 rounded border border-secondary" style="border-color: var(--border-subtle) !important;">
+                    <span class="small fw-bold" style="color: var(--text-muted);">Turno Menú Comida:</span>
+                    <form action="/admin/cambiar-turno" method="POST" class="m-0">
+                        <select name="turno" class="form-select form-select-sm text-center fw-bold" onchange="this.form.submit()" style="width: 130px; color: var(--accent-gold) !important;">
+                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
+                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div>
+                    <button class="btn btn-outline-secondary btn-sm me-2" style="color: var(--text-muted); border-color: var(--border-subtle);" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
+                    <a href="/?mesa=1" class="btn btn-outline-dark btn-sm">Ver Menú ↗</a>
+                </div>
+            </div>
         </div>
 
         <div class="row g-4">
-            <!-- COLUMNA IZQUIERDA: Catálogo de Productos por Categoría -->
+            <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
             <div class="col-lg-8">
-                
-                <!-- Pestañas de Navegación de Categorías -->
-                <ul class="nav nav-pills mb-4 flex-nowrap overflow-auto pb-2" id="pills-tab" role="tablist">
-                    {% set active_tab = true %}
-                    {% for cat_nombre, items in categorias.items() %}
-                        {% if items %}
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link {% if active_tab %}active{% endif %}" id="pills-{{ loop.index }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ loop.index }}" type="button" role="tab">
-                                {{ cat_nombre }}
-                            </button>
-                        </li>
-                        {% set active_tab = false %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+                <div class="card-colonial p-4 h-100">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
+                    <div id="contenedor-alertas">
+                        <div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">
+                            ⏳ Esperando órdenes o llamadas de las mesas...
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Contenido de las Pestañas -->
-                <div class="tab-content" id="pills-tabContent">
-                    {% set active_content = true %}
-                    {% for cat_nombre, items in categorias.items() %}
-                        {% if items %}
-                        <div class="tab-pane fade {% if active_content %}show active{% endif %}" id="pills-{{ loop.index }}" role="tabpanel">
-                            <div class="row row-cols-1 row-cols-md-2 g-3">
-                                {% for p in items %}
-                                    {% set nombre_lower = p.nombre | lower %}
-                                    {% if "la tablita" not in nombre_lower and "la media tablita" not in nombre_lower %}
-                                    <div class="col">
-                                        <div class="product-card d-flex flex-column justify-content-between">
-                                            <div>
-                                                {% if p.imagen %}
-                                                    <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
-                                                {% endif %}
-                                                <div class="p-3">
-                                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                                        <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">{{ p.nombre }}</h5>
-                                                        <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q {{ "%.2f"|format(p.precio) }}</span>
-                                                    </div>
-                                                    <p class="text-muted small mb-2" style="font-size: 0.85rem; line-height: 1.3;">{{ p.descripcion }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="px-3 pb-3 pt-0">
-                                                <button class="btn btn-amber btn-sm w-100 py-1" onclick='abrirModalProducto({{ p | tojson | safe }})'>
-                                                    Agregar al Carrito
-                                                </button>
-                                            </div>
-                                        </div>
+            <!-- COLUMNA DERECHA: QR y Agregar Producto -->
+            <div class="col-lg-4 d-flex flex-column gap-4">
+                <div class="card-colonial p-4 text-center">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📱 Generar Código QR</h4>
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold" style="color: var(--text-muted);">Número de Mesa:</label>
+                        <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
+                    </div>
+                    <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
+                    <button class="btn btn-amber w-100 py-2 shadow-sm mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
+                </div>
+
+                <div class="card-colonial overflow-hidden">
+                    <button class="btn w-100 d-flex justify-content-between align-items-center p-4 fw-bold fs-5 text-start border-0" 
+                            type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent; color: var(--accent-gold);">
+                        <span>➕ Agregar Producto</span>
+                        <span class="fs-6">▼</span>
+                    </button>
+                    <div class="collapse" id="formAgregarCollapse">
+                        <div class="p-4 pt-0">
+                            <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Nombre</label>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio (Q)</label>
+                                    <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Categoría</label>
+                                    <select class="form-select" name="categoria" required>
+                                        <option value="" disabled selected>Seleccione</option>
+                                        <option value="Bebidas Frías">Bebidas Frías</option>
+                                        <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                        <option value="Comida">Comida</option>
+                                        <option value="Postres">Postres</option>
+                                        <option value="Métodos">Métodos</option>
+                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
+                                        <option value="Extras">Extras</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Horario (Solo Comida)</label>
+                                    <select class="form-select" name="horario" required>
+                                        <option value="Ambos">Mañana y Tarde</option>
+                                        <option value="Mañana">Solo Mañana</option>
+                                        <option value="Tarde">Solo Tarde</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Configuración de Tamaño:</label>
+                                    <select class="form-select" name="config_tamano" required>
+                                        <option value="ninguno">Sin Tamaño / Estándar</option>
+                                        <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)</option>
+                                        <option value="fijo_12oz">Tamaño Fijo: Grande (12oz)</option>
+                                        <option value="elegir_ambos">Elegir entre 8oz y 12oz</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3 p-3 rounded border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
+                                        <label class="form-check-label small" for="checkPromo" style="color: var(--text-main);">
+                                            🌅 Incluir opción de desayuno / bebida matutina
+                                        </label>
                                     </div>
-                                    {% endif %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="admite_extras_cafe" value="true" id="checkExtras" checked>
+                                        <label class="form-check-label small" for="checkExtras" style="color: var(--text-main);">
+                                            🥛 Permitir opciones de Leche y Endulzante
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Descripción</label>
+                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Foto</label>
+                                    <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-amber w-100 py-2 shadow-sm">Guardar Producto</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventario Completo -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-colonial p-4">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📋 Inventario del Menú</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle bg-transparent" style="color: var(--text-main);">
+                            <thead>
+                                <tr style="color: var(--accent-gold); border-bottom: 2px solid var(--border-subtle);">
+                                    <th>Imagen y Cambiar</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio (Q)</th>
+                                    <th>Tamaño / Config</th>
+                                    <th>Horario Comida</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in productos %}
+                                <tr style="border-bottom: 1px solid var(--border-subtle);">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if p.imagen %}
+                                                <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
+                                            {% else %}
+                                                <span class="text-muted small">Sin foto</span>
+                                            {% endif %}
+                                            <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
+                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm" style="font-size: 0.7rem; width: 140px;" required>
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.75rem; color: var(--text-muted);">📷 Actualizar Foto</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">{{ p.nombre }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ p.categoria }}</span></td>
+                                    <td>
+                                        <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
+                                            <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
+                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/actualizar-tamano/{{ p.id }}" method="POST">
+                                            <select name="config_tamano" class="form-select form-select-sm fw-bold" style="width: 145px; color: var(--accent-gold);" onchange="this.form.submit()">
+                                                <option value="ninguno" {% if p.config_tamano == 'ninguno' %}selected{% endif %}>Sin Tamaño</option>
+                                                <option value="fijo_8oz" {% if p.config_tamano == 'fijo_8oz' %}selected{% endif %}>Fijo: 8 oz</option>
+                                                <option value="fijo_12oz" {% if p.config_tamano == 'fijo_12oz' %}selected{% endif %}>Fijo: 12 oz</option>
+                                                <option value="elegir_ambos" {% if p.config_tamano == 'elegir_ambos' %}selected{% endif %}>Elegir 8/12oz</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        {% if p.categoria == 'Comida' %}
+                                        <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
+                                            <select name="horario" class="form-select form-select-sm fw-bold" style="width: 125px; color: var(--accent-gold);" onchange="this.form.submit()">
+                                                <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
+                                                <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
+                                                <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
+                                            </select>
+                                        </form>
+                                        {% else %}
+                                            <span class="text-muted small">Siempre visible</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
                                 {% endfor %}
-
-                                <!-- Tarjetas Únicas Agrupadas para La Tablita y La Media Tablita -->
-                                {% if cat_nombre == "Comida" %}
-                                <div class="col">
-                                    <div class="product-card d-flex flex-column justify-content-between">
-                                        <div>
-                                            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400" class="product-img" alt="La Tablita">
-                                            <div class="p-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">La Tablita (8 tacos)</h5>
-                                                    <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q 80.00+</span>
-                                                </div>
-                                                <p class="text-muted small mb-2" style="font-size: 0.85rem;">8 tacos con cebolla, cilantro, salsas y opción de elegir carnes.</p>
-                                            </div>
-                                        </div>
-                                        <div class="px-3 pb-3 pt-0">
-                                            <button class="btn btn-amber btn-sm w-100 py-1" onclick="abrirModalTablita('La Tablita', 80.0)">
-                                                Personalizar y Agregar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col">
-                                    <div class="product-card d-flex flex-column justify-content-between">
-                                        <div>
-                                            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400" class="product-img" alt="La Media Tablita">
-                                            <div class="p-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">La Media Tablita (4 tacos)</h5>
-                                                    <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q 43.00+</span>
-                                                </div>
-                                                <p class="text-muted small mb-2" style="font-size: 0.85rem;">4 tacos surtidos con cebolla, cilantro y opción de carnes.</p>
-                                            </div>
-                                        </div>
-                                        <div class="px-3 pb-3 pt-0">
-                                            <button class="btn btn-amber btn-sm w-100 py-1" onclick="abrirModalTablita('La Media Tablita', 43.0)">
-                                                Personalizar y Agregar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-
-                            </div>
-                        </div>
-                        {% set active_content = false %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- COLUMNA DERECHA: Carrito de Compras -->
-            <div class="col-lg-4">
-                <div class="card-colonial p-3 sticky-top" style="top: 20px;">
-                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">🛒 Tu Orden (Mesa #{{ mesa }})</h4>
-                    
-                    <div id="lista-carrito" class="mb-3" style="max-height: 320px; overflow-y: auto;">
-                        <p class="text-muted small text-center py-3">Tu carrito está vacío.</p>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <div class="border-top pt-3" style="border-color: var(--border-subtle) !important;">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="fw-bold">Total a pagar:</span>
-                            <span class="fw-bold fs-5" style="color: var(--accent-gold);" id="total-carrito">Q 0.00</span>
-                        </div>
-                        <button class="btn btn-amber w-100 py-2 shadow-sm mb-2" onclick="enviarPedido()">🚀 Enviar Pedido a Cocina</button>
-                        
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <button class="btn btn-outline-secondary w-100 btn-sm" onclick="llamarMesero('mesero')">🔔 Mesero</button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-dark w-100 btn-sm" onclick="llamarMesero('cuenta')">🧾 Cuenta</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE CONFIGURACIÓN GENERAL / CAFÉ -->
-    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content card-colonial p-3">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" style="color: var(--accent-gold);" id="modal-titulo">Personalizar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="modal-nombre">
-                    <input type="hidden" id="modal-precio">
-                    <input type="hidden" id="modal-base-precio">
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Para quien es:</label>
-                        <input type="text" id="modal-cliente" class="form-control" placeholder="Nombre (Ej. Juan)">
-                    </div>
-
-                    <div class="mb-3" id="seccion-tamano" style="display: none;">
-                        <label class="form-label small fw-bold text-muted">Tamaño:</label>
-                        <select class="form-select" id="modal-tamano" onchange="calcularPrecioModal()">
-                            <option value="8oz">Pequeño (8oz)</option>
-                            <option value="12oz">Grande (12oz) [+Q 4.00]</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3" id="seccion-leche" style="display: none;">
-                        <label class="form-label small fw-bold text-muted">Tipo de Leche:</label>
-                        <select class="form-select" id="modal-leche">
-                            <option value="Entera">Leche Entera</option>
-                            <option value="Deslactosada">Leche Deslactosada</option>
-                            <option value="Almendra">Leche de Almendra [+Q 5.00]</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3" id="seccion-endulzante" style="display: none;">
-                        <label class="form-label small fw-bold text-muted">Endulzante:</label>
-                        <select class="form-select" id="modal-endulzante">
-                            <option value="Azúcar normal">Azúcar normal</option>
-                            <option value="Morena">Azúcar Morena</option>
-                            <option value="Splenda">Splenda</option>
-                            <option value="Sin endulzante">Sin endulzante</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Nota o instrucciones especiales:</label>
-                        <textarea class="form-control" id="modal-nota" rows="2" placeholder="Ej. Poco hielo, bien caliente..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-amber w-100 py-2" onclick="agregarAlCarritoDesdeModal()">Añadir al Carrito</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL ESPECÍFICO PARA LA TABLITA / MEDIA TABLITA -->
-    <div class="modal fade" id="modalTablita" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content card-colonial p-3">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" style="color: var(--accent-gold);" id="tablita-titulo">Personalizar Tacos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="tablita-nombre-base">
-                    <input type="hidden" id="tablita-precio-base">
-                    
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Seleccione el tipo de carne:</label>
-                        <select class="form-select" id="select-tipo-carne" onchange="verificarOpcionMixta()">
-                            <option value="4 Carnes">4 Carnes (Surtidos)</option>
-                            <option value="Cochinita Pibil">Cochinita Pibil [+Q 5.00 si aplica]</option>
-                            <option value="Quesillo y Chorizo">Quesillo y Chorizo [+Q 5.00 si aplica]</option>
-                            <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
-                            <option value="Mixtos">Mixtos (Elige exactamente 2 opciones)</option>
-                        </select>
-                    </div>
-
-                    <!-- Contenedor desplegable para Mixtos (2 opciones) -->
-                    <div id="contenedor-mixtos" class="mb-3 p-3 rounded border" style="display: none; background-color: #faf8f5; border-color: var(--border-subtle) !important;">
-                        <label class="form-label small fw-bold" style="color: var(--accent-gold);">Seleccione las 2 opciones para su mixto:</label>
-                        <div class="form-check">
-                            <input class="form-check-input check-mixto" type="checkbox" value="4 Carnes" id="mix1">
-                            <label class="form-check-label small" for="mix1">4 Carnes</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-mixto" type="checkbox" value="Cochinita Pibil" id="mix2">
-                            <label class="form-check-label small" for="mix2">Cochinita Pibil</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-mixto" type="checkbox" value="Quesillo y Chorizo" id="mix3">
-                            <label class="form-check-label small" for="mix3">Quesillo y Chorizo</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input check-mixto" type="checkbox" value="Pollo con salsa de maracuyá" id="mix4">
-                            <label class="form-check-label small" for="mix4">Pollo con salsa de maracuyá</label>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Nombre para el pedido (Opcional):</label>
-                        <input type="text" id="tablita-cliente" class="form-control" placeholder="Ej. Juan">
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-amber w-100 py-2" onclick="agregarTablitaAlCarrito()">Añadir al Carrito</button>
                 </div>
             </div>
         </div>
@@ -354,243 +317,202 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let carrito = [];
-        const mesaActual = {{ mesa }};
+        let qrCodeInstance = null;
+        let contadorNotificaciones = 0;
+        let idsEventosProcesados = new Set();
 
-        function abrirModalProducto(p) {
-            document.getElementById('modal-nombre').value = p.nombre;
-            document.getElementById('modal-precio').value = p.precio;
-            document.getElementById('modal-base-precio').value = p.precio;
-            document.getElementById('modal-titulo').innerText = p.nombre;
-            document.getElementById('modal-cliente').value = '';
-            document.getElementById('modal-nota').value = '';
-
-            // Gestionar visibilidad de tamaños
-            let seccionTamano = document.getElementById('seccion-tamano');
-            let selectTamano = document.getElementById('modal-tamano');
-            if (p.config_tamano === 'elegir_ambos') {
-                seccionTamano.style.display = 'block';
-                selectTamano.innerHTML = `<option value="8oz">Pequeño (8oz)</option><option value="12oz">Grande (12oz) [+Q 4.00]</option>`;
-                selectTamano.value = '8oz';
-            } else if (p.config_tamano === 'fijo_8oz') {
-                seccionTamano.style.display = 'block';
-                selectTamano.innerHTML = `<option value="8oz">Pequeño (8oz)</option>`;
-                selectTamano.value = '8oz';
-            } else if (p.config_tamano === 'fijo_12oz') {
-                seccionTamano.style.display = 'block';
-                selectTamano.innerHTML = `<option value="12oz">Grande (12oz)</option>`;
-                selectTamano.value = '12oz';
-            } else {
-                seccionTamano.style.display = 'none';
-            }
-
-            // Gestionar opciones de café (leche y endulzante)
-            let seccionLeche = document.getElementById('seccion-leche');
-            let seccionEndulzante = document.getElementById('seccion-endulzante');
-            if (p.admite_extras_cafe) {
-                seccionLeche.style.display = 'block';
-                seccionEndulzante.style.display = 'block';
-                document.getElementById('modal-leche').value = 'Entera';
-                document.getElementById('modal-endulzante').value = 'Azúcar normal';
-            } else {
-                seccionLeche.style.display = 'none';
-                seccionEndulzante.style.display = 'none';
-            }
-
-            let myModal = new bootstrap.Modal(document.getElementById('modalProducto'));
-            myModal.show();
+        function generarQR() {
+            const numMesa = document.getElementById('input-num-mesa').value || 1;
+            const contenedorQR = document.getElementById('qr-box');
+            contenedorQR.innerHTML = "";
+            let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
+            qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
+        }
+        
+        function descargarQR() {
+            const imgElement = document.querySelector('#qr-box img');
+            if (!imgElement) return;
+            let enlace = document.createElement('a');
+            enlace.href = imgElement.src;
+            enlace.download = `QR_Mesa_${document.getElementById('input-num-mesa').value || 1}.png`;
+            document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        function calcularPrecioModal() {
-            let base = parseFloat(document.getElementById('modal-base-precio').value);
-            let tamano = document.getElementById('modal-tamano').value;
-            let precioFinal = base;
-            if (tamano === '12oz' && document.getElementById('seccion-tamano').style.display !== 'none') {
-                precioFinal += 4.00;
-            }
-            document.getElementById('modal-precio').value = precioFinal;
-        }
+        // --- SISTEMA HÍBRIDO: WEBSOCKET + RESPALDO HTTP AUTOMÁTICO ---
+        function conectarWebSocket() {
+            let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
 
-        function agregarAlCarritoDesdeModal() {
-            let nombre = document.getElementById('modal-nombre').value;
-            let precio = parseFloat(document.getElementById('modal-precio').value);
-            let cliente = document.getElementById('modal-cliente').value || 'General';
-            let nota = document.getElementById('modal-nota').value;
-            let tamano = document.getElementById('seccion-tamano').style.display !== 'none' ? document.getElementById('modal-tamano').value : '';
-            
-            let tipoLeche = '';
-            let tipoEndulzante = '';
-            if (document.getElementById('seccion-leche').style.display !== 'none') {
-                tipoLeche = document.getElementById('modal-leche').value;
-                if (tipoLeche === 'Almendra') precio += 5.00;
-                tipoEndulzante = document.getElementById('modal-endulzante').value;
-            }
-
-            carrito.push({
-                nombre: nombre,
-                precio: precio,
-                cantidad: 1,
-                cliente: cliente,
-                tamano: tamano,
-                tipoLeche: tipoLeche,
-                tipoEndulzante: tipoEndulzante,
-                nota: nota
-            });
-
-            actualizarCarritoVisual();
-            bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
-        }
-
-        // --- LÓGICA DE LA TABLITA Y MEDIA TABLITA ---
-        function verificarOpcionMixto() {
-            const seleccion = document.getElementById('select-tipo-carne').value;
-            const contenedorMixtos = document.getElementById('contenedor-mixtos');
-            if (seleccion === 'Mixtos') {
-                contenedorMixtos.style.display = 'block';
-            } else {
-                contenedorMixtos.style.display = 'none';
-                document.querySelectorAll('.check-mixto').forEach(chk => chk.checked = false);
-            }
-        }
-
-        function abrirModalTablita(nombreBase, precioBase) {
-            document.getElementById('tablita-titulo').innerText = `Personalizar: ${nombreBase}`;
-            document.getElementById('tablita-nombre-base').value = nombreBase;
-            document.getElementById('tablita-precio-base').value = precioBase;
-            document.getElementById('select-tipo-carne').value = "4 Carnes";
-            document.getElementById('tablita-cliente').value = "";
-            verificarOpcionMixto();
-            
-            let myModal = new bootstrap.Modal(document.getElementById('modalTablita'));
-            myModal.show();
-        }
-
-        function agregarTablitaAlCarrito() {
-            const nombreBase = document.getElementById('tablita-nombre-base').value;
-            let precioBase = parseFloat(document.getElementById('tablita-precio-base').value);
-            const tipoCarne = document.getElementById('select-tipo-carne').value;
-            const cliente = document.getElementById('tablita-cliente').value || 'General';
-            
-            let detalleCarne = tipoCarne;
-            if (tipoCarne === 'Cochinita Pibil' || tipoCarne === 'Quesillo y Chorizo') {
-                precioBase += 2.00; // Ajuste si la variante base sube de precio según el inventario original
-            }
-
-            if (tipoCarne === 'Mixtos') {
-                let seleccionados = [];
-                document.querySelectorAll('.check-mixto:checked').forEach(chk => {
-                    seleccionados.push(chk.value);
-                });
-                if (seleccionados.length !== 2) {
-                    alert("Por favor, seleccione exactamente 2 opciones para su combinación mixta.");
-                    return;
-                }
-                detalleCarne = `Mixto (${seleccionados.join(' + ')})`;
-            }
-
-            carrito.push({
-                nombre: `${nombreBase} - ${detalleCarne}`,
-                precio: precioBase,
-                cantidad: 1,
-                cliente: cliente,
-                nota: `Estilo de carne: ${detalleCarne}`
-            });
-
-            actualizarCarritoVisual();
-            bootstrap.Modal.getInstance(document.getElementById('modalTablita')).hide();
-        }
-
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarCarritoVisual();
-        }
-
-        function actualizarCarritoVisual() {
-            const contenedor = document.getElementById('lista-carrito');
-            const spanTotal = document.getElementById('total-carrito');
-            
-            if (carrito.length === 0) {
-                contenedor.innerHTML = `<p class="text-muted small text-center py-3">Tu carrito está vacío.</p>`;
-                spanTotal.innerText = `Q 0.00`;
-                return;
-            }
-
-            let html = '';
-            let total = 0;
-
-            carrito.forEach((item, index) => {
-                let subtotal = item.precio * item.cantidad;
-                total += subtotal;
-
-                let extrasHtml = '';
-                if (item.tamano) extrasHtml += `<br><small class="text-secondary">📏 Tamaño: ${item.tamano}</small>`;
-                if (item.tipoLeche) extrasHtml += `<br><small class="text-secondary">🥛 Leche: ${item.tipoLeche}</small>`;
-                if (item.tipoEndulzante) extrasHtml += `<br><small class="text-secondary">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
-                if (item.nota) extrasHtml += `<br><small class="text-secondary">📝 ${item.nota}</small>`;
-
-                html += `
-                    <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2 small">
-                        <div>
-                            <b>[${item.cliente}]</b> ${item.cantidad}x ${item.nombre}
-                            ${extrasHtml}
-                        </div>
-                        <div class="text-end">
-                            <span class="fw-bold">Q ${subtotal.toFixed(2)}</span><br>
-                            <button class="btn btn-link text-danger p-0" style="font-size: 0.75rem;" onclick="eliminarDelCarrito(${index})">Eliminar</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            contenedor.innerHTML = html;
-            spanTotal.innerText = `Q ${total.toFixed(2)}`;
-        }
-
-        async function enviarPedido() {
-            if (carrito.length === 0) {
-                alert("Tu carrito está vacío.");
-                return;
-            }
-
-            let total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
-
-            let payload = {
-                mesa: mesaActual,
-                items: carrito,
-                total: total
+            ws.onmessage = function(event) {
+                let data = JSON.parse(event.data);
+                procesarYMostrarEvento(data);
             };
 
-            try {
-                let response = await fetch('/api/enviar-pedido', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            ws.onclose = function() {
+                setTimeout(conectarWebSocket, 3000);
+            };
+        }
 
-                if (response.ok) {
-                    alert("¡Pedido enviado con éxito a cocina!");
-                    carrito = [];
-                    actualizarCarritoVisual();
-                } else {
-                    alert("Error al enviar el pedido. Intente nuevamente.");
+        async function verificarEventosHttp() {
+            try {
+                let response = await fetch('/api/obtener-eventos');
+                let eventos = await response.json();
+                if (eventos && eventos.length > 0) {
+                    eventos.forEach(evento => {
+                        procesarYMostrarEvento(evento);
+                    });
                 }
-            } catch (e) {
-                alert("Error de conexión con el servidor.");
+            } catch (error) {
+                // Silenciar errores menores
             }
         }
 
-        async function llamarMesero(tipo) {
+        function actualizarContadorVisual() {
+            const badge = document.getElementById('badge-contador');
+            const pageTitle = document.getElementById('page-title');
+            
+            if (contadorNotificaciones > 0) {
+                badge.innerText = contadorNotificaciones;
+                badge.style.display = 'inline-block';
+                pageTitle.innerText = `(${contadorNotificaciones}) Panel Administrativo - Don Nicolás`;
+            } else {
+                badge.style.display = 'none';
+                pageTitle.innerText = `Panel Administrativo - Don Nicolás`;
+            }
+        }
+
+        // --- REPRODUCTOR DE SONIDO NATIVO ---
+        function reproducirSonidoAlerta() {
             try {
-                let response = await fetch('/api/alerta-mesero', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mesa: mesaActual, tipo: tipo })
-                });
-                if (response.ok) {
-                    alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Se ha solicitado la cuenta.");
-                }
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
             } catch (e) {
-                alert("Error al enviar la alerta.");
+                console.log("Audio bloqueado temporalmente por políticas del navegador.");
+            }
+        }
+
+        window.onload = function() { 
+            generarQR(); 
+            conectarWebSocket(); 
+            setInterval(verificarEventosHttp, 2000); 
+        };
+
+        function pedirPermisoNotificaciones() { 
+            if (!window.Notification) {
+                alert("Este navegador no soporta notificaciones de escritorio.");
+                return;
+            }
+            
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("¡Notificaciones de escritorio estilo WhatsApp activadas!");
+                    reproducirSonidoAlerta();
+                    new Notification("Don Nicolás", {
+                        body: "Las alertas en la esquina de tu pantalla están listas.",
+                        icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png"
+                    });
+                } else {
+                    alert("Has denegado los permisos de notificación.");
+                }
+            });
+        }
+
+        function procesarYMostrarEvento(data) {
+            let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
+            
+            if (idsEventosProcesados.has(idUnico)) return;
+            idsEventosProcesados.add(idUnico);
+
+            // 1. Contador y sonido
+            contadorNotificaciones++;
+            actualizarContadorVisual();
+            reproducirSonidoAlerta();
+
+            // 2. Notificación flotante en la esquina estilo WhatsApp
+            if (window.Notification && Notification.permission === "granted") {
+                let tituloNoti = data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`;
+                let cuerpoNoti = data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`;
+                
+                let notificacionFlotante = new Notification(tituloNoti, {
+                    body: cuerpoNoti,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png",
+                    tag: 'don-nicolas-alerta'
+                });
+
+                notificacionFlotante.onclick = function() {
+                    window.focus();
+                    notificacionFlotante.close();
+                };
+            }
+
+            // 3. Pintar tarjeta en el monitor interno
+            const contenedor = document.getElementById('contenedor-alertas');
+            const mensajeVacio = document.getElementById('mensaje-vacio');
+            if (mensajeVacio) mensajeVacio.remove();
+
+            let tarjetaFlash = document.createElement('div');
+            tarjetaFlash.className = 'notid-card p-3 mb-3';
+
+            if (data.tipo === 'alerta') {
+                tarjetaFlash.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">${data.titulo}</h5>
+                        <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                    </div>
+                    <p class="mt-2 mb-2 text-dark">${data.mensaje}</p>
+                    <div class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary py-0" onclick="marcarAtendido(this)">Marcar atendido</button>
+                    </div>
+                `;
+            } else if (data.tipo === 'nuevo_pedido') {
+                let itemsHtml = data.items.map(i => {
+                    let detalles = '';
+                    if (i.tamano) detalles += `<br><small class="text-secondary ms-3">📏 Tamaño: ${i.tamano}</small>`;
+                    if (i.promo) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🌅 Promo: ${i.promo}</small>`;
+                    if (i.tipoLeche) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🥛 Leche: ${i.tipoLeche}</small>`;
+                    if (i.tipoEndulzante) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🍯 Endulzante: ${i.tipoEndulzante}</small>`;
+                    if (i.nota) detalles += `<br><small class="text-secondary ms-3">📝 Nota: ${i.nota}</small>`;
+                    return `<li class="mb-2"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})${detalles}</li>`;
+                }).join('');
+
+                tarjetaFlash.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">🚀 Nuevo Pedido</h5>
+                        <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                    </div>
+                    <ul class="mt-2 mb-2 ps-3 text-dark small">${itemsHtml}</ul>
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: var(--border-subtle) !important;">
+                        <span class="fw-bold fs-6" style="color: var(--accent-gold);">Total: Q ${data.total.toFixed(2)}</span>
+                        <button class="btn btn-sm btn-amber py-1" onclick="marcarAtendido(this)">Completar Pedido</button>
+                    </div>
+                `;
+            }
+            contenedor.prepend(tarjetaFlash);
+        }
+
+        function marcarAtendido(button) {
+            button.closest('.notid-card').remove();
+            if (contadorNotificaciones > 0) {
+                contadorNotificaciones--;
+                actualizarContadorVisual();
+            }
+            const contenedor = document.getElementById('contenedor-alertas');
+            if (contenedor.children.length === 0) {
+                contenedor.innerHTML = `<div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">⏳ Esperando órdenes o llamadas de las mesas...</div>`;
             }
         }
     </script>
