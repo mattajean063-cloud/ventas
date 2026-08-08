@@ -5,11 +5,16 @@ import requests
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+import jinja2
 
 app = FastAPI()
 
-# Configuración de plantillas
-templates = Jinja2Templates(directory="templates")
+# Inicialización segura de plantillas sin conflicto de caché
+env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader("templates"),
+    autoescape=True
+)
+templates = Jinja2Templates(env=env)
 
 # Configuración de Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://tu-proyecto.supabase.co")
