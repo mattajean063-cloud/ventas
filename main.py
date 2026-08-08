@@ -178,26 +178,37 @@ async def obtener_eventos():
 
 # --- ADMIN (GESTIÓN EN SUPABASE) ---
 @app.post("/admin/agregar")
-async def agregar_producto(nombre: str = Form(...), precio: float = Form(...), categoria: str = Form(...), descripcion: str = Form(default=""), imagen_file: UploadFile = File(...)):
-    file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
-    with open(file_path, "wb") as buffer: 
-        shutil.copyfileobj(imagen_file.file, buffer)
-    
-    db = SessionLocal()
+async def agregar_producto(
+    nombre: str = Form(...), 
+    precio: float = Form(...), 
+    categoria: str = Form(...), 
+    descripcion: str = Form(default=""), 
+    imagen_file: UploadFile = File(...)
+):
     try:
-        nuevo_producto = ProductoModel(
-            nombre=nombre,
-            precio=precio,
-            categoria=categoria,
-            descripcion=descripcion,
-            imagen=imagen_file.filename
-        )
-        db.add(nuevo_producto)
-        db.commit()
+        file_path = os.path.join(UPLOAD_DIR, imagen_file.filename)
+        with open(file_path, "wb") as buffer: 
+            shutil.copyfileobj(imagen_file.file, buffer)
+        
+        db = SessionLocal()
+        try:
+            nuevo_producto = ProductoModel(
+                nombre=nombre,
+                precio=precio,
+                categoria=categoria,
+                descripcion=descripcion,
+                imagen=imagen_file.filename
+            )
+            db.add(nuevo_producto)
+            db.commit()
+            print("¡PRODUCTO GUARDADO EXITOSAMENTE EN SUPABASE!")
+        except Exception as db_err:
+            db.rollback()
+            print("ERROR AL GUARDAR EN SUPABASE:", db_err)
+        finally:
+            db.close()
     except Exception as e:
-        print("ERROR AL INSERTAR EN SUPABASE:", e)
-    finally:
-        db.close()
+        print("ERROR GENERAL EN /admin/agregar:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
