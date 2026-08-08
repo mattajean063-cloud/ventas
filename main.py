@@ -19,7 +19,7 @@ templates = Jinja2Templates(env=env)
 
 # Configuración de Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://tu-proyecto.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "TU_SUPABASE_KEY")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -52,6 +52,27 @@ manager = ConnectionManager()
 # Variable global para el turno actual
 turno_global = "Mañana"
 
+# Ruta principal para los clientes (Menú)
+@app.get("/", response_class=HTMLResponse)
+async def menu_cliente(request: Request, mesa: int = 1):
+    productos = []
+    try:
+        response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
+        if response.status_code == 200:
+            productos = response.json()
+    except Exception as e:
+        print("Error obteniendo productos para el menú:", e)
+    
+    template = env.get_template("index.html") # Asegúrate de que tu plantilla de cliente se llame index.html o como la tengas nombrada
+    html_content = template.render(
+        request=request,
+        productos=productos,
+        turno_actual=turno_global,
+        mesa=mesa
+    )
+    return HTMLResponse(content=html_content)
+
+# Ruta del panel administrativo
 @app.get("/admin", response_class=HTMLResponse)
 async def panel_admin(request: Request):
     productos = []
@@ -59,12 +80,9 @@ async def panel_admin(request: Request):
         response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
         if response.status_code == 200:
             productos = response.json()
-        else:
-            print("Error de Supabase en /admin:", response.text)
     except Exception as e:
         print("Error obteniendo productos:", e)
     
-    # Renderizado nativo con Jinja2 para evitar conflictos de caché con Starlette
     template = env.get_template("admin.html")
     html_content = template.render(
         request=request,
