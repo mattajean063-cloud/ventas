@@ -30,9 +30,8 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h2 class="text-warning fw-bold m-0">🖥️ Monitor y Gestión - Don Nicolás</h2>
                 
-                <!-- Interruptor de Turno en la Esquina -->
                 <div class="d-flex align-items-center gap-3 bg-dark p-2 rounded border border-secondary">
-                    <span class="text-warning small fw-bold">Turno Activo Menú Comida:</span>
+                    <span class="text-warning small fw-bold">Turno Menú Comida:</span>
                     <form action="/admin/cambiar-turno" method="POST" class="m-0">
                         <select name="turno" class="form-select form-select-sm text-center fw-bold text-warning" onchange="this.form.submit()" style="width: 130px;">
                             <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
@@ -48,10 +47,8 @@
             </div>
         </div>
 
-        <!-- Estructura Principal en 2 Columnas -->
         <div class="row g-4">
-            
-            <!-- COLUMNA IZQUIERDA: Pedidos y Alertas -->
+            <!-- COLUMNA IZQUIERDA: Pedidos -->
             <div class="col-lg-8">
                 <div class="card-colonial p-4 shadow h-100">
                     <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
@@ -63,10 +60,8 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: Generador QR y Formulario Plegable -->
+            <!-- COLUMNA DERECHA: QR y Agregar Producto -->
             <div class="col-lg-4 d-flex flex-column gap-4">
-                
-                <!-- Generador de Códigos QR -->
                 <div class="card-colonial p-4 shadow text-center">
                     <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📱 Generar Código QR</h4>
                     <div class="mb-3">
@@ -74,25 +69,21 @@
                         <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
                     </div>
                     <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
-                    <button class="btn btn-amber w-100 py-2 shadow mt-2" onclick="descargarQR()">
-                        📥 Descargar Imagen QR
-                    </button>
+                    <button class="btn btn-amber w-100 py-2 shadow mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
                 </div>
 
-                <!-- Formulario Plegable de Agregar Producto -->
                 <div class="card-colonial shadow overflow-hidden">
                     <button class="btn w-100 d-flex justify-content-between align-items-center p-4 text-warning fw-bold fs-5 text-start border-0" 
-                            type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" aria-controls="formAgregarCollapse" style="background-color: transparent;">
+                            type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent;">
                         <span>➕ Agregar Producto</span>
                         <span class="fs-6">▼</span>
                     </button>
-                    
                     <div class="collapse" id="formAgregarCollapse">
                         <div class="p-4 pt-0">
                             <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Nombre del Producto</label>
-                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Caldo de Gallina" required>
+                                    <label class="form-label text-warning small fw-bold">Nombre</label>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Helado" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Precio (Q)</label>
@@ -101,7 +92,7 @@
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Categoría</label>
                                     <select class="form-select" name="categoria" required>
-                                        <option value="" disabled selected>Seleccione Categoría</option>
+                                        <option value="" disabled selected>Seleccione</option>
                                         <option value="Bebidas Frías">Bebidas Frías</option>
                                         <option value="Bebidas Calientes">Bebidas Calientes</option>
                                         <option value="Comida">Comida</option>
@@ -109,19 +100,19 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Horario (Solo aplica para Comida)</label>
+                                    <label class="form-label text-warning small fw-bold">Horario (Solo Comida)</label>
                                     <select class="form-select" name="horario" required>
                                         <option value="Ambos">Mañana y Tarde</option>
-                                        <option value="Mañana">Solo Menú Mañana</option>
-                                        <option value="Tarde">Solo Menú Tarde</option>
+                                        <option value="Mañana">Solo Mañana</option>
+                                        <option value="Tarde">Solo Tarde</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Descripción</label>
-                                    <input type="text" class="form-control" name="descripcion" placeholder="Breve descripción..." required>
+                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-warning small fw-bold">Foto del Archivo</label>
+                                    <label class="form-label text-warning small fw-bold">Foto</label>
                                     <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
                                 </div>
                                 <button type="submit" class="btn btn-amber w-100 py-2 shadow">Guardar Producto</button>
@@ -129,16 +120,14 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
 
-        <!-- Inventario Completo Abajo -->
+        <!-- Inventario -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-colonial p-4 shadow">
-                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú (Configuración de Comidas)</h4>
+                    <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">📋 Inventario del Menú</h4>
                     <div class="table-responsive">
                         <table class="table table-dark table-hover align-middle bg-transparent">
                             <thead>
@@ -146,7 +135,7 @@
                                     <th>Foto</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
-                                    <th>Precio (Q) / Editar</th>
+                                    <th>Precio (Q)</th>
                                     <th>Horario Comida</th>
                                     <th>Acción</th>
                                 </tr>
@@ -195,88 +184,40 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let qrCodeInstance = null;
-
         function generarQR() {
             const numMesa = document.getElementById('input-num-mesa').value || 1;
             const contenedorQR = document.getElementById('qr-box');
             contenedorQR.innerHTML = "";
-            
-            const dominioWeb = window.location.origin; 
-            let urlMesa = `${dominioWeb}/?mesa=${numMesa}`;
-            
-            qrCodeInstance = new QRCode(contenedorQR, {
-                text: urlMesa,
-                width: 160,
-                height: 160,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
+            qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
         }
-
         function descargarQR() {
             const imgElement = document.querySelector('#qr-box img');
-            const numMesa = document.getElementById('input-num-mesa').value || 1;
-            
-            if (!imgElement) {
-                alert("Primero genere el código QR.");
-                return;
-            }
-
+            if (!imgElement) return;
             let enlace = document.createElement('a');
             enlace.href = imgElement.src;
-            enlace.download = `QR_Mesa_${numMesa}.png`;
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
+            enlace.download = `QR_Mesa_${document.getElementById('input-num-mesa').value || 1}.png`;
+            document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
-
-        window.onload = function() {
-            generarQR();
-            setInterval(verificarNuevosEventos, 3000);
-        };
-
-        function pedirPermisoNotificaciones() {
-            if (!window.Notification) {
-                alert("Este navegador no soporta notificaciones de escritorio.");
-                return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    alert("¡Avisos de escritorio activados con éxito!");
-                } else {
-                    alert("Permisos denegados en el navegador.");
-                }
-            });
-        }
-
+        window.onload = function() { generarQR(); setInterval(verificarNuevosEventos, 3000); };
+        function pedirPermisoNotificaciones() { Notification.requestPermission(); }
         async function verificarNuevosEventos() {
             try {
                 let respuesta = await fetch('/api/obtener-eventos');
                 if (!respuesta.ok) return;
                 let eventos = await respuesta.json();
-
-                if (eventos && eventos.length > 0) {
-                    eventos.forEach(data => procesarYMostrarEvento(data));
-                }
-            } catch (e) {
-                console.error("Error consultando eventos:", e);
-            }
+                if (eventos && eventos.length > 0) eventos.forEach(data => procesarYMostrarEvento(data));
+            } catch (e) {}
         }
-
         function procesarYMostrarEvento(data) {
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
-            
-            if (mensajeVacio) {
-                mensajeVacio.remove();
-            }
+            if (mensajeVacio) mensajeVacio.remove();
 
             let tarjetaFlash = document.createElement('div');
             tarjetaFlash.className = 'notid-card p-3 mb-3 text-light';
@@ -288,15 +229,13 @@
                         <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
                     </div>
                     <p class="mt-2 mb-2 text-light">${data.mensaje}</p>
-                    <div class="text-end">
-                        <button class="btn btn-sm btn-outline-light py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button>
-                    </div>
+                    <div class="text-end"><button class="btn btn-sm btn-outline-light py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button></div>
                 `;
             } else if (data.tipo === 'nuevo_pedido') {
-                let itemsHtml = data.items.map(i => `<li>${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})</li>`).join('');
+                let itemsHtml = data.items.map(i => `<li><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})</li>`).join('');
                 tarjetaFlash.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="text-warning m-0 fw-bold">🚀 Nuevo Pedido Recibido</h5>
+                        <h5 class="text-warning m-0 fw-bold">🚀 Nuevo Pedido (Cuentas Separadas)</h5>
                         <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
                     </div>
                     <ul class="mt-2 mb-2 ps-3 text-light small">${itemsHtml}</ul>
@@ -306,12 +245,7 @@
                     </div>
                 `;
             }
-
             contenedor.prepend(tarjetaFlash);
-
-            if (window.Notification && Notification.permission === "granted") {
-                new Notification("Don Nicolás - Alerta", { body: data.mensaje || "Nuevo pedido recibido" });
-            }
         }
     </script>
 </body>
