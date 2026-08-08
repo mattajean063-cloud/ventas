@@ -5,17 +5,11 @@ import requests
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-import jinja2
 
-# Activamos debug=True para ver errores detallados si ocurren
-app = FastAPI(debug=True)
+app = FastAPI()
 
-# Inicialización segura de plantillas sin conflicto de caché
-env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader("templates"),
-    autoescape=True
-)
-templates = Jinja2Templates(env=env)
+# Configuración de plantillas
+templates = Jinja2Templates(directory="templates")
 
 # Configuración de Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://tu-proyecto.supabase.co")
@@ -52,34 +46,6 @@ manager = ConnectionManager()
 # Variable global para el turno actual
 turno_global = "Mañana"
 
-# Ruta principal para los clientes (Menú)
-@app.get("/", response_class=HTMLResponse)
-async def menu_cliente(request: Request, mesa: int = 1):
-    productos = []
-    try:
-        response = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=*", headers=HEADERS)
-        if response.status_code == 200:
-            productos = response.json()
-    except Exception as e:
-        print("Error obteniendo productos para el menú:", e)
-    
-    if not isinstance(productos, list):
-        productos = []
-
-    # Definimos la lista de categorías que requiere index.html en la línea 211
-    categorias = ["Bebidas Frías", "Bebidas Calientes", "Comida", "Postres", "Métodos", "Cócteles y Café Filtrado", "Extras"]
-
-    template = env.get_template("index.html")
-    html_content = template.render(
-        request=request,
-        productos=productos,
-        categorias=categorias,
-        turno_actual=turno_global,
-        mesa=mesa
-    )
-    return HTMLResponse(content=html_content)
-
-# Ruta del panel administrativo
 @app.get("/admin", response_class=HTMLResponse)
 async def panel_admin(request: Request):
     productos = []
@@ -90,13 +56,11 @@ async def panel_admin(request: Request):
     except Exception as e:
         print("Error obteniendo productos:", e)
     
-    template = env.get_template("admin.html")
-    html_content = template.render(
-        request=request,
-        productos=productos,
-        turno_actual=turno_global
-    )
-    return HTMLResponse(content=html_content)
+    return templates.TemplateResponse("admin.html", {
+        "request": request,
+        "productos": productos,
+        "turno_actual": turno_global
+    })
 
 @app.post("/admin/cambiar-turno")
 async def cambiar_turno(turno: str = Form(...)):
