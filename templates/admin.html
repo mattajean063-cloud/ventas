@@ -160,7 +160,6 @@
             const contenedorQR = document.getElementById('qr-box');
             contenedorQR.innerHTML = "";
             
-            // Toma automáticamente el dominio actual (Render o Localhost)
             const dominioWeb = window.location.origin; 
             let urlMesa = `${dominioWeb}/?mesa=${numMesa}`;
             
@@ -197,15 +196,23 @@
         };
 
         function pedirPermisoNotificaciones() {
-            if (window.Notification && Notification.permission !== "granted") {
-                Notification.requestPermission();
+            if (!window.Notification) {
+                alert("Este navegador no soporta notificaciones de escritorio.");
+                return;
             }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("¡Avisos de escritorio activados con éxito!");
+                } else {
+                    alert("Permisos denegados en el navegador.");
+                }
+            });
         }
 
-        // --- CONEXIÓN WEBSOCKET Y NOTIFICACIONES FLASH ---
         function iniciarWebSocketAdmin() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
+            const wsUrl = `${protocol}//${window.location.host}/ws/admin`;
+            const ws = new WebSocket(wsUrl);
 
             ws.onmessage = function(event) {
                 const data = JSON.parse(event.data);
@@ -230,13 +237,8 @@
                             <button class="btn btn-sm btn-outline-light py-0" onclick="this.closest('.notid-card').remove()">Marcar atendido</button>
                         </div>
                     `;
-                    
-                    // Notificación de Escritorio nativa si el usuario dio permisos
-                    if (window.Notification && Notification.permission === "granted") {
-                        new Notification(data.titulo, { body: data.mensaje });
-                    }
                 } else if (data.tipo === 'nuevo_pedido') {
-                    let itemsHtml = data.items.map(i => `<li>${i.cantidad}x ${i.nombre} (Q ${(i.precio * i.cantidad).toFixed(2)})</li>`).join('');
+                    let itemsHtml = data.items.map(i => `<li>${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})</li>`).join('');
                     tarjetaFlash.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="text-warning m-0 fw-bold">🚀 Nuevo Pedido Recibido</h5>
@@ -248,17 +250,16 @@
                             <button class="btn btn-sm btn-amber py-1" onclick="this.closest('.notid-card').remove()">Completar Pedido</button>
                         </div>
                     `;
-
-                    if (window.Notification && Notification.permission === "granted") {
-                        new Notification("Nuevo Pedido", { body: `Pedido de Q ${data.total.toFixed(2)} para la Mesa #${data.mesa}` });
-                    }
                 }
 
                 contenedor.prepend(tarjetaFlash);
+
+                if (window.Notification && Notification.permission === "granted") {
+                    new Notification("Don Nicolás - Alerta", { body: data.mensaje || "Nuevo pedido recibido" });
+                }
             };
 
             ws.onclose = function() {
-                // Reconectar automáticamente si se cae el socket
                 setTimeout(iniciarWebSocketAdmin, 3000);
             };
         }
