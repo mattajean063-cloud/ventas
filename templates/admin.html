@@ -48,7 +48,7 @@
         </div>
 
         <div class="row g-4">
-            <!-- COLUMNA IZQUIERDA: Pedidos -->
+            <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
             <div class="col-lg-8">
                 <div class="card-colonial p-4 shadow h-100">
                     <h4 class="text-warning mb-3 border-bottom border-secondary pb-2">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
@@ -123,7 +123,7 @@
             </div>
         </div>
 
-        <!-- Inventario -->
+        <!-- Inventario Completo -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card-colonial p-4 shadow">
@@ -189,6 +189,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let qrCodeInstance = null;
+
         function generarQR() {
             const numMesa = document.getElementById('input-num-mesa').value || 1;
             const contenedorQR = document.getElementById('qr-box');
@@ -196,6 +197,7 @@
             let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
             qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
         }
+
         function descargarQR() {
             const imgElement = document.querySelector('#qr-box img');
             if (!imgElement) return;
@@ -204,16 +206,33 @@
             enlace.download = `QR_Mesa_${document.getElementById('input-num-mesa').value || 1}.png`;
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
-        window.onload = function() { generarQR(); setInterval(verificarNuevosEventos, 3000); };
-        function pedirPermisoNotificaciones() { Notification.requestPermission(); }
+        
+        window.onload = function() { 
+            generarQR(); 
+            setInterval(verificarNuevosEventos, 3000); 
+        };
+
+        function pedirPermisoNotificaciones() { 
+            if (window.Notification) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") alert("¡Avisos de escritorio activados!");
+                });
+            }
+        }
+
         async function verificarNuevosEventos() {
             try {
                 let respuesta = await fetch('/api/obtener-eventos');
                 if (!respuesta.ok) return;
                 let eventos = await respuesta.json();
-                if (eventos && eventos.length > 0) eventos.forEach(data => procesarYMostrarEvento(data));
-            } catch (e) {}
+                if (eventos && eventos.length > 0) {
+                    eventos.forEach(data => procesarYMostrarEvento(data));
+                }
+            } catch (e) {
+                console.error("Error consultando eventos:", e);
+            }
         }
+
         function procesarYMostrarEvento(data) {
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
@@ -246,6 +265,10 @@
                 `;
             }
             contenedor.prepend(tarjetaFlash);
+
+            if (window.Notification && Notification.permission === "granted") {
+                new Notification("Don Nicolás - Alerta", { body: data.mensaje || "Nuevo pedido recibido" });
+            }
         }
     </script>
 </body>
