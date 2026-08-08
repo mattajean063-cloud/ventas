@@ -23,7 +23,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # --- CREDENCIALES DE LA API REST DE SUPABASE (PUERTO 443 / HTTP) ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnBvamEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcyMzg5OTUxOCwiZXhwIjoyMDM5NDc1NTE4fQ.TU_CLAVE_ANON_O_SERVICE_ROLE_AQUI" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
 # (O usa tu Service Role Key de Supabase si necesitas permisos de escritura totales)
 
 HEADERS = {
