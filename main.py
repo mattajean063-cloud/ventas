@@ -17,9 +17,9 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# ⚠️ COLOCA AQUÍ TU LLAVE REAL DE SUPABASE (anon / public)
+# ⚠️ REEMPLAZA CON TU LLAVE REAL DE SUPABASE (anon / public)
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "TU_SUPABASE_ANON_KEY_AQUI" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -30,7 +30,7 @@ HEADERS = {
 historial_notificaciones = []
 TURNO_ACTUAL_SISTEMA = "Mañana"
 
-# --- MENÚ COMPLETO Y EXACTO EXTRAÍDO DEL PDF ---
+# --- MENÚ COMPLETO Y EXACTO (CON APARTADO DE MÉTODOS) ---
 MENU_INICIAL_COMPLETO = [
     # 1. Menú Brunch / Salados (Mañana - Incluyen opción de bebida)
     {"nombre": "Chilaquiles", "precio": 55.0, "categoria": "Comida", "descripcion": "Huevos estrellados sobre tortillas fritas, salsa roja, queso mozzarella, crema, pechuga de pollo y cebolla morada curtida.", "horario": "Mañana", "config_tamano": "ninguno", "admite_promo": True, "imagen": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400"},
@@ -124,14 +124,16 @@ MENU_INICIAL_COMPLETO = [
     {"nombre": "Licuado con Leche", "precio": 26.0, "categoria": "Bebidas Frías", "descripcion": "Licuado natural con leche.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400"},
     {"nombre": "Licuado con Agua", "precio": 22.0, "categoria": "Bebidas Frías", "descripcion": "Licuado natural con agua.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400"},
 
-    # 9. Cócteles y Café Filtrado
+    # 9. Métodos de Café Filtrado
+    {"nombre": "Chemex", "precio": 20.0, "categoria": "Métodos", "descripcion": "Café filtrado en Chemex (frío o caliente).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"},
+    {"nombre": "V60", "precio": 20.0, "categoria": "Métodos", "descripcion": "Café filtrado por método V60.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"},
+    {"nombre": "Prensa Francesa", "precio": 20.0, "categoria": "Métodos", "descripcion": "Café filtrado en prensa francesa.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"},
+
+    # 10. Cócteles
     {"nombre": "Zacapa Cold Brew", "precio": 40.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Cóctel exclusivo con ron Zacapa y cold brew.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400"},
     {"nombre": "Espresso Martini", "precio": 30.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Cóctel clásico con espresso.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=400"},
     {"nombre": "Nikko Frost", "precio": 30.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Cóctel especial de la casa.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400"},
-    {"nombre": "Carajillo", "precio": 35.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Carajillo tradicional con espresso y licor.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=400"},
-    {"nombre": "Chemex", "precio": 20.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Café filtrado en Chemex (frío o caliente).", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"},
-    {"nombre": "V60", "precio": 20.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Café filtrado por método V60.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"},
-    {"nombre": "Prensa Francesa", "precio": 20.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Café filtrado en prensa francesa.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400"}
+    {"nombre": "Carajillo", "precio": 35.0, "categoria": "Cócteles y Café Filtrado", "descripcion": "Carajillo tradicional con espresso y licor.", "horario": "Ambos", "config_tamano": "ninguno", "admite_promo": False, "imagen": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=400"}
 ]
 
 class ConnectionManager:
@@ -173,15 +175,17 @@ class AlertaRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     try:
-        res = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=id", headers=HEADERS)
+        res = requests.get(f"{SUPABASE_URL}/rest/v1/productos?select=nombre", headers=HEADERS)
         if res.status_code == 200:
-            productos_actuales = res.json()
-            print(f"Productos encontrados en la BD: {len(productos_actuales)}")
-            if len(productos_actuales) == 0:
-                db_headers = {**HEADERS, "Content-Type": "application/json"}
-                for prod in MENU_INICIAL_COMPLETO:
+            existentes = {p["nombre"] for p in res.json()}
+            db_headers = {**HEADERS, "Content-Type": "application/json"}
+            
+            agregados = 0
+            for prod in MENU_INICIAL_COMPLETO:
+                if prod["nombre"] not in existentes:
                     requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=prod)
-                print("¡Catálogo completo precargado exitosamente en Supabase!")
+                    agregados += 1
+            print(f"Sincronización completada. Se añadieron {agregados} productos nuevos.")
         else:
             print("Error al conectar con Supabase:", res.status_code, res.text)
     except Exception as e:
@@ -207,6 +211,7 @@ async def ver_menu(request: Request, mesa: int = 1):
     categorias = {
         "Bebidas Frías": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Frías"],
         "Bebidas Calientes": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Calientes"],
+        "Métodos": [p for p in productos_filtrados if p.get("categoria") == "Métodos"],
         "Comida": [p for p in productos_filtrados if p.get("categoria") == "Comida"],
         "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"],
         "Cócteles y Café Filtrado": [p for p in productos_filtrados if p.get("categoria") == "Cócteles y Café Filtrado"],
@@ -235,8 +240,10 @@ async def cambiar_turno(turno: str = Form(...)):
 async def websocket_admin(websocket: WebSocket):
     await manager.connect(websocket)
     try:
-        while True: await websocket.receive_text()
-    except WebSocketDisconnect: manager.disconnect(websocket)
+        while True: 
+            await websocket.receive_text()
+    except WebSocketDisconnect: 
+        manager.disconnect(websocket)
 
 @app.post("/api/enviar-pedido")
 async def recibir_pedido(pedido: PedidoRequest):
