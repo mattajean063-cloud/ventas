@@ -110,7 +110,6 @@
                                     </select>
                                 </div>
                                 
-                                <!-- Configuración de Tamaños -->
                                 <div class="mb-3">
                                     <label class="form-label text-warning small fw-bold">Configuración de Tamaño:</label>
                                     <select class="form-select" name="config_tamano" required>
@@ -155,7 +154,8 @@
                         <table class="table table-dark table-hover align-middle bg-transparent">
                             <thead>
                                 <tr class="text-warning">
-                                    <th>Foto</th>
+                                    <th>Foto Actual</th>
+                                    <th>Cambiar Foto</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Precio (Q)</th>
@@ -172,6 +172,12 @@
                                         {% else %}
                                             <span class="text-muted small">Sin foto</span>
                                         {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex gap-1 align-items-center">
+                                            <input type="file" name="nueva_imagen_file" class="form-control form-control-sm" accept="image/*" style="width: 140px; font-size: 0.75rem;" required>
+                                            <button type="submit" class="btn btn-outline-warning btn-sm px-2 py-1" style="font-size: 0.75rem;">Subir</button>
+                                        </form>
                                     </td>
                                     <td class="fw-bold text-light">{{ p.nombre }}</td>
                                     <td><span class="badge bg-secondary">{{ p.categoria }}</span></td>
