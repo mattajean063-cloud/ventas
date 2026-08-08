@@ -1,5 +1,6 @@
 import os
 import base64
+from datetime import datetime
 from fastapi import FastAPI, Request, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +21,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # --- CREDENCIALES DE LA API REST DE SUPABASE ---
 SUPABASE_URL = "https://picteudhhdsytfvpvoja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRoaGRzeXRmdnB2b2phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNTM4NDYsImV4cCI6MjEwMTcyOTg0Nn0.g5FWFDX3Ks6189MpJ98YXMJy2-L3GHbhZkSgdKldHVE" 
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpY3RldWRhdGRzeXRmdnBvamEiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcyMzg5OTUxOCwiZXhwIjoyMDM5NDc1NTE4fQ.TU_CLAVE_ANON_O_SERVICE_ROLE_AQUI" 
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -79,12 +80,25 @@ async def ver_menu(request: Request, mesa: int = 1):
     except Exception as e:
         print("ERROR AL CONSULTAR SUPABASE API (INDEX):", e)
 
+    # Determinar horario actual en base a la hora del servidor (Mañana: 00:00 - 12:00, Tarde: 12:00 - 23:59)
+    hora_actual = datetime.now().hour
+    turno_actual = "Mañana" if hora_actual < 12 else "Tarde"
+
+    # Filtrar productos para que solo muestren los del turno correspondiente (o los que apliquen a "Ambos")
+    productos_filtrados = []
+    for p in menu_lista:
+        horario = p.get("horario", "Ambos")
+        if horario == "Ambos" or horario == turno_actual:
+            productos_filtrados.append(p)
+
     categorias = {
-        "Bebidas": [p for p in menu_lista if p.get("categoria") == "Bebidas"],
-        "Comida": [p for p in menu_lista if p.get("categoria") == "Comida"],
-        "Postres": [p for p in menu_lista if p.get("categoria") == "Postres"]
+        "Bebidas Frías": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Frías"],
+        "Bebidas Calientes": [p for p in productos_filtrados if p.get("categoria") == "Bebidas Calientes"],
+        "Comida": [p for p in productos_filtrados if p.get("categoria") == "Comida"],
+        "Postres": [p for p in productos_filtrados if p.get("categoria") == "Postres"]
     }
-    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias})
+    
+    return templates.TemplateResponse(request=request, name="index.html", context={"mesa": mesa, "categorias": categorias, "turno": turno_actual})
 
 @app.get("/admin", response_class=HTMLResponse)
 async def ver_admin(request: Request):
@@ -140,13 +154,14 @@ async def obtener_eventos():
     historial_notificaciones.clear()
     return eventos
 
-# --- ADMIN (GESTIÓN DE PRODUCTOS CON IMAGEN BASE64) ---
+# --- ADMIN (GESTIÓN DE PRODUCTOS, PRECIOS Y HORARIOS) ---
 @app.post("/admin/agregar")
 async def agregar_producto(
     nombre: str = Form(...), 
     precio: float = Form(...), 
     categoria: str = Form(...), 
     descripcion: str = Form(default=""), 
+    horario: str = Form(default="Ambos"), 
     imagen_file: UploadFile = File(...)
 ):
     try:
@@ -160,6 +175,7 @@ async def agregar_producto(
             "precio": float(precio),
             "categoria": categoria,
             "descripcion": descripcion,
+            "horario": horario,
             "imagen": imagen_base64
         }
         
@@ -181,6 +197,19 @@ async def actualizar_precio(producto_id: int, nuevo_precio: float = Form(...)):
         requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
     except Exception as e:
         print("ERROR AL ACTUALIZAR PRECIO EN SUPABASE:", e)
+
+    return RedirectResponse(url="/admin", status_code=303)
+
+@app.post("/admin/actualizar-horario/{producto_id}")
+async def actualizar_horario(producto_id: int, horario: str = Form(...)):
+    try:
+        payload = {
+            "horario": horario
+        }
+        db_headers = {**HEADERS, "Content-Type": "application/json"}
+        requests.patch(f"{SUPABASE_URL}/rest/v1/productos?id=eq.{producto_id}", headers=db_headers, json=payload)
+    except Exception as e:
+        print("ERROR AL ACTUALIZAR HORARIO EN SUPABASE:", e)
 
     return RedirectResponse(url="/admin", status_code=303)
 
