@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo - Don Nicolás</title>
+    <title id="page-title">Panel Administrativo - Don Nicolás</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -340,7 +340,7 @@
             ws.onmessage = function(event) {
                 let data = JSON.parse(event.data);
                 
-                // Incrementar contador estilo WhatsApp
+                // Incrementar contador y reflejar en interfaz + pestaña
                 contadorNotificaciones++;
                 actualizarContadorVisual();
 
@@ -354,11 +354,15 @@
 
         function actualizarContadorVisual() {
             const badge = document.getElementById('badge-contador');
+            const pageTitle = document.getElementById('page-title');
+            
             if (contadorNotificaciones > 0) {
                 badge.innerText = contadorNotificaciones;
                 badge.style.display = 'inline-block';
+                pageTitle.innerText = `(${contadorNotificaciones}) Panel Administrativo - Don Nicolás`;
             } else {
                 badge.style.display = 'none';
+                pageTitle.innerText = `Panel Administrativo - Don Nicolás`;
             }
         }
 
@@ -420,7 +424,7 @@
             contenedor.prepend(tarjetaFlash);
         }
 
-        // Función para decrementar el contador estilo WhatsApp cuando atiendes/completas un pedido
+        // Función para decrementar el contador al atender o completar pedidos
         function marcarAtendido(button) {
             button.closest('.notid-card').remove();
             if (contadorNotificaciones > 0) {
