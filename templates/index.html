@@ -256,7 +256,7 @@
 
             <div class="mb-3">
                 <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">📝 Nota Adicional (Opcional):</label>
-                <input type="text" id="input-nota-custom" class="form-control" placeholder="Ej. Bien caliente...">
+                <input type="text" id="input-nota-custom" class="form-control" placeholder="Escriba sus requerimientos...">
             </div>
 
             <div class="d-flex gap-2">
@@ -319,10 +319,29 @@
                 </div>
             </div>
 
-            <!-- NOTA ADICIONAL PARA TACOS -->
+            <!-- SECCIÓN DE LECHE Y ENDULZANTE UNIVERSAL PARA CUALQUIER BEBIDA CON SUBCATEGORÍA -->
+            <div id="seccion-leche-endulzante-subcat" class="mb-3" style="display: none;">
+                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🥛 Tipo de Leche:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatLeche('Entera', this, 0)">Entera</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatLeche('Deslactosada', this, 0)">Deslactosada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatLeche('Descremada', this, 0)">Descremada</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatLeche('Leche Vegetal (+Q8)', this, 8)">Leche Vegetal (+Q8)</div></div>
+                </div>
+
+                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🍯 Tipo de Endulzante:</label>
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatEndulzante('Azúcar', this)">Azúcar</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatEndulzante('Splenda', this)">Splenda</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatEndulzante('Morena', this)">Morena</div></div>
+                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcionSubcatEndulzante('Sin Endulzante', this)">Ninguno</div></div>
+                </div>
+            </div>
+
+            <!-- NOTA ADICIONAL PARA TACOS / SUB-MENÚ -->
             <div class="mb-3">
                 <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">📝 Nota Adicional (Opcional):</label>
-                <input type="text" id="input-nota-tacos" class="form-control" placeholder="Ej. Sin cebolla...">
+                <input type="text" id="input-nota-tacos" class="form-control" placeholder="Escriba sus requerimientos...">
             </div>
 
             <div class="d-flex gap-2 mt-4">
@@ -464,6 +483,10 @@
         let seleccionTacosLecheTemp = 'Entera';
         let seleccionTacosEndulzanteTemp = 'Azúcar';
         let costoExtraTacosLeche = 0;
+
+        let seleccionSubcatLecheTemp = 'Entera';
+        let seleccionSubcatEndulzanteTemp = 'Azúcar';
+        let costoExtraSubcatLeche = 0;
         
         let categoriaActivaFiltro = 'todos';
 
@@ -608,23 +631,38 @@
             let esComida = prod.categoria === 'Comida';
             let seccionPromoTacos = document.getElementById('seccion-promo-tacos');
             let seccionLecheEndulzanteTacos = document.getElementById('seccion-leche-endulzante-tacos');
+            let seccionLecheEndulzanteSubcat = document.getElementById('seccion-leche-endulzante-subcat');
             
             if (bannerManana && esComida && prod.admitePromo) {
                 seccionPromoTacos.style.display = 'block';
                 seleccionPromoTacosTemp = '';
                 costoExtraPromoTacos = 0;
                 seccionLecheEndulzanteTacos.style.display = 'none';
+                seccionLecheEndulzanteSubcat.style.display = 'none';
                 document.querySelectorAll('#seccion-promo-tacos .opcion-btn').forEach(b => b.classList.remove('selected'));
             } else {
                 seccionPromoTacos.style.display = 'none';
-                seccionLecheEndulzanteTacos.style.display = 'none';
                 seleccionPromoTacosTemp = '';
                 costoExtraPromoTacos = 0;
+
+                // Mostrar leche y endulzante para cualquier otra bebida con subcategorías (como Cortado u otras bebidas)
+                let esBebidaSub = prod.categoria.includes('Bebida') || prod.categoria.includes('Cócteles');
+                if (esBebidaSub && prod.admiteExtrasCafe) {
+                    seccionLecheEndulzanteSubcat.style.display = 'block';
+                    seccionLecheEndulzanteTacos.style.display = 'none';
+                } else {
+                    seccionLecheEndulzanteSubcat.style.display = 'none';
+                    seccionLecheEndulzanteTacos.style.display = 'none';
+                }
             }
 
             seleccionTacosLecheTemp = 'Entera';
             seleccionTacosEndulzanteTemp = 'Azúcar';
             costoExtraTacosLeche = 0;
+
+            seleccionSubcatLecheTemp = 'Entera';
+            seleccionSubcatEndulzanteTemp = 'Azúcar';
+            costoExtraSubcatLeche = 0;
 
             verificarOpcionMixta(selectElem);
 
@@ -677,6 +715,19 @@
             seleccionTacosEndulzanteTemp = valor;
         }
 
+        function seleccionarOpcionSubcatLeche(valor, elemento, extra = 0) {
+            elemento.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+            seleccionSubcatLecheTemp = valor;
+            costoExtraSubcatLeche = extra;
+        }
+
+        function seleccionarOpcionSubcatEndulzante(valor, elemento) {
+            elemento.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+            seleccionSubcatEndulzanteTemp = valor;
+        }
+
         function cerrarModalTacos() {
             document.getElementById('modal-tacos').style.display = 'none';
             productoPendiente = null;
@@ -690,7 +741,16 @@
 
             let partesVal = val.split('|');
             let subcatNombre = partesVal[0];
-            let subcatPrecio = parseFloat(partesVal[1]) + costoExtraPromoTacos + costoExtraTacosLeche;
+            
+            let esBebidaSub = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
+            let esPromoActiva = document.getElementById('seccion-promo-tacos').style.display !== 'none';
+            
+            let extraAdicional = costoExtraPromoTacos;
+            if (esBebidaSub && !esPromoActiva && productoPendiente.admiteExtrasCafe) {
+                extraAdicional = costoExtraSubcatLeche;
+            }
+
+            let subcatPrecio = parseFloat(partesVal[1]) + extraAdicional;
 
             let detalleMixto = "";
             if (subcatNombre.toLowerCase().includes('mixto')) {
@@ -706,17 +766,38 @@
             let notaInput = document.getElementById('input-nota-tacos').value.trim();
             let partesNota = [];
             partesNota.push(`Opción: ${subcatNombre}${detalleMixto}`);
-            if (seleccionPromoTacosTemp) {
+
+            let tipoLecheFinal = '';
+            let tipoEndulzanteFinal = '';
+
+            if (esPromoActiva && seleccionPromoTacosTemp) {
                 partesNota.push(`Incluye: ${seleccionPromoTacosTemp}`);
                 if (seleccionPromoTacosTemp === 'Cambiar a Latte') {
-                    if (seleccionTacosLecheTemp && seleccionTacosLecheTemp !== 'Entera') partesNota.push(`Leche: ${seleccionTacosLecheTemp}`);
-                    if (seleccionTacosEndulzanteTemp && seleccionTacosEndulzanteTemp !== 'Azúcar') partesNota.push(`Endulzante: ${seleccionTacosEndulzanteTemp}`);
+                    if (seleccionTacosLecheTemp && seleccionTacosLecheTemp !== 'Entera') {
+                        partesNota.push(`Leche: ${seleccionTacosLecheTemp}`);
+                        tipoLecheFinal = seleccionTacosLecheTemp;
+                    }
+                    if (seleccionTacosEndulzanteTemp && seleccionTacosEndulzanteTemp !== 'Azúcar') {
+                        partesNota.push(`Endulzante: ${seleccionTacosEndulzanteTemp}`);
+                        tipoEndulzanteFinal = seleccionTacosEndulzanteTemp;
+                    }
+                }
+            } else if (esBebidaSub && productoPendiente.admiteExtrasCafe) {
+                if (seleccionSubcatLecheTemp && seleccionSubcatLecheTemp !== 'Entera') {
+                    partesNota.push(`Leche: ${seleccionSubcatLecheTemp}`);
+                    tipoLecheFinal = seleccionSubcatLecheTemp;
+                }
+                if (seleccionSubcatEndulzanteTemp && seleccionSubcatEndulzanteTemp !== 'Azúcar') {
+                    partesNota.push(`Endulzante: ${seleccionSubcatEndulzanteTemp}`);
+                    tipoEndulzanteFinal = seleccionSubcatEndulzanteTemp;
                 }
             }
+
             if (notaInput) partesNota.push(`Nota: ${notaInput}`);
 
             let nombrePersonalizado = `${productoPendiente.nombre} (${subcatNombre}${detalleMixto})`;
-            procesarAdicionFinal(subcatPrecio, seleccionPromoTacosTemp === 'Cambiar a Latte' ? seleccionTacosLecheTemp : '', seleccionPromoTacosTemp === 'Cambiar a Latte' ? seleccionTacosEndulzanteTemp : '', '', seleccionPromoTacosTemp, partesNota.join(' | '), nombrePersonalizado, subcatNombre);
+            let promoGuardar = esPromoActiva ? seleccionPromoTacosTemp : '';
+            procesarAdicionFinal(subcatPrecio, tipoLecheFinal, tipoEndulzanteFinal, '', promoGuardar, partesNota.join(' | '), nombrePersonalizado, subcatNombre);
             cerrarModalTacos();
         }
 
