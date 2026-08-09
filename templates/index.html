@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Café Don Nicolás - Menú Digital</title>
+    <title id="page-title">Panel Administrativo - Don Nicolás</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --bg-cream: #f7f4ed;
@@ -21,704 +22,503 @@
             background-color: var(--bg-cream); 
             color: var(--text-main); 
             font-family: 'Montserrat', sans-serif; 
-            padding-bottom: 180px; 
         }
 
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Cormorant Garamond', serif;
             font-weight: 700;
         }
-
-        .sticky-container { 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            background: rgba(247, 244, 237, 0.95); 
-            backdrop-filter: blur(10px); 
-            padding-bottom: 10px; 
-            border-bottom: 1px solid var(--border-subtle); 
-        }
-
-        .product-card { 
+        
+        .card-colonial { 
             background-color: var(--bg-card-white); 
             border: 1px solid var(--border-subtle); 
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            transition: all 0.2s ease-in-out; 
         }
-        .product-card:hover { 
-            transform: translateY(-2px); 
-            border-color: var(--accent-gold); 
-        }
-
-        .product-img { 
-            width: 80px; 
-            height: 80px; 
-            object-fit: cover; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-subtle); 
-        }
-
+        
         .btn-amber { 
             background-color: var(--accent-gold); 
             color: white; 
             font-weight: 600; 
-            border-radius: 10px; 
             border: none;
-            transition: background-color 0.2s; 
         }
-        .btn-amber:hover:not(:disabled) { 
+        .btn-amber:hover { 
             background-color: var(--accent-gold-hover); 
             color: white; 
         }
-        .btn-amber:disabled { 
-            background-color: #e0d5c1; 
-            color: #8c7d6b; 
-            cursor: not-allowed; 
+
+        .notid-card {
+            background: #ffffff;
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
         }
 
-        .badge-mesa { 
-            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-hover) 100%); 
-            color: white; 
-            font-weight: bold; 
+        .notid-card:hover {
+            transform: translateY(-2px);
         }
 
-        .category-title { 
-            color: var(--accent-gold); 
-            border-bottom: 2px solid var(--border-subtle); 
-            padding-bottom: 6px; 
-            margin-top: 2rem; 
-            margin-bottom: 1rem; 
-            font-weight: bold; 
-        }
-
-        .btn-categoria { 
-            background-color: var(--bg-card-white); 
-            color: var(--text-main); 
-            border: 1px solid var(--border-subtle); 
-            border-radius: 20px; 
-            padding: 6px 14px; 
-            font-size: 0.85rem; 
-            transition: all 0.2s; 
-        }
-        .btn-categoria.active, .btn-categoria:hover { 
-            background-color: var(--accent-gold); 
-            color: white; 
-            border-color: var(--accent-gold); 
-        }
-
-        .order-panel { 
-            position: fixed; 
-            bottom: 15px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 100%; 
-            max-width: 600px; 
-            background: rgba(255, 255, 255, 0.98); 
-            border: 2px solid var(--accent-gold); 
-            border-radius: 20px; 
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.1); 
-            z-index: 1050; 
-            backdrop-filter: blur(10px); 
-        }
-
-        .modal-overlay { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(44, 34, 30, 0.6); 
-            z-index: 2000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
-        }
-
-        .modal-colonial { 
-            background-color: var(--bg-card-white); 
-            border: 2px solid var(--accent-gold); 
-            border-radius: 16px; 
-            max-width: 450px; 
-            width: 100%; 
-            padding: 25px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
-        }
-
-        .opcion-btn { 
-            background-color: #faf8f5; 
-            border: 1px solid var(--border-subtle); 
-            color: var(--text-main); 
-            border-radius: 10px; 
-            padding: 8px; 
-            font-weight: 600; 
-            font-size: 0.85rem; 
-            transition: all 0.2s; 
-            text-align: center; 
-            cursor: pointer; 
-        }
-        .opcion-btn:hover, .opcion-btn.selected { 
-            background-color: var(--accent-gold); 
-            color: white; 
-            border-color: var(--accent-gold); 
-        }
-
-        .form-control, .form-select {
-            background-color: #faf8f5 !important;
-            color: var(--text-main) !important;
-            border-color: var(--border-subtle) !important;
+        .form-control, .form-select { 
+            background-color: #faf8f5 !important; 
+            color: var(--text-main) !important; 
+            border-color: var(--border-subtle) !important; 
             border-radius: 8px;
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-gold) !important;
             box-shadow: 0 0 0 0.2rem rgba(179, 139, 89, 0.15);
         }
+
+        .product-img { 
+            width: 55px; 
+            height: 55px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-subtle); 
+        }
+        
+        #qr-box img { 
+            margin: 0 auto; 
+            border-radius: 8px; 
+            padding: 5px; 
+            background: white; 
+            border: 1px solid var(--border-subtle);
+        }
+
+        .badge-whatsapp {
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            box-shadow: 0 2px 5px rgba(37, 211, 102, 0.4);
+        }
     </style>
 </head>
-<body>
-
-    <!-- MODAL DE BIENVENIDA -->
-    <div id="modal-bienvenida" class="modal-overlay">
-        <div class="modal-colonial shadow-lg text-center">
-            <h3 style="color: var(--accent-gold);" class="fw-bold mb-3">☕ ¡Bienvenidos a Don Nicolás!</h3>
-            <p class="mb-4" style="line-height: 1.5; color: var(--text-muted);">
-                Nos alegra mucho atenderle en la <strong style="color: var(--text-main);">Mesa #{{ mesa }}</strong>. Por favor, indíquenos cómo desean gestionar su cuenta el día de hoy:
-            </p>
-            <div class="d-grid gap-3">
-                <button class="btn btn-amber py-2 fs-6 shadow-sm" onclick="seleccionarTipoCuenta('juntas')">👥 Cuentas Juntas</button>
-                <button class="btn btn-outline-secondary py-2 fs-6 shadow-sm" style="border-color: var(--border-subtle); color: var(--text-main);" onclick="seleccionarTipoCuenta('separadas')">👤 Cuentas Separadas</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL NOMBRE CLIENTE -->
-    <div id="modal-nombre-cliente" class="modal-overlay" style="display: none;">
-        <div class="modal-colonial shadow-lg text-center">
-            <div class="fs-1 mb-2">👤</div>
-            <h4 style="color: var(--accent-gold);" class="fw-bold mb-2">Cuenta Personal</h4>
-            <p class="small mb-3" style="color: var(--text-muted);">Por favor, indíquenos su nombre:</p>
-            <div class="mb-3">
-                <input type="text" id="input-nombre-personal" class="form-control text-center fw-bold fs-5" placeholder="Escriba su nombre...">
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary w-50 py-2" style="border-color: var(--border-subtle); color: var(--text-main);" onclick="cancelarNombreCliente()">Cancelar</button>
-                <button class="btn btn-amber w-50 py-2" onclick="confirmarNombreCliente()">Continuar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PERSONALIZAR PRODUCTO -->
-    <div id="modal-personalizar" class="modal-overlay" style="display: none;">
-        <div class="modal-colonial shadow-lg">
-            <h4 style="color: var(--accent-gold);" class="fw-bold mb-2 text-center" id="titulo-modal-producto">Personalizar Producto</h4>
-            <p class="small text-center mb-3" style="color: var(--text-muted);">Personalice su elección:</p>
-            
-            <div id="seccion-tamanos" class="mb-3" style="display: none;">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">📏 Tamaño:</label>
-                <div class="row g-2">
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Pequeño 8oz', this)">Pequeño (8oz)</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('tamano', 'Grande 12oz', this)">Grande (12oz)</div></div>
-                </div>
-            </div>
-
-            <div id="seccion-promo-manana" class="mb-3" style="display: none;">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🌅 Opción Incluida / Cambio a Latte (+Q12):</label>
-                <div class="row g-2 mb-2">
-                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Café Negro', this, 0)">Café Negro</div></div>
-                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Jugo Naranja', this, 0)">Jugo Naranja</div></div>
-                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcion('promo', 'Té', this, 0)">Té</div></div>
-                </div>
-                <div class="d-grid">
-                    <div class="opcion-btn" style="color: var(--accent-gold);" onclick="seleccionarOpcion('promo', 'Cambiar a Latte', this, 12)">✨ Cambiar a Latte (+Q12)</div>
-                </div>
-            </div>
-
-            <div id="seccion-leche-endulzante">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🥛 Tipo de Leche:</label>
-                <div class="row g-2 mb-3">
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Entera', this, 0)">Entera</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Deslactosada', this, 0)">Deslactosada</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Descremada', this, 0)">Descremada</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('leche', 'Leche Vegetal (+Q8)', this, 8)">Leche Vegetal (+Q8)</div></div>
-                </div>
-
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🍯 Tipo de Endulzante:</label>
-                <div class="row g-2 mb-3">
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Azúcar', this)">Azúcar</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Splenda', this)">Splenda</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Morena', this)">Morena</div></div>
-                    <div class="col-6"><div class="opcion-btn" onclick="seleccionarOpcion('endulzante', 'Sin Endulzante', this)">Ninguno</div></div>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">📝 Nota Adicional (Opcional):</label>
-                <input type="text" id="input-nota-custom" class="form-control" placeholder="Ej. Bien caliente...">
-            </div>
-
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary w-50 py-2" style="border-color: var(--border-subtle); color: var(--text-main);" onclick="cerrarModalPersonalizar()">Cancelar</button>
-                <button class="btn btn-amber w-50 py-2" onclick="confirmarPersonalizacionBebida()">Agregar al Pedido</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL SELECCIONAR CARNES TACOS -->
-    <div id="modal-tacos" class="modal-overlay" style="display: none;">
-        <div class="modal-colonial shadow-lg">
-            <h4 style="color: var(--accent-gold);" class="fw-bold mb-2 text-center" id="titulo-modal-tacos">Seleccionar Tacos</h4>
-            <p class="small text-center mb-3" style="color: var(--text-muted);" id="subtitulo-modal-tacos">Elige las carnes para tus tacos:</p>
-            
-            <div id="selector-carne-unica" class="mb-3">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🥩 Tipo de Carne:</label>
-                <select id="select-carne-unica" class="form-select">
-                    <option value="4 Carnes">4 Carnes</option>
-                    <option value="Cochinita Pibil">Cochinita Pibil</option>
-                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
-                    <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
-                </select>
-            </div>
-
-            <div id="selector-carnes-mixtas" class="mb-3" style="display: none;">
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🥩 Primera Opción de Carne:</label>
-                <select id="select-carne-1" class="form-select mb-2">
-                    <option value="4 Carnes">4 Carnes</option>
-                    <option value="Cochinita Pibil">Cochinita Pibil</option>
-                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
-                    <option value="Pollo con salsa de maracuyá">Pollo con salsa de maracuyá</option>
-                </select>
-
-                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🥩 Segunda Opción de Carne:</label>
-                <select id="select-carne-2" class="form-select">
-                    <option value="4 Carnes">4 Carnes</option>
-                    <option value="Cochinita Pibil">Cochinita Pibil</option>
-                    <option value="Quesillo y Chorizo">Quesillo y Chorizo</option>
-                    <option value="Pollo con salsa de maracuyá" selected>Pollo con salsa de maracuyá</option>
-                </select>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-                <button class="btn btn-outline-secondary w-50 py-2" style="border-color: var(--border-subtle); color: var(--text-main);" onclick="cerrarModalTacos()">Cancelar</button>
-                <button class="btn btn-amber w-50 py-2" onclick="confirmarSeleccionTacos()">Confirmar Tacos</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL AGRADECIMIENTO -->
-    <div id="modal-agradecimiento" class="modal-overlay" style="display: none;">
-        <div class="modal-colonial shadow-lg text-center">
-            <div class="fs-1 mb-2">🎉</div>
-            <h3 style="color: var(--accent-gold);" class="fw-bold mb-3">¡Muchas gracias por su pedido!</h3>
-            <p class="mb-4" style="color: var(--text-muted);">Su orden ha sido recibida con éxito en cocina.</p>
-            <button class="btn btn-amber w-100 py-2 shadow-sm" onclick="cerrarMensajeAgradecimiento()">Continuar viendo el menú</button>
-        </div>
-    </div>
-
-    <!-- Contenedor Fijo Superior -->
-    <div class="sticky-container shadow-sm mb-3 pt-3">
-        <div class="container d-flex justify-content-between align-items-center mb-2" style="max-width: 600px;">
-            <div>
-                <h4 style="color: var(--accent-gold);" class="fw-bold m-0">☕ Don Nicolás</h4>
-                <small style="color: var(--text-muted);">Modo Cuenta: <strong style="color: var(--accent-gold);" id="label-tipo-cuenta">Juntas</strong> | Turno: <strong style="color: var(--accent-gold);">{{ turno }}</strong></small>
-            </div>
-            <div class="text-end">
-                <span class="badge badge-mesa fs-6 px-3 py-2 rounded-pill shadow-sm">Mesa #<span id="label-mesa">{{ mesa }}</span></span>
-            </div>
-        </div>
-        <div class="container d-flex gap-2 mb-2" style="max-width: 600px;">
-            <button class="btn btn-outline-dark btn-sm w-50 py-1" onclick="enviarAlerta('mesero')">🙋‍♂️ Llamar Mesero</button>
-            <button class="btn btn-outline-secondary btn-sm w-50 py-1" style="color: var(--text-main); border-color: var(--border-subtle);" onclick="enviarAlerta('cuenta')">🧾 Pedir Cuenta</button>
-        </div>
+<body class="p-4">
+    <div class="container-fluid" style="max-width: 1300px;">
         
-        <!-- BARRA DE BÚSQUEDA -->
-        <div class="container mb-2" style="max-width: 600px;">
-            <input type="text" id="input-buscador" class="form-control form-control-sm text-center" placeholder="🔍 Buscar platillo o bebida..." oninput="filtrarProductos()">
-        </div>
+        <!-- Cabecera Superior con Logo Arriba de la Tabla e Interruptor de Turno -->
+        <div class="card-colonial p-4 mb-4 text-center">
+            <div class="mb-3">
+                <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">☕ Don Nicolás</h2>
+            </div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <h4 style="color: var(--accent-gold);" class="fw-bold m-0 fs-4">🖥️ Monitor y Gestión</h4>
+                    <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3 bg-white p-2 rounded border border-secondary" style="border-color: var(--border-subtle) !important;">
+                    <span class="small fw-bold" style="color: var(--text-muted);">Turno Menú Comida:</span>
+                    <form action="/admin/cambiar-turno" method="POST" class="m-0">
+                        <select name="turno" class="form-select form-select-sm text-center fw-bold" onchange="this.form.submit()" style="width: 130px; color: var(--accent-gold) !important;">
+                            <option value="Mañana" {% if turno_actual == 'Mañana' %}selected{% endif %}>🌅 Mañana</option>
+                            <option value="Tarde" {% if turno_actual == 'Tarde' %}selected{% endif %}>🌇 Tarde</option>
+                        </select>
+                    </form>
+                </div>
 
-        <div class="container d-flex justify-content-center gap-1 flex-wrap" style="max-width: 600px;">
-            <button class="btn-categoria active" onclick="filtrarCategoria('todos', this)">🌟 Todos</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Bebidas', this)">🥤 Bebidas</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Comida', this)">🍳 Comida</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Postres', this)">🍰 Postres</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Cócteles y Café Filtrado', this)">🍸 Cócteles</button>
-            <button class="btn-categoria" onclick="filtrarCategoria('Extras', this)">➕ Extras</button>
-        </div>
-    </div>
-
-    <div class="container" style="max-width: 600px;">
-        
-        <!-- BANNER DE BEBIDA INCLUIDA (Solo aparece si el turno actual es 'Mañana') -->
-        {% if turno == 'Mañana' %}
-        <div id="banner-turno-manana" class="d-flex justify-content-center mb-4">
-            <div class="text-center px-4 py-3 shadow-sm" style="background-color: var(--bg-card-white); border: 2px solid var(--accent-gold); border-radius: 30px; max-width: 420px; width: 100%;">
-                <p class="m-0 fw-bold" style="font-size: 0.9rem; line-height: 1.4; color: var(--text-main);">
-                    Todos incluyen café negro,<br>jugo de naranja o té.<br>
-                    <span style="color: var(--accent-gold);">Por +Q12 cámbialo por un latte.</span>
-                </p>
+                <div>
+                    <button class="btn btn-outline-secondary btn-sm me-2" style="color: var(--text-muted); border-color: var(--border-subtle);" onclick="pedirPermisoNotificaciones()">🔔 Activar Avisos</button>
+                    <a href="/?mesa=1" class="btn btn-outline-dark btn-sm">Ver Menú ↗</a>
+                </div>
             </div>
         </div>
-        {% endif %}
 
-        {% for cat_nombre, cat_productos in categorias.items() %}
-        {% if cat_productos %}
-        <div class="grupo-categoria" data-categoria="{{ 'Bebidas' if 'Bebidas' in cat_nombre else (cat_nombre if cat_nombre in ['Comida', 'Postres', 'Extras'] else 'Cócteles y Café Filtrado') }}">
-            <h5 class="category-title">
-                {% if 'Bebidas' in cat_nombre %}☕ Bebidas (Frías y Calientes)
-                {% elif cat_nombre == 'Comida' %}🍳 Comida y Platillos
-                {% elif cat_nombre == 'Postres' %}🍰 Postres Tradicionales
-                {% elif cat_nombre == 'Cócteles y Café Filtrado' %}🍸 Cócteles y Café Filtrado
-                {% else %}➕ Extras{% endif %}
-            </h5>
-            <div class="d-flex flex-column gap-3">
-                {% for p in cat_productos %}
-                <div class="product-card p-3 d-flex align-items-center justify-content-between shadow-sm item-producto" data-nombre="{{ p.nombre|lower }}" data-descripcion="{{ p.descripcion|lower }}">
-                    <div class="d-flex align-items-center gap-3">
-                        <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="product-img shadow-sm">
-                        <div>
-                            <h6 class="mb-1 fw-bold" style="color: var(--text-main);">{{ p.nombre }}
-                                {% if p.config_tamano == 'fijo_8oz' %}<span class="badge bg-light text-dark border" style="font-size: 0.65rem;">8 oz</span>{% endif %}
-                                {% if p.config_tamano == 'fijo_12oz' %}<span class="badge bg-light text-dark border" style="font-size: 0.65rem;">12 oz</span>{% endif %}
-                            </h6>
-                            <p class="small mb-2" style="font-size: 0.82rem; color: var(--text-muted);">{{ p.descripcion }}</p>
-                            <span class="fw-bold fs-6" style="color: var(--accent-gold);">Q {{ "%.2f"|format(p.precio) }}</span>
+        <div class="row g-4">
+            <!-- COLUMNA IZQUIERDA: Pedidos y Alertas en Tiempo Real -->
+            <div class="col-lg-8">
+                <div class="card-colonial p-4 h-100">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">🔔 Pedidos y Solicitudes en Tiempo Real</h4>
+                    <div id="contenedor-alertas">
+                        <div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">
+                            ⏳ Esperando órdenes o llamadas de las mesas...
                         </div>
                     </div>
-                    <button class="btn btn-amber px-3 py-2 shadow-sm" onclick="iniciarAgregarProducto({{ p.id }}, '{{ p.nombre }}', {{ p.precio }}, '{{ p.categoria }}', '{{ p.config_tamano|default('ninguno') }}', {{ 'true' if p.admite_promo else 'false' }}, {{ 'true' if p.admite_extras_cafe|default(true) else 'false' }})">➕</button>
                 </div>
-                {% endfor %}
             </div>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </div>
 
-    <!-- PANEL FLOTANTE DE PEDIDO -->
-    <div id="contenedor-resumen-pedido" class="order-panel p-3 px-4" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseDetallePedido" aria-expanded="false" style="cursor: pointer;">
-            <div>
-                <h5 style="color: var(--accent-gold);" class="fw-bold m-0 fs-6">📋 Su Selección</h5>
-                <small style="color: var(--text-muted); font-size: 0.75rem;">Toque para desplegar/ocultar</small>
-            </div>
-            <div class="text-end d-flex align-items-center gap-2">
-                <span class="fw-bold fs-5" style="color: var(--accent-gold);" id="total-carrito">Q 0.00</span>
-                <span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.75rem;">▼ Ver</span>
+            <!-- COLUMNA DERECHA: QR y Agregar Producto -->
+            <div class="col-lg-4 d-flex flex-column gap-4">
+                <div class="card-colonial p-4 text-center">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📱 Generar Código QR</h4>
+                    <div class="mb-3 text-start">
+                        <label class="form-label small fw-bold" style="color: var(--text-muted);">Número de Mesa:</label>
+                        <input type="number" id="input-num-mesa" class="form-control text-center fw-bold fs-5" value="1" min="1" max="99" oninput="generarQR()">
+                    </div>
+                    <div id="qr-box" class="my-3 d-flex justify-content-center"></div>
+                    <button class="btn btn-amber w-100 py-2 shadow-sm mt-2" onclick="descargarQR()">📥 Descargar Imagen QR</button>
+                </div>
+
+                <div class="card-colonial overflow-hidden">
+                    <button class="btn w-100 d-flex justify-content-between align-items-center p-4 fw-bold fs-5 text-start border-0" 
+                            type="button" data-bs-toggle="collapse" data-bs-target="#formAgregarCollapse" aria-expanded="false" style="background-color: transparent; color: var(--accent-gold);">
+                        <span>➕ Agregar Producto</span>
+                        <span class="fs-6">▼</span>
+                    </button>
+                    <div class="collapse" id="formAgregarCollapse">
+                        <div class="p-4 pt-0">
+                            <form action="/admin/agregar" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Nombre</label>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio Base (Q)</label>
+                                    <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Categoría</label>
+                                    <select class="form-select" name="categoria" required>
+                                        <option value="" disabled selected>Seleccione</option>
+                                        <option value="Bebidas Frías">Bebidas Frías</option>
+                                        <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                        <option value="Comida">Comida</option>
+                                        <option value="Postres">Postres</option>
+                                        <option value="Métodos">Métodos</option>
+                                        <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
+                                        <option value="Extras">Extras</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Subcategoría / Opciones (Opcional - Formato: Nombre:Precio, separadas por comas)</label>
+                                    <input type="text" class="form-control" name="subcategorias" placeholder="Ej: Chocolate:25, Vainilla:28">
+                                    <small class="text-muted" style="font-size: 0.75rem;">Útil para Muffins, Tacos, Waffles de la tarde, Galletas, etc.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Horario (Solo Comida)</label>
+                                    <select class="form-select" name="horario" required>
+                                        <option value="Ambos">Mañana y Tarde</option>
+                                        <option value="Mañana">Solo Mañana</option>
+                                        <option value="Tarde">Solo Tarde</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Configuración de Tamaño:</label>
+                                    <select class="form-select" name="config_tamano" required>
+                                        <option value="ninguno">Sin Tamaño / Estándar</option>
+                                        <option value="fijo_8oz">Tamaño Fijo: Pequeño (8oz)</option>
+                                        <option value="fijo_12oz">Tamaño Fijo: Grande (12oz)</option>
+                                        <option value="elegir_ambos">Elegir entre 8oz y 12oz</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3 p-3 rounded border" style="background-color: #faf8f5; border-color: var(--border-subtle) !important;">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="admite_promo" value="true" id="checkPromo" checked>
+                                        <label class="form-check-label small" for="checkPromo" style="color: var(--text-main);">
+                                            🌅 Incluir opción de desayuno / bebida matutina
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="admite_extras_cafe" value="true" id="checkExtras" checked>
+                                        <label class="form-check-label small" for="checkExtras" style="color: var(--text-main);">
+                                            🥛 Permitir opciones de Leche y Endulzante
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Descripción</label>
+                                    <input type="text" class="form-control" name="descripcion" placeholder="Descripción..." required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Foto</label>
+                                    <input type="file" class="form-control" name="imagen_file" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-amber w-100 py-2 shadow-sm">Guardar Producto</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="collapse mt-2 pt-2 border-top border-secondary" id="collapseDetallePedido">
-            <div id="lista-carrito" class="mb-3" style="max-height: 200px; overflow-y: auto;"></div>
-            <div class="form-check mb-3 p-2 rounded" style="background-color: #faf8f5; border: 1px solid var(--border-subtle);">
-                <input class="form-check-input ms-0 me-2" type="checkbox" id="checkRevisado" onchange="toggleBotonEnviar()">
-                <label class="form-check-label fw-bold" for="checkRevisado" style="font-size: 0.82rem; cursor: pointer; color: var(--text-main);">He revisado bien mi pedido y estoy seguro de enviarlo.</label>
+
+        <!-- Inventario Completo -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-colonial p-4">
+                    <h4 class="mb-3 border-bottom pb-2" style="color: var(--accent-gold); border-color: var(--border-subtle) !important;">📋 Inventario del Menú</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle bg-transparent" style="color: var(--text-main);">
+                            <thead>
+                                <tr style="color: var(--accent-gold); border-bottom: 2px solid var(--border-subtle);">
+                                    <th>Imagen y Cambiar</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio Base (Q)</th>
+                                    <th>Subcategorías / Variantes</th>
+                                    <th>Tamaño / Config</th>
+                                    <th>Horario Comida</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in productos %}
+                                <tr style="border-bottom: 1px solid var(--border-subtle);">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if p.imagen %}
+                                                <img src="{{ p.imagen }}" class="product-img" alt="{{ p.nombre }}">
+                                            {% else %}
+                                                <span class="text-muted small">Sin foto</span>
+                                            {% endif %}
+                                            <form action="/admin/actualizar-imagen/{{ p.id }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1">
+                                                <input type="file" name="imagen_file" accept="image/*" class="form-control form-control-sm" style="font-size: 0.7rem; width: 140px;" required>
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.75rem; color: var(--text-muted);">📷 Actualizar Foto</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">{{ p.nombre }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ p.categoria }}</span></td>
+                                    <td>
+                                        <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
+                                            <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
+                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/actualizar-subcategorias/{{ p.id }}" method="POST" class="d-flex flex-column gap-1">
+                                            <input type="text" name="subcategorias" value="{{ p.subcategorias|default('') }}" class="form-control form-control-sm" style="width: 160px; font-size: 0.8rem;" placeholder="Ej: Choco:25, Fresa:28">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">Guardar Opciones</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/actualizar-tamano/{{ p.id }}" method="POST">
+                                            <select name="config_tamano" class="form-select form-select-sm fw-bold" style="width: 145px; color: var(--accent-gold);" onchange="this.form.submit()">
+                                                <option value="ninguno" {% if p.config_tamano == 'ninguno' %}selected{% endif %}>Sin Tamaño</option>
+                                                <option value="fijo_8oz" {% if p.config_tamano == 'fijo_8oz' %}selected{% endif %}>Fijo: 8 oz</option>
+                                                <option value="fijo_12oz" {% if p.config_tamano == 'fijo_12oz' %}selected{% endif %}>Fijo: 12 oz</option>
+                                                <option value="elegir_ambos" {% if p.config_tamano == 'elegir_ambos' %}selected{% endif %}>Elegir 8/12oz</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        {% if p.categoria == 'Comida' %}
+                                        <form action="/admin/actualizar-horario/{{ p.id }}" method="POST">
+                                            <select name="horario" class="form-select form-select-sm fw-bold" style="width: 125px; color: var(--accent-gold);" onchange="this.form.submit()">
+                                                <option value="Ambos" {% if p.horario == 'Ambos' %}selected{% endif %}>Ambos</option>
+                                                <option value="Mañana" {% if p.horario == 'Mañana' %}selected{% endif %}>Mañana</option>
+                                                <option value="Tarde" {% if p.horario == 'Tarde' %}selected{% endif %}>Tarde</option>
+                                            </select>
+                                        </form>
+                                        {% else %}
+                                            <span class="text-muted small">Siempre visible</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="/admin/eliminar/{{ p.id }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" onclick="return confirm('¿Eliminar producto?')">🗑️ Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <button id="btn-enviar-pedido" class="btn btn-amber w-100 py-2 fw-bold shadow" onclick="enviarPedido()" disabled>🚀 Confirmar y Enviar Pedido</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        let numeroMesa = urlParams.get('mesa') || '1';
-        document.getElementById('label-mesa').innerText = numeroMesa;
+        let qrCodeInstance = null;
+        let contadorNotificaciones = 0;
+        let idsEventosProcesados = new Set();
 
-        let carrito = [];
-        let tipoCuentaSeleccionada = 'juntas';
-        let productoPendiente = null;
-        let clienteActualTemp = 'General';
-        let seleccionLecheTemp = 'Entera';
-        let seleccionEndulzanteTemp = 'Azúcar';
-        let seleccionTamanoTemp = '';
-        let seleccionPromoTemp = '';
-        let costoExtraLeche = 0;
-        let costoExtraPromo = 0;
-        let categoriaActivaFiltro = 'todos';
-
-        function seleccionarTipoCuenta(tipo) {
-            tipoCuentaSeleccionada = tipo;
-            document.getElementById('label-tipo-cuenta').innerText = tipo === 'juntas' ? 'Juntas' : 'Separadas';
-            document.getElementById('modal-bienvenida').style.display = 'none';
+        function generarQR() {
+            const numMesa = document.getElementById('input-num-mesa').value || 1;
+            const contenedorQR = document.getElementById('qr-box');
+            contenedorQR.innerHTML = "";
+            let urlMesa = `${window.location.origin}/?mesa=${numMesa}`;
+            qrCodeInstance = new QRCode(contenedorQR, { text: urlMesa, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
+        }
+        
+        function descargarQR() {
+            const imgElement = document.querySelector('#qr-box img');
+            if (!imgElement) return;
+            let enlace = document.createElement('a');
+            enlace.href = imgElement.src;
+            enlace.download = `QR_Mesa_${document.getElementById('input-num-mesa').value || 1}.png`;
+            document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        function filtrarCategoria(categoria, boton) {
-            document.querySelectorAll('.btn-categoria').forEach(btn => btn.classList.remove('active'));
-            boton.classList.add('active');
-            categoriaActivaFiltro = categoria;
-            aplicarFiltrosBusquedaYCategoria();
+        function conectarWebSocket() {
+            let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
+
+            ws.onmessage = function(event) {
+                let data = JSON.parse(event.data);
+                procesarYMostrarEvento(data);
+            };
+
+            ws.onclose = function() {
+                setTimeout(conectarWebSocket, 3000);
+            };
         }
 
-        function filtrarProductos() {
-            aplicarFiltrosBusquedaYCategoria();
+        async function verificarEventosHttp() {
+            try {
+                let response = await fetch('/api/obtener-eventos');
+                let eventos = await response.json();
+                if (eventos && eventos.length > 0) {
+                    eventos.forEach(evento => {
+                        procesarYMostrarEvento(evento);
+                    });
+                }
+            } catch (error) {}
         }
 
-        function aplicarFiltrosBusquedaYCategoria() {
-            let textoBusqueda = document.getElementById('input-buscador').value.toLowerCase().trim();
+        function actualizarContadorVisual() {
+            const badge = document.getElementById('badge-contador');
+            const pageTitle = document.getElementById('page-title');
             
-            document.querySelectorAll('.grupo-categoria').forEach(grupo => {
-                let catGrupo = grupo.dataset.categoria;
-                let cumpleCategoria = (categoriaActivaFiltro === 'todos' || catGrupo === categoriaActivaFiltro);
-                
-                let productosEnGrupo = grupo.querySelectorAll('.item-producto');
-                let hayProductosVisiblesEnGrupo = false;
-
-                productosEnGrupo.forEach(prod => {
-                    let nombre = prod.dataset.nombre;
-                    let desc = prod.dataset.descripcion;
-                    let cumpleBusqueda = (nombre.includes(textoBusqueda) || desc.includes(textoBusqueda));
-
-                    if (cumpleCategoria && cumpleBusqueda) {
-                        prod.style.display = 'flex';
-                        hayProductosVisiblesEnGrupo = true;
-                    } else {
-                        prod.style.display = 'none';
-                    }
-                });
-
-                grupo.style.display = (cumpleCategoria && hayProductosVisiblesEnGrupo) ? 'block' : 'none';
-            });
-        }
-
-        function iniciarAgregarProducto(id, nombre, precio, categoria, configTamano, admitePromo, admiteExtrasCafe) {
-            productoPendiente = { id, nombre, precio, categoria, configTamano, admitePromo, admiteExtrasCafe };
-
-            if (tipoCuentaSeleccionada === 'separadas') {
-                document.getElementById('input-nombre-personal').value = '';
-                document.getElementById('modal-nombre-cliente').style.display = 'flex';
-                setTimeout(() => { document.getElementById('input-nombre-personal').focus(); }, 100);
+            if (contadorNotificaciones > 0) {
+                badge.innerText = contadorNotificaciones;
+                badge.style.display = 'inline-block';
+                pageTitle.innerText = `(${contadorNotificaciones}) Panel Administrativo - Don Nicolás`;
             } else {
-                continuarDespuesDeNombre("General");
+                badge.style.display = 'none';
+                pageTitle.innerText = `Panel Administrativo - Don Nicolás`;
             }
         }
 
-        function cancelarNombreCliente() {
-            document.getElementById('modal-nombre-cliente').style.display = 'none';
-            productoPendiente = null;
+        function reproducirSonidoAlerta() {
+            try {
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {}
         }
 
-        function confirmarNombreCliente() {
-            let nombreInput = document.getElementById('input-nombre-personal').value.trim();
-            let cliente = nombreInput === "" ? "Invitado" : nombreInput;
-            document.getElementById('modal-nombre-cliente').style.display = 'none';
-            continuarDespuesDeNombre(cliente);
-        }
+        window.onload = function() { 
+            generarQR(); 
+            conectarWebSocket(); 
+            setInterval(verificarEventosHttp, 2000); 
+        };
 
-        function continuarDespuesDeNombre(cliente) {
-            if (!productoPendiente) return;
-            clienteActualTemp = cliente;
-            productoPendiente.cliente = cliente;
-
-            let nombreProd = productoPendiente.nombre.toLowerCase();
-            if (nombreProd.includes('tacos') || nombreProd.includes('tablita')) {
-                abrirModalTacos(productoPendiente);
+        function pedirPermisoNotificaciones() { 
+            if (!window.Notification) {
+                alert("Este navegador no soporta notificaciones de escritorio.");
                 return;
             }
-
-            if (productoPendiente.configTamano === 'elegir_ambos') {
-                document.getElementById('seccion-tamanos').style.display = 'block';
-                seleccionTamanoTemp = '';
-            } else if (productoPendiente.configTamano === 'fijo_8oz') {
-                document.getElementById('seccion-tamanos').style.display = 'none';
-                seleccionTamanoTemp = 'Pequeño (8oz)';
-            } else if (productoPendiente.configTamano === 'fijo_12oz') {
-                document.getElementById('seccion-tamanos').style.display = 'none';
-                seleccionTamanoTemp = 'Grande (12oz)';
-            } else {
-                document.getElementById('seccion-tamanos').style.display = 'none';
-                seleccionTamanoTemp = '';
-            }
-
-            let bannerManana = document.getElementById('banner-turno-manana');
-            let esComida = productoPendiente.categoria === 'Comida';
-            document.getElementById('seccion-promo-manana').style.display = (bannerManana && esComida && productoPendiente.admitePromo) ? 'block' : 'none';
             
-            let esBebida = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
-            let mostrarLecheAzucar = esBebida && productoPendiente.admiteExtrasCafe;
-            document.getElementById('seccion-leche-endulzante').style.display = mostrarLecheAzucar ? 'block' : 'none';
-
-            seleccionLecheTemp = 'Entera';
-            seleccionEndulzanteTemp = 'Azúcar';
-            seleccionPromoTemp = '';
-            costoExtraLeche = 0;
-            costoExtraPromo = 0;
-            document.getElementById('input-nota-custom').value = '';
-            
-            document.querySelectorAll('#modal-personalizar .opcion-btn').forEach(b => b.classList.remove('selected'));
-            document.getElementById('titulo-modal-producto').innerText = productoPendiente.nombre;
-            document.getElementById('modal-personalizar').style.display = 'flex';
-        }
-
-        function abrirModalTacos(prod) {
-            document.getElementById('titulo-modal-tacos').innerText = prod.nombre;
-            let esMixto = prod.nombre.toLowerCase().includes('mixto') || prod.nombre.toLowerCase().includes('2 opciones');
-            
-            if (esMixto) {
-                let esOcho = prod.nombre.toLowerCase().includes('8 tacos');
-                document.getElementById('subtitulo-modal-tacos').innerText = esOcho 
-                    ? 'Elige 2 carnes (4 tacos de cada una para completar 8)' 
-                    : 'Elige 2 carnes (2 tacos de cada una para completar 4)';
-                document.getElementById('selector-carne-unica').style.display = 'none';
-                document.getElementById('selector-carnes-mixtas').style.display = 'block';
-            } else {
-                let esOcho = prod.nombre.toLowerCase().includes('8 tacos');
-                document.getElementById('subtitulo-modal-tacos').innerText = esOcho 
-                    ? 'Elige la carne para tus 8 tacos' 
-                    : 'Elige la carne para tus 4 tacos';
-                document.getElementById('selector-carne-unica').style.display = 'block';
-                document.getElementById('selector-carnes-mixtas').style.display = 'none';
-            }
-            document.getElementById('modal-tacos').style.display = 'flex';
-        }
-
-        function cerrarModalTacos() {
-            document.getElementById('modal-tacos').style.display = 'none';
-            productoPendiente = null;
-        }
-
-        function confirmarSeleccionTacos() {
-            if (!productoPendiente) return;
-            let nombreBase = productoPendiente.nombre;
-            let esMixto = nombreBase.toLowerCase().includes('mixto') || nombreBase.toLowerCase().includes('2 opciones');
-            let detalleCarne = "";
-
-            if (esMixto) {
-                let c1 = document.getElementById('select-carne-1').value;
-                let c2 = document.getElementById('select-carne-2').value;
-                if (c1 === c2) {
-                    alert("Por favor seleccione dos opciones de carne diferentes.");
-                    return;
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("¡Notificaciones de escritorio estilo WhatsApp activadas!");
+                    reproducirSonidoAlerta();
+                    new Notification("Don Nicolás", {
+                        body: "Las alertas en la esquina de tu pantalla están listas.",
+                        icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png"
+                    });
+                } else {
+                    alert("Has denegado los permisos de notificación.");
                 }
-                detalleCarne = `${c1} & ${c2}`;
-            } else {
-                detalleCarne = document.getElementById('select-carne-unica').value;
+            });
+        }
+
+        function procesarYMostrarEvento(data) {
+            let idUnico = data.id || `${data.tipo}-${data.mesa}-${data.mensaje || (data.items ? data.items.length : 0)}-${JSON.stringify(data.total || 0)}`;
+            
+            if (idsEventosProcesados.has(idUnico)) return;
+            idsEventosProcesados.add(idUnico);
+
+            contadorNotificaciones++;
+            actualizarContadorVisual();
+            reproducirSonidoAlerta();
+
+            if (window.Notification && Notification.permission === "granted") {
+                let tituloNoti = data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`;
+                let cuerpoNoti = data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`;
+                
+                let notificacionFlotante = new Notification(tituloNoti, {
+                    body: cuerpoNoti,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3233/3233483.png",
+                    tag: 'don-nicolas-alerta'
+                });
+
+                notificacionFlotante.onclick = function() {
+                    window.focus();
+                    notificacionFlotante.close();
+                };
             }
 
-            let nombrePersonalizado = `${nombreBase} (${detalleCarne})`;
-            procesarAdicionFinal(productoPendiente.precio, '', '', '', '', `Carne: ${detalleCarne}`, nombrePersonalizado);
-            cerrarModalTacos();
-        }
+            const contenedor = document.getElementById('contenedor-alertas');
+            const mensajeVacio = document.getElementById('mensaje-vacio');
+            if (mensajeVacio) mensajeVacio.remove();
 
-        function seleccionarOpcion(categoria, valor, elemento, extra = 0) {
-            elemento.parentElement.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('selected'));
-            elemento.classList.add('selected');
+            let tarjetaFlash = document.createElement('div');
+            tarjetaFlash.className = 'notid-card p-3 mb-3';
 
-            if (categoria === 'leche') { seleccionLecheTemp = valor; costoExtraLeche = extra; }
-            if (categoria === 'endulzante') seleccionEndulzanteTemp = valor;
-            if (categoria === 'tamano') seleccionTamanoTemp = valor;
-            if (categoria === 'promo') { seleccionPromoTemp = valor; costoExtraPromo = extra; }
-        }
-
-        function cerrarModalPersonalizar() {
-            document.getElementById('modal-personalizar').style.display = 'none';
-            productoPendiente = null;
-        }
-
-        function confirmarPersonalizacionBebida() {
-            if (!productoPendiente) return;
-            let nota = document.getElementById('input-nota-custom').value.trim();
-            let precioFinal = productoPendiente.precio + costoExtraLeche + costoExtraPromo;
-            let esBebida = productoPendiente.categoria.includes('Bebida') || productoPendiente.categoria.includes('Cócteles');
-            let aplicarExtras = esBebida && productoPendiente.admiteExtrasCafe;
-
-            procesarAdicionFinal(
-                precioFinal, 
-                aplicarExtras ? seleccionLecheTemp : '', 
-                aplicarExtras ? seleccionEndulzanteTemp : '', 
-                seleccionTamanoTemp, 
-                seleccionPromoTemp, 
-                nota,
-                productoPendiente.nombre
-            );
-            cerrarModalPersonalizar();
-        }
-
-        function procesarAdicionFinal(precioFinal, tipoLeche = '', tipoEndulzante = '', tamano = '', promo = '', nota = '', nombrePersonalizado = '') {
-            if (!productoPendiente) return;
-            let { id, cliente } = productoPendiente;
-            let nombreFinal = nombrePersonalizado || productoPendiente.nombre;
-            let itemKey = `${id}-${cliente}-${tipoLeche}-${tipoEndulzante}-${tamano}-${promo}-${nota}-${nombreFinal}`;
-            let itemExistente = carrito.find(item => item.key === itemKey);
-
-            if (itemExistente) {
-                itemExistente.cantidad += 1;
-            } else {
-                carrito.push({ key: itemKey, id, nombre: nombreFinal, precio: precioFinal, cantidad: 1, cliente, tipoLeche, tipoEndulzante, tamano, promo, nota });
-            }
-            productoPendiente = null;
-            actualizarCarritoUI();
-        }
-
-        function actualizarCarritoUI() {
-            const panel = document.getElementById('contenedor-resumen-pedido');
-            const lista = document.getElementById('lista-carrito');
-            const totalSpan = document.getElementById('total-carrito');
-
-            if (carrito.length === 0) { panel.style.display = 'none'; return; }
-            panel.style.display = 'block';
-            lista.innerHTML = '';
-            let total = 0;
-
-            carrito.forEach((item, index) => {
-                let subtotal = item.precio * item.cantidad;
-                total += subtotal;
-                let badgeCliente = tipoCuentaSeleccionada === 'separadas' ? `<span class="badge bg-secondary mb-1">👤 ${item.cliente}</span>` : '';
-                let detallesExtras = '';
-                if (item.tamano) detallesExtras += `<br><small class="text-info">📏 Tamaño: ${item.tamano}</small>`;
-                if (item.promo) detallesExtras += `<br><small style="color: var(--accent-gold);">🌅 Incluye: ${item.promo}</small>`;
-                if (item.tipoLeche && item.tipoLeche !== 'Entera') detallesExtras += `<br><small style="color: var(--accent-gold);">🥛 Leche: ${item.tipoLeche}</small>`;
-                if (item.tipoEndulzante && item.tipoEndulzante !== 'Azúcar') detallesExtras += `<br><small style="color: var(--accent-gold);">🍯 Endulzante: ${item.tipoEndulzante}</small>`;
-                if (item.nota) detallesExtras += `<br><small style="color: var(--text-muted);">📝 ${item.nota}</small>`;
-
-                lista.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary py-2">
-                        <div>
-                            ${badgeCliente}
-                            <div class="fw-bold" style="color: var(--text-main);">${item.cantidad}x ${item.nombre}</div>
-                            ${detallesExtras}
-                            <div class="small" style="color: var(--text-muted);">Q ${subtotal.toFixed(2)}</div>
-                        </div>
-                        <button class="btn btn-outline-danger btn-sm py-0 px-2 mt-1" onclick="removerDelCarrito(${index})">❌</button>
+            if (data.tipo === 'alerta') {
+                tarjetaFlash.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">${data.titulo}</h5>
+                        <span class="badge bg-danger fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                    </div>
+                    <p class="mt-2 mb-2 text-dark">${data.mensaje}</p>
+                    <div class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary py-0" onclick="marcarAtendido(this)">Marcar atendido</button>
                     </div>
                 `;
-            });
-            totalSpan.innerText = `Q ${total.toFixed(2)}`;
+            } else if (data.tipo === 'nuevo_pedido') {
+                let itemsHtml = data.items.map(i => {
+                    let detalles = '';
+                    if (i.subcategoria) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🏷️ Variante: ${i.subcategoria}</small>`;
+                    if (i.tamano) detalles += `<br><small class="text-secondary ms-3">📏 Tamaño: ${i.tamano}</small>`;
+                    if (i.promo) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🌅 Promo: ${i.promo}</small>`;
+                    if (i.tipoLeche) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🥛 Leche: ${i.tipoLeche}</small>`;
+                    if (i.tipoEndulzante) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🍯 Endulzante: ${i.tipoEndulzante}</small>`;
+                    if (i.nota) detalles += `<br><small class="text-secondary ms-3">📝 Nota: ${i.nota}</small>`;
+                    return `<li class="mb-2"><b>[${i.cliente || 'General'}]</b> ${i.cantidad || 1}x ${i.nombre} (Q ${(i.precio * (i.cantidad || 1)).toFixed(2)})${detalles}</li>`;
+                }).join('');
+
+                tarjetaFlash.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="m-0 fw-bold" style="color: var(--accent-gold);">🚀 Nuevo Pedido</h5>
+                        <span class="badge bg-success fs-6 px-3 py-1">Mesa #${data.mesa}</span>
+                    </div>
+                    <ul class="mt-2 mb-2 ps-3 text-dark small">${itemsHtml}</ul>
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-color: var(--border-subtle) !important;">
+                        <span class="fw-bold fs-6" style="color: var(--accent-gold);">Total: Q ${data.total.toFixed(2)}</span>
+                        <button class="btn btn-sm btn-amber py-1" onclick="marcarAtendido(this)">Completar Pedido</button>
+                    </div>
+                `;
+            }
+            contenedor.prepend(tarjetaFlash);
         }
 
-        function removerDelCarrito(index) { carrito.splice(index, 1); actualizarCarritoUI(); }
-        function toggleBotonEnviar() {
-            const check = document.getElementById('checkRevisado');
-            const boton = document.getElementById('btn-enviar-pedido');
-            if (check && boton) boton.disabled = !check.checked;
-        }
-
-        async function enviarPedido() {
-            if (carrito.length === 0) return;
-            let total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            let payload = { mesa: parseInt(numeroMesa), items: carrito, total: total };
-            try {
-                let respuesta = await fetch('/api/enviar-pedido', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (respuesta.ok) {
-                    carrito = [];
-                    actualizarCarritoUI();
-                    document.getElementById('contenedor-resumen-pedido').style.display = 'none';
-                    document.getElementById('checkRevisado').checked = false;
-                    toggleBotonEnviar();
-                    document.getElementById('modal-agradecimiento').style.display = 'flex';
-                }
-            } catch (e) { alert("Error de conexión."); }
-        }
-        function cerrarMensajeAgradecimiento() { document.getElementById('modal-agradecimiento').style.display = 'none'; }
-        async function enviarAlerta(tipo) {
-            try {
-                let res = await fetch('/api/alerta-mesero', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mesa: parseInt(numeroMesa), tipo: tipo })
-                });
-                if(res.ok) alert(tipo === 'mesero' ? "🔔 Se ha notificado al mesero." : "🧾 Solicitud de cuenta enviada.");
-            } catch (e) { alert("Error de conexión."); }
+        function marcarAtendido(button) {
+            button.closest('.notid-card').remove();
+            if (contadorNotificaciones > 0) {
+                contadorNotificaciones--;
+                actualizarContadorVisual();
+            }
+            const contenedor = document.getElementById('contenedor-alertas');
+            if (contenedor.children.length === 0) {
+                contenedor.innerHTML = `<div id="mensaje-vacio" class="p-4 text-center" style="color: var(--text-muted);">⏳ Esperando órdenes o llamadas de las mesas...</div>`;
+            }
         }
     </script>
 </body>
