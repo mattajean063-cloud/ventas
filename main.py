@@ -164,8 +164,9 @@ async def agregar_producto(request: Request):
         horario = form_data.get("horario", "Ambos")
         config_tamano = form_data.get("config_tamano", "ninguno")
         subcategorias = form_data.get("subcategorias", "")
-        admite_promo = True if form_data.get("admite_promo") == "true" else False
-        admite_extras_cafe = True if form_data.get("admite_extras_cafe") == "true" else False
+        
+        admite_promo = True if form_data.get("admite_promo") in ["true", "on", True] else False
+        admite_extras_cafe = True if form_data.get("admite_extras_cafe") in ["true", "on", True] else False
         
         imagen_file = form_data.get("imagen_file")
         imagen_base64 = ""
@@ -189,7 +190,11 @@ async def agregar_producto(request: Request):
             "imagen": imagen_base64
         }
         
-        db_headers = {**HEADERS, "Content-Type": "application/json"}
+        db_headers = {
+            **HEADERS, 
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+        }
         res = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
         print("STATUS SUPABASE:", res.status_code)
         print("RESPUESTA SUPABASE:", res.text)
