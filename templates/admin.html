@@ -86,7 +86,6 @@
             border: 1px solid var(--border-subtle);
         }
 
-        /* Estilo para la burbuja de notificación estilo WhatsApp */
         .badge-whatsapp {
             background-color: #25d366;
             color: white;
@@ -104,12 +103,14 @@
 <body class="p-4">
     <div class="container-fluid" style="max-width: 1300px;">
         
-        <!-- Cabecera Superior con Interruptor de Turno -->
-        <div class="card-colonial p-4 mb-4">
+        <!-- Cabecera Superior con Logo Arriba de la Tabla e Interruptor de Turno -->
+        <div class="card-colonial p-4 mb-4 text-center">
+            <div class="mb-3">
+                <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">☕ Don Nicolás</h2>
+            </div>
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div class="d-flex align-items-center">
-                    <h2 style="color: var(--accent-gold);" class="fw-bold m-0 fs-2">🖥️ Monitor y Gestión - Don Nicolás</h2>
-                    <!-- Burbuja de notificaciones a la par del título -->
+                    <h4 style="color: var(--accent-gold);" class="fw-bold m-0 fs-4">🖥️ Monitor y Gestión</h4>
                     <span id="badge-contador" class="badge-whatsapp" style="display: none;">0</span>
                 </div>
                 
@@ -169,7 +170,7 @@
                                     <input type="text" class="form-control" name="nombre" placeholder="Ej. Café Filtrado" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio (Q)</label>
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Precio Base (Q)</label>
                                     <input type="number" step="0.01" class="form-control" name="precio" placeholder="0.00" required>
                                 </div>
                                 <div class="mb-3">
@@ -184,6 +185,11 @@
                                         <option value="Cócteles y Café Filtrado">Cócteles y Café Filtrado</option>
                                         <option value="Extras">Extras</option>
                                     </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold" style="color: var(--text-muted);">Subcategoría / Opciones (Opcional - Formato: Nombre:Precio, separadas por comas)</label>
+                                    <input type="text" class="form-control" name="subcategorias" placeholder="Ej: Chocolate:25, Vainilla:28">
+                                    <small class="text-muted" style="font-size: 0.75rem;">Útil para Muffins, Tacos, Waffles de la tarde, Galletas, etc.</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold" style="color: var(--text-muted);">Horario (Solo Comida)</label>
@@ -247,7 +253,8 @@
                                     <th>Imagen y Cambiar</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
-                                    <th>Precio (Q)</th>
+                                    <th>Precio Base (Q)</th>
+                                    <th>Subcategorías / Variantes</th>
                                     <th>Tamaño / Config</th>
                                     <th>Horario Comida</th>
                                     <th>Acción</th>
@@ -275,6 +282,12 @@
                                         <form action="/admin/actualizar-precio/{{ p.id }}" method="POST" class="d-flex gap-2 align-items-center">
                                             <input type="number" step="0.01" name="nuevo_precio" value="{{ p.precio }}" class="form-control form-control-sm text-center" style="width: 85px;" required>
                                             <button type="submit" class="btn btn-success btn-sm px-2 py-1">Guardar</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/actualizar-subcategorias/{{ p.id }}" method="POST" class="d-flex flex-column gap-1">
+                                            <input type="text" name="subcategorias" value="{{ p.subcategorias|default('') }}" class="form-control form-control-sm" style="width: 160px; font-size: 0.8rem;" placeholder="Ej: Choco:25, Fresa:28">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm py-0" style="font-size: 0.7rem;">Guardar Opciones</button>
                                         </form>
                                     </td>
                                     <td>
@@ -338,7 +351,6 @@
             document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
         }
 
-        // --- SISTEMA HÍBRIDO: WEBSOCKET + RESPALDO HTTP AUTOMÁTICO ---
         function conectarWebSocket() {
             let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
@@ -362,9 +374,7 @@
                         procesarYMostrarEvento(evento);
                     });
                 }
-            } catch (error) {
-                // Silenciar errores menores
-            }
+            } catch (error) {}
         }
 
         function actualizarContadorVisual() {
@@ -381,7 +391,6 @@
             }
         }
 
-        // --- REPRODUCTOR DE SONIDO NATIVO ---
         function reproducirSonidoAlerta() {
             try {
                 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -400,9 +409,7 @@
                 
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {
-                console.log("Audio bloqueado temporalmente por políticas del navegador.");
-            }
+            } catch (e) {}
         }
 
         window.onload = function() { 
@@ -437,12 +444,10 @@
             if (idsEventosProcesados.has(idUnico)) return;
             idsEventosProcesados.add(idUnico);
 
-            // 1. Contador y sonido
             contadorNotificaciones++;
             actualizarContadorVisual();
             reproducirSonidoAlerta();
 
-            // 2. Notificación flotante en la esquina estilo WhatsApp
             if (window.Notification && Notification.permission === "granted") {
                 let tituloNoti = data.tipo === 'alerta' ? data.titulo : `🚀 Nuevo Pedido - Mesa #${data.mesa}`;
                 let cuerpoNoti = data.tipo === 'alerta' ? data.mensaje : `Total a cobrar: Q ${data.total.toFixed(2)}`;
@@ -459,7 +464,6 @@
                 };
             }
 
-            // 3. Pintar tarjeta en el monitor interno
             const contenedor = document.getElementById('contenedor-alertas');
             const mensajeVacio = document.getElementById('mensaje-vacio');
             if (mensajeVacio) mensajeVacio.remove();
@@ -481,6 +485,7 @@
             } else if (data.tipo === 'nuevo_pedido') {
                 let itemsHtml = data.items.map(i => {
                     let detalles = '';
+                    if (i.subcategoria) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🏷️ Variante: ${i.subcategoria}</small>`;
                     if (i.tamano) detalles += `<br><small class="text-secondary ms-3">📏 Tamaño: ${i.tamano}</small>`;
                     if (i.promo) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🌅 Promo: ${i.promo}</small>`;
                     if (i.tipoLeche) detalles += `<br><small class="ms-3" style="color: var(--accent-gold);">🥛 Leche: ${i.tipoLeche}</small>`;
