@@ -285,6 +285,24 @@
                 <div class="form-check text-start"><input class="form-check-input check-carne" type="checkbox" value="pollo con salsa de maracuyá" id="c4" onclick="limitarSeleccionCarnes(this)"><label class="form-check-label small" for="c4">Pollo con salsa de maracuyá</label></div>
             </div>
 
+            <!-- SECCIÓN DE PROMO Y BEBIDA INCLUIDA PARA TACOS -->
+            <div id="seccion-promo-tacos" class="mb-3" style="display: none;">
+                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🌅 Opción Incluida / Cambio a Latte (+Q12):</label>
+                <div class="row g-2 mb-2">
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcionTacosPromo('Café Negro', this, 0)">Café Negro</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcionTacosPromo('Jugo Naranja', this, 0)">Jugo Naranja</div></div>
+                    <div class="col-4"><div class="opcion-btn" onclick="seleccionarOpcionTacosPromo('Té', this, 0)">Té</div></div>
+                </div>
+                <div class="d-grid">
+                    <div class="opcion-btn" style="color: var(--accent-gold);" onclick="seleccionarOpcionTacosPromo('Cambiar a Latte', this, 12)">✨ Cambiar a Latte (+Q12)</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">📝 Nota Adicional (Opcional):</label>
+                <input type="text" id="input-nota-tacos" class="form-control" placeholder="Ej. Sin cebolla...">
+            </div>
+
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-outline-secondary w-50 py-2" style="border-color: var(--border-subtle); color: var(--text-main);" onclick="cerrarModalTacos()">Cancelar</button>
                 <button class="btn btn-amber w-50 py-2" onclick="confirmarSeleccionTacos()">Confirmar</button>
@@ -418,6 +436,8 @@
         let seleccionPromoTemp = '';
         let costoExtraLeche = 0;
         let costoExtraPromo = 0;
+        let seleccionPromoTacosTemp = '';
+        let costoExtraPromoTacos = 0;
         let categoriaActivaFiltro = 'todos';
 
         function seleccionarTipoCuenta(tipo) {
@@ -552,11 +572,26 @@
                 }
             });
 
-            // Limpiar checkboxes y ocultar sección mixtos al abrir
+            // Limpiar campos y secciones al abrir
             document.querySelectorAll('.check-carne').forEach(chk => chk.checked = false);
             document.getElementById('contenedor-sub-mixtos').style.display = 'none';
+            document.getElementById('input-nota-tacos').value = '';
 
-            // Evaluar de entrada por si la primera opción por defecto es mixtos
+            let bannerManana = document.getElementById('banner-turno-manana');
+            let esComida = prod.categoria === 'Comida';
+            let seccionPromoTacos = document.getElementById('seccion-promo-tacos');
+            
+            if (bannerManana && esComida && prod.admitePromo) {
+                seccionPromoTacos.style.display = 'block';
+                seleccionPromoTacosTemp = '';
+                costoExtraPromoTacos = 0;
+                document.querySelectorAll('#seccion-promo-tacos .opcion-btn').forEach(b => b.classList.remove('selected'));
+            } else {
+                seccionPromoTacos.style.display = 'none';
+                seleccionPromoTacosTemp = '';
+                costoExtraPromoTacos = 0;
+            }
+
             verificarOpcionMixta(selectElem);
 
             document.getElementById('modal-tacos').style.display = 'flex';
@@ -581,6 +616,13 @@
             }
         }
 
+        function seleccionarOpcionTacosPromo(valor, elemento, extra = 0) {
+            elemento.parentElement.parentElement.querySelectorAll('#seccion-promo-tacos .opcion-btn').forEach(b => b.classList.remove('selected'));
+            elemento.classList.add('selected');
+            seleccionPromoTacosTemp = valor;
+            costoExtraPromoTacos = extra;
+        }
+
         function cerrarModalTacos() {
             document.getElementById('modal-tacos').style.display = 'none';
             productoPendiente = null;
@@ -594,7 +636,7 @@
 
             let partesVal = val.split('|');
             let subcatNombre = partesVal[0];
-            let subcatPrecio = parseFloat(partesVal[1]);
+            let subcatPrecio = parseFloat(partesVal[1]) + costoExtraPromoTacos;
 
             let detalleMixto = "";
             if (subcatNombre.toLowerCase().includes('mixto')) {
@@ -607,8 +649,14 @@
                 detalleMixto = ` (${carnesElegidas})`;
             }
 
+            let notaInput = document.getElementById('input-nota-tacos').value.trim();
+            let partesNota = [];
+            partesNota.push(`Opción: ${subcatNombre}${detalleMixto}`);
+            if (seleccionPromoTacosTemp) partesNota.push(`Incluye: ${seleccionPromoTacosTemp}`);
+            if (notaInput) partesNota.push(`Nota: ${notaInput}`);
+
             let nombrePersonalizado = `${productoPendiente.nombre} (${subcatNombre}${detalleMixto})`;
-            procesarAdicionFinal(subcatPrecio, '', '', '', '', `Opción: ${subcatNombre}${detalleMixto}`, nombrePersonalizado, subcatNombre);
+            procesarAdicionFinal(subcatPrecio, '', '', '', seleccionPromoTacosTemp, partesNota.join(' | '), nombrePersonalizado, subcatNombre);
             cerrarModalTacos();
         }
 
