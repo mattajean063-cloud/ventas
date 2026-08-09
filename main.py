@@ -154,43 +154,48 @@ async def obtener_eventos():
     return eventos_a_enviar
 
 @app.post("/admin/agregar")
-async def agregar_producto(
-    nombre: str = Form(...), 
-    precio: float = Form(...), 
-    categoria: str = Form(...), 
-    descripcion: str = Form(default=""), 
-    horario: str = Form(default="Ambos"), 
-    config_tamano: str = Form(default="ninguno"),
-    subcategorias: str = Form(default=""),
-    admite_promo: Optional[str] = Form(default=None),
-    admite_extras_cafe: Optional[str] = Form(default=None),
-    imagen_file: UploadFile = File(default=None)
-):
+async def agregar_producto(request: Request):
     try:
+        form_data = await request.form()
+        nombre = form_data.get("nombre")
+        precio = float(form_data.get("precio", 0))
+        categoria = form_data.get("categoria")
+        descripcion = form_data.get("descripcion", "")
+        horario = form_data.get("horario", "Ambos")
+        config_tamano = form_data.get("config_tamano", "ninguno")
+        subcategorias = form_data.get("subcategorias", "")
+        admite_promo = True if form_data.get("admite_promo") == "true" else False
+        admite_extras_cafe = True if form_data.get("admite_extras_cafe") == "true" else False
+        
+        imagen_file = form_data.get("imagen_file")
         imagen_base64 = ""
-        if imagen_file and imagen_file.filename:
+        if imagen_file and hasattr(imagen_file, "filename") and imagen_file.filename:
             file_bytes = await imagen_file.read()
             if file_bytes:
                 encoded_image = base64.b64encode(file_bytes).decode('utf-8')
                 content_type = imagen_file.content_type or "image/jpeg"
                 imagen_base64 = f"data:{content_type};base64,{encoded_image}"
-        
+
         payload = {
             "nombre": nombre,
-            "precio": float(precio),
+            "precio": precio,
             "categoria": categoria,
             "descripcion": descripcion,
             "horario": horario if categoria == "Comida" else "Ambos",
             "config_tamano": config_tamano,
-            "subcategorias": subcategorias if subcategorias else "",
-            "admite_promo": True if admite_promo == "true" else False,
-            "admite_extras_cafe": True if admite_extras_cafe == "true" else False,
+            "subcategorias": subcategorias,
+            "admite_promo": admite_promo,
+            "admite_extras_cafe": admite_extras_cafe,
             "imagen": imagen_base64
         }
+        
         db_headers = {**HEADERS, "Content-Type": "application/json"}
         res = requests.post(f"{SUPABASE_URL}/rest/v1/productos", headers=db_headers, json=payload)
-        print("RESPUESTA SUPABASE AL AGREGAR:", res.status_code, res.text)
-    except Exception as e: print("ERROR EN /admin/agregar:", e)
+        print("STATUS SUPABASE:", res.status_code)
+        print("RESPUESTA SUPABASE:", res.text)
+    except Exception as e:
+        print("EXCEPCIÓN EN /admin/agregar:", e)
+    
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/actualizar-imagen/{producto_id}")
