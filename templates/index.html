@@ -272,8 +272,17 @@
             
             <div id="selector-subcategoria-dinamico" class="mb-3">
                 <label class="form-label small fw-bold mb-1" style="color: var(--accent-gold);">🏷️ Variante / Opción:</label>
-                <select id="select-subcategoria-opcion" class="form-select">
+                <select id="select-subcategoria-opcion" class="form-select" onchange="verificarOpcionMixta(this)">
                 </select>
+            </div>
+
+            <!-- CONTENEDOR NUEVO PARA ELEGIR 2 CARNES CUANDO SE SELECCIONA MIXTOS -->
+            <div id="contenedor-sub-mixtos" style="display: none;" class="mb-3 p-3 border rounded bg-light">
+                <label class="form-label small fw-bold text-dark mb-2">🌮 Seleccione exactamente 2 carnes para su mixto:</label>
+                <div class="form-check text-start"><input class="form-check-input check-carne" type="checkbox" value="4 carnes" id="c1" onclick="limitarSeleccionCarnes(this)"><label class="form-check-label small" for="c1">4 carnes</label></div>
+                <div class="form-check text-start"><input class="form-check-input check-carne" type="checkbox" value="cochinita pibil" id="c2" onclick="limitarSeleccionCarnes(this)"><label class="form-check-label small" for="c2">Cochinita Pibil</label></div>
+                <div class="form-check text-start"><input class="form-check-input check-carne" type="checkbox" value="quesillo y chorizo" id="c3" onclick="limitarSeleccionCarnes(this)"><label class="form-check-label small" for="c3">Quesillo y Chorizo</label></div>
+                <div class="form-check text-start"><input class="form-check-input check-carne" type="checkbox" value="pollo con salsa de maracuyá" id="c4" onclick="limitarSeleccionCarnes(this)"><label class="form-check-label small" for="c4">Pollo con salsa de maracuyá</label></div>
             </div>
 
             <div class="d-flex gap-2 mt-4">
@@ -543,7 +552,33 @@
                 }
             });
 
+            // Limpiar checkboxes y ocultar sección mixtos al abrir
+            document.querySelectorAll('.check-carne').forEach(chk => chk.checked = false);
+            document.getElementById('contenedor-sub-mixtos').style.display = 'none';
+
+            // Evaluar de entrada por si la primera opción por defecto es mixtos
+            verificarOpcionMixta(selectElem);
+
             document.getElementById('modal-tacos').style.display = 'flex';
+        }
+
+        function verificarOpcionMixta(selectElem) {
+            let val = selectElem.value;
+            let contenedorMixtos = document.getElementById('contenedor-sub-mixtos');
+            if (val && val.toLowerCase().includes('mixto')) {
+                contenedorMixtos.style.display = 'block';
+            } else {
+                contenedorMixtos.style.display = 'none';
+                document.querySelectorAll('.check-carne').forEach(chk => chk.checked = false);
+            }
+        }
+
+        function limitarSeleccionCarnes(checkbox) {
+            let seleccionados = document.querySelectorAll('.check-carne:checked');
+            if (seleccionados.length > 2) {
+                checkbox.checked = false;
+                alert("Solo puede seleccionar máximo 2 carnes para el mixto.");
+            }
         }
 
         function cerrarModalTacos() {
@@ -561,8 +596,19 @@
             let subcatNombre = partesVal[0];
             let subcatPrecio = parseFloat(partesVal[1]);
 
-            let nombrePersonalizado = `${productoPendiente.nombre} (${subcatNombre})`;
-            procesarAdicionFinal(subcatPrecio, '', '', '', '', `Opción: ${subcatNombre}`, nombrePersonalizado, subcatNombre);
+            let detalleMixto = "";
+            if (subcatNombre.toLowerCase().includes('mixto')) {
+                let seleccionados = document.querySelectorAll('.check-carne:checked');
+                if (seleccionados.length < 2) {
+                    alert("Por favor seleccione exactamente 2 carnes para su mixto.");
+                    return;
+                }
+                let carnesElegidas = Array.from(seleccionados).map(chk => chk.value).join(' y ');
+                detalleMixto = ` (${carnesElegidas})`;
+            }
+
+            let nombrePersonalizado = `${productoPendiente.nombre} (${subcatNombre}${detalleMixto})`;
+            procesarAdicionFinal(subcatPrecio, '', '', '', '', `Opción: ${subcatNombre}${detalleMixto}`, nombrePersonalizado, subcatNombre);
             cerrarModalTacos();
         }
 
